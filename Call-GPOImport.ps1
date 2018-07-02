@@ -18,7 +18,7 @@ Import-Module $env:USERPROFILE\Desktop\GPOMigration\GPOMigration -Force
 # This path must be absolute, not relative
 $date = (get-date).ToString("mmddyyyy")
 $Path        = $PWD  # Current folder specified in Set-Location above
-$BackupPath  = "C:\Users\Administrator\Desktop\GPOMigrationWorkingFolder\GPO Backup.domain.local 2018-07-02-10-47-11\"
+$BackupPath  = "C:\Users\Administrator\Desktop\GPOMigrationWorkingFolder\GPO Backup.domain.local 2018-07-02-12-55-21\"
 New-Item -ItemType Directory $BackupPath -ea SilentlyContinue 
 
 ###############################################################################

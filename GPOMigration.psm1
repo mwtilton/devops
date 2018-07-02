@@ -1,103 +1,5 @@
-#.ExternalHelp GPOMigration.psm1-help.xml
-function Invoke-BackupGPO {
-Param(
-    [Parameter(Mandatory=$true,
-        ParameterSetName="All")]
-    [Switch]
-    $All, # Backup all GPOs
-    [Parameter(Mandatory=$true,
-        ValueFromPipelineByPropertyName=$true,
-        ParameterSetName="DisplayName")]
-    [String[]]
-    $DisplayName, # Array of GPO DisplayNames to backup
-    [Parameter(Mandatory=$true)]
-    [String]
-    $SrceDomain,
-    [Parameter(Mandatory=$true)]
-    [String]
-    $SrceServer,
-    [Parameter(Mandatory=$true)]
-    [ValidateScript({Test-Path $_})]
-    [String]
-    $Path # Base path where backup folder will be created
-)
-    $BackupPath = Join-Path $Path "\GPO Backup $SrceDomain $(Get-Date -Format 'yyyy-MM-dd-HH-mm-ss')\"
-    New-Item -Path $BackupPath -ItemType Directory -Force | Out-Null
-    
-    If ($All) {
-        Backup-GPO -Server $SrceServer -Domain $SrceDomain -Path $BackupPath -All | Out-Null
-    } Else {
-        ForEach ($Name in $DisplayName) {
-            Backup-GPO -Server $SrceServer -Domain $SrceDomain -Path $BackupPath -Name $Name | Out-Null
-        }
-    }
-
-    # Backup WMI filters
-    If ($All) {
-        $WMIFilterNames = Get-GPO -All |
-            Where-Object {$_.WmiFilter} |
-            Select-Object -ExpandProperty WmiFilter |
-            Select-Object -ExpandProperty Name -Unique
-    } Else {
-        $WMIFilterNames = Get-GPO -All |
-            Where-Object {$DisplayName -contains $_.DisplayName -and $_.WmiFilter} |
-            Select-Object -ExpandProperty WmiFilter |
-            Select-Object -ExpandProperty Name -Unique
-    }
-    If ($WMIFilterNames) {
-        Export-WMIFilter -Name $WMIFilterNames -SrceServer $SrceServer -Path $BackupPath
-    } Else {
-        Write-Host "No WMI filters to export."
-    }
-
-    return $BackupPath
-}
 
 
-#.ExternalHelp GPOMigration.psm1-help.xml
-function Export-GPPermission {
-Param(
-    [Parameter(Mandatory=$true,
-        ParameterSetName="All")]
-    [Switch]
-    $All, # Backup all GPOs
-    [Parameter(Mandatory=$true,
-        ValueFromPipelineByPropertyName=$true,
-        ParameterSetName="DisplayName")]
-    [String[]]
-    $DisplayName, # Array of GPO DisplayNames to backup
-    [Parameter(Mandatory=$true)]
-    [String]
-    $SrceDomain,
-    [Parameter(Mandatory=$true)]
-    [String]
-    $SrceServer,
-    [Parameter(Mandatory=$true)]
-    [ValidateScript({Test-Path $_})]
-    [String]
-    $Path
-)
-    $GPO_ACEs = @()
-    
-    If ($All) {
-        $DisplayName = Get-GPO -Server $SrceServer -Domain $SrceDomain -All |
-            Select-Object -ExpandProperty DisplayName
-    }
-
-    ForEach ($Name in $DisplayName) {
-        $GPO = Get-GPO -Server $SrceServer -Domain $SrceDomain -Name $Name
-        # Using the NTSecurityDescriptor attribute instead of calling Get-ACL
-        $ACL = (Get-ADObject -Identity $GPO.Path -Properties NTSecurityDescriptor |
-            Select-Object -ExpandProperty NTSecurityDescriptor).Access
-
-        $GPO_ACEs += $ACL | Select-Object `
-                @{name='Name';expression={$Name}}, `
-                @{name='Path';expression={$GPO.Path}}, `
-                *                
-    }
-    
-    $GPO_ACEs | Export-CSV (Join-Path $Path GPPermissions.csv) -NoTypeInformation
-}
 
 
 #.ExternalHelp GPOMigration.psm1-help.xml
@@ -801,38 +703,6 @@ Param (
 }
 
 
-#.ExternalHelp GPOMigration.psm1-help.xml
-Function Start-GPOExport {
-Param (
-    [Parameter(Mandatory=$true)]
-    [String]
-    $SrceDomain,
-    [Parameter(Mandatory=$true)]
-    [String]
-    $SrceServer,
-    [Parameter(Mandatory=$true)]
-    [String[]]
-    $DisplayName,
-    [Parameter(Mandatory=$true)]
-    [ValidateScript({Test-Path $_})]
-    [String]
-    $Path  # Working path to store migration tables and backups
-)
-    # Backup the GPOs
-    # Capture the backup path for subsequent cmdlets
-    # Dump the WMI filters also
-    $BackupPath = Invoke-BackupGPO -SrceDomain $SrceDomain -SrceServer $SrceServer -DisplayName $DisplayName -Path $Path
-    
-    # Dump the permissions
-    Export-GPPermission -SrceDomain $SrceDomain -SrceServer $SrceServer -DisplayName $DisplayName -Path $BackupPath
-
-    # Dump the WMI filters
-    # This is called from Invoke-BackupGPO
-    #Export-WMIFilter -SrceServer $SrceServer -Path $BackupPath
-
-    "Use this path as input for the import command."
-    "BackupPath: ""$BackupPath"""
-} # End Function
 
 
 #.ExternalHelp GPOMigration.psm1-help.xml
@@ -937,4 +807,151 @@ either restarting the NTDS service or rebooting the server.
         }
 
     } # End If
+}
+
+
+
+##############################################################################################################
+#Export Related Functions
+
+
+#.ExternalHelp GPOMigration.psm1-help.xml
+Function Start-GPOExport {
+    Param (
+        [Parameter(Mandatory=$true)]
+        [String]
+        $SrceDomain,
+        [Parameter(Mandatory=$true)]
+        [String]
+        $SrceServer,
+        [Parameter(Mandatory=$true)]
+        [String[]]
+        $DisplayName,
+        [Parameter(Mandatory=$true)]
+        [ValidateScript({Test-Path $_})]
+        [String]
+        $Path  # Working path to store migration tables and backups
+    )
+    # Backup the GPOs
+    # Capture the backup path for subsequent cmdlets
+    # Dump the WMI filters also
+    $BackupPath = Invoke-BackupGPO -SrceDomain $SrceDomain -SrceServer $SrceServer -DisplayName $DisplayName -Path $Path
+    
+    # Dump the permissions
+    Export-GPPermission -SrceDomain $SrceDomain -SrceServer $SrceServer -DisplayName $DisplayName -Path $BackupPath
+
+    # Dump the WMI filters
+    # This is called from Invoke-BackupGPO
+    #Export-WMIFilter -SrceServer $SrceServer -Path $BackupPath
+
+    "Use this path as input for the import command."
+    "BackupPath: ""$BackupPath"""
+} # End Function
+
+
+
+#.ExternalHelp GPOMigration.psm1-help.xml
+function Invoke-BackupGPO {
+    Param(
+        [Parameter(Mandatory=$true,
+            ParameterSetName="All")]
+        [Switch]
+        $All, # Backup all GPOs
+        [Parameter(Mandatory=$true,
+            ValueFromPipelineByPropertyName=$true,
+            ParameterSetName="DisplayName")]
+        [String[]]
+        $DisplayName, # Array of GPO DisplayNames to backup
+        [Parameter(Mandatory=$true)]
+        [String]
+        $SrceDomain,
+        [Parameter(Mandatory=$true)]
+        [String]
+        $SrceServer,
+        [Parameter(Mandatory=$true)]
+        [ValidateScript({Test-Path $_})]
+        [String]
+        $Path # Base path where backup folder will be created
+    )
+
+    $BackupPath = Join-Path $Path "\GPO Backup $SrceDomain $(Get-Date -Format 'yyyy-MM-dd-HH-mm-ss')\"
+    New-Item -Path $BackupPath -ItemType Directory -Force | Out-Null
+    
+    If ($All) {
+        Backup-GPO -Server $SrceServer -Domain $SrceDomain -Path $BackupPath -All | Out-Null
+    } 
+    Else {
+        ForEach ($Name in $DisplayName) {
+            Backup-GPO -Server $SrceServer -Domain $SrceDomain -Path $BackupPath -Name $Name | Out-Null
+        }
+    }
+
+    # Backup WMI filters
+    If ($All) {
+        $WMIFilterNames = Get-GPO -All |
+            Where-Object {$_.WmiFilter} |
+            Select-Object -ExpandProperty WmiFilter |
+            Select-Object -ExpandProperty Name -Unique
+    } 
+    Else {
+        $WMIFilterNames = Get-GPO -All |
+            Where-Object {$DisplayName -contains $_.DisplayName -and $_.WmiFilter} |
+            Select-Object -ExpandProperty WmiFilter |
+            Select-Object -ExpandProperty Name -Unique
+    }
+    If ($WMIFilterNames) {
+        Export-WMIFilter -Name $WMIFilterNames -SrceServer $SrceServer -Path $BackupPath
+    } 
+    Else {
+        Write-Host "No WMI filters to export."
+    }
+
+    return $BackupPath
+}
+
+
+
+#.ExternalHelp GPOMigration.psm1-help.xml
+function Export-GPPermission {
+    Param(
+        [Parameter(Mandatory=$true,
+            ParameterSetName="All")]
+        [Switch]
+        $All, # Backup all GPOs
+        [Parameter(Mandatory=$true,
+            ValueFromPipelineByPropertyName=$true,
+            ParameterSetName="DisplayName")]
+        [String[]]
+        $DisplayName, # Array of GPO DisplayNames to backup
+        [Parameter(Mandatory=$true)]
+        [String]
+        $SrceDomain,
+        [Parameter(Mandatory=$true)]
+        [String]
+        $SrceServer,
+        [Parameter(Mandatory=$true)]
+        [ValidateScript({Test-Path $_})]
+        [String]
+        $Path
+    )
+    $GPO_ACEs = @()
+    
+    If ($All) {
+        $DisplayName = Get-GPO -Server $SrceServer -Domain $SrceDomain -All |
+            Select-Object -ExpandProperty DisplayName
+    }
+
+    ForEach ($Name in $DisplayName) {
+        $GPO = Get-GPO -Server $SrceServer -Domain $SrceDomain -Name $Name
+        # Using the NTSecurityDescriptor attribute instead of calling Get-ACL
+        $ACL = (Get-ADObject -Identity $GPO.Path -Properties NTSecurityDescriptor |
+            Select-Object -ExpandProperty NTSecurityDescriptor).Access
+
+        $GPO_ACEs += $ACL | Select-Object `
+                @{name='Name';expression={$Name}}, `
+                @{name='Path';expression={$GPO.Path}}, `
+                *                
+    }
+    
+    $GPO_ACEs | Export-CSV (Join-Path $Path GPPermissions.csv) -NoTypeInformation
 }

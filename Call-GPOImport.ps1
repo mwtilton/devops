@@ -18,14 +18,14 @@ Import-Module $env:USERPROFILE\Desktop\GPOMigration\GPOMigration -Force
 # This path must be absolute, not relative
 $date = (get-date).ToString("mmddyyyy")
 $Path        = $PWD  # Current folder specified in Set-Location above
-$BackupPath  = "C:\Users\Administrator\Desktop\GPOMigrationWorkingFolder\GPO Backup.domain.local 2018-07-02-12-55-21\"
+$BackupPath  = "C:\Users\Administrator\Desktop\GPOMigrationWorkingFolder\GPO Backup.domain.local 2018-07-02-14-45-54\"
 New-Item -ItemType Directory $BackupPath -ea SilentlyContinue 
 
 ###############################################################################
 # IMPORT PROCESS
 ###############################################################################
-$DestDomain  = .domain.local'
-$DestServer  = 'dc01.domain.local'
+$DestDomain  = $env:USERDNSDOMAIN
+$DestServer  = "$env:COMPUTERNAME.$env:USERDNSDOMAIN"
 $MigTableCSVPath = "$env:USERPROFILE\Desktop\GPOMigration\MigTable_sample.csv"
 
 Start-GPOImport `

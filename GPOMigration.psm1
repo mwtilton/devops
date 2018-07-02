@@ -1,21 +1,20 @@
-
-
-
+############################################################################
+#Import related functions
 
 #.ExternalHelp GPOMigration.psm1-help.xml
 Function Export-WMIFilter {
-Param(
-    [Parameter(Mandatory=$true)]
-    [String[]]
-    $Name,
-    [Parameter(Mandatory=$true)]
-    [String]
-    $SrceServer,
-    [Parameter(Mandatory=$true)]
-    [ValidateScript({Test-Path $_})]
-    [String]
-    $Path
-)
+    Param(
+        [Parameter(Mandatory=$true)]
+        [String[]]
+        $Name,
+        [Parameter(Mandatory=$true)]
+        [String]
+        $SrceServer,
+        [Parameter(Mandatory=$true)]
+        [ValidateScript({Test-Path $_})]
+        [String]
+        $Path
+    )
     # CN=SOM,CN=WMIPolicy,CN=System,DC=wingtiptoys,DC=local
     $WMIPath = "CN=SOM,CN=WMIPolicy,$((Get-ADDomain -Server $SrceServer).SystemsContainer)"
 
@@ -23,28 +22,28 @@ Param(
      Where-Object {$Name -contains $_."msWMI-Name"} |
      Select-Object msWMI-Author, msWMI-Name, msWMI-Parm1, msWMI-Parm2 |
      Export-CSV (Join-Path $Path WMIFilter.csv) -NoTypeInformation
-}
+} # End Function
 
 
 #.ExternalHelp GPOMigration.psm1-help.xml
 Function New-GPOMigrationTable {
-Param (
-    [Parameter(Mandatory=$true)]
-    [String]
-    $DestDomain,
-    [Parameter(Mandatory=$true)]
-    [ValidateScript({Test-Path $_})]
-    [String]
-    $Path = '.\',  # Working path to store migration tables and backups
-    [Parameter(Mandatory=$true)]
-    [ValidateScript({Test-Path $_})]
-    [String]
-    $BackupPath,
-    [Parameter(Mandatory=$true)]
-    [ValidateScript({Test-Path $_})]
-    [String]
-    $MigTableCSVPath
-)
+    Param (
+        [Parameter(Mandatory=$true)]
+        [String]
+        $DestDomain,
+        [Parameter(Mandatory=$true)]
+        [ValidateScript({Test-Path $_})]
+        [String]
+        $Path = '.\',  # Working path to store migration tables and backups
+        [Parameter(Mandatory=$true)]
+        [ValidateScript({Test-Path $_})]
+        [String]
+        $BackupPath,
+        [Parameter(Mandatory=$true)]
+        [ValidateScript({Test-Path $_})]
+        [String]
+        $MigTableCSVPath
+    )
         # Instead of manually editing multiple migration tables,
         # use a CSV template of search/replace values to update the
         # migration table by code.
@@ -115,17 +114,17 @@ Param (
         $mt.Save($MigTablePath)
 
         return $MigTablePath
-}
+} # End Function
 
 
 #.ExternalHelp GPOMigration.psm1-help.xml
 Function Show-GPOMigrationTable {
-Param (
-    [Parameter(Mandatory=$true)]
-    [ValidateScript({Test-Path $_})]
-    [String]
-    $Path # Path for migration table
-)
+    Param (
+        [Parameter(Mandatory=$true)]
+        [ValidateScript({Test-Path $_})]
+        [String]
+        $Path # Path for migration table
+    )
     $gpm = New-Object -ComObject GPMgmt.GPM
     $mt = $gpm.GetMigrationTable($Path)
 
@@ -153,44 +152,44 @@ Param (
             }
         }},
         Destination
-}
+} # End Function
 
 
 #.ExternalHelp GPOMigration.psm1-help.xml
 Function Test-GPOMigrationTable {
-Param (
-    [Parameter(Mandatory=$true)]
-    [ValidateScript({Test-Path $_})]
-    [String]
-    $Path
-)
+    Param (
+        [Parameter(Mandatory=$true)]
+        [ValidateScript({Test-Path $_})]
+        [String]
+        $Path
+    )
     $gpm = New-Object -ComObject GPMgmt.GPM
     $mt = $gpm.GetMigrationTable($Path)
     $mt.Validate().Status
-}
+} # End Function
 
 
 #.ExternalHelp GPOMigration.psm1-help.xml
 Function Invoke-ImportGPO {
-Param (
-    [Parameter(Mandatory=$true)]
-    [String]
-    $DestDomain,
-    [Parameter(Mandatory=$true)]
-    [String]
-    $DestServer,
-    [Parameter(Mandatory=$true)]
-    [ValidateScript({Test-Path $_})]
-    [String]
-    $BackupPath,
-    [Parameter(Mandatory=$true)]
-    [ValidateScript({Test-Path $_})]
-    [String]
-    $MigTablePath,
-    [Parameter()]
-    [Switch]
-    $CopyACL
-)
+    Param (
+        [Parameter(Mandatory=$true)]
+        [String]
+        $DestDomain,
+        [Parameter(Mandatory=$true)]
+        [String]
+        $DestServer,
+        [Parameter(Mandatory=$true)]
+        [ValidateScript({Test-Path $_})]
+        [String]
+        $BackupPath,
+        [Parameter(Mandatory=$true)]
+        [ValidateScript({Test-Path $_})]
+        [String]
+        $MigTablePath,
+        [Parameter()]
+        [Switch]
+        $CopyACL
+    )
     $gpm = New-Object -ComObject GPMgmt.GPM
     $Constants = $gpm.getConstants()
     $GPMBackupDir = $gpm.GetBackupDir($BackupPath)
@@ -240,15 +239,15 @@ Param (
 
 #.ExternalHelp GPOMigration.psm1-help.xml
 Function Import-WMIFilter {
-Param (
-    [Parameter(Mandatory=$true)]
-    [String]
-    $DestServer,
-    [Parameter(Mandatory=$true)]
-    [ValidateScript({Test-Path $_})]
-    [String]
-    $Path
-)
+    Param (
+        [Parameter(Mandatory=$true)]
+        [String]
+        $DestServer,
+        [Parameter(Mandatory=$true)]
+        [ValidateScript({Test-Path $_})]
+        [String]
+        $Path
+    )
     $WMIExportFile = Join-Path -Path $Path -ChildPath 'WMIFilter.csv'
     If ((Test-Path $WMIExportFile) -eq $false) {
 
@@ -292,31 +291,31 @@ Param (
             }
         }
     } # End If No WMI filters
-}
+} # End Function
 
 
 #.ExternalHelp GPOMigration.psm1-help.xml
 Function Import-GPPermission {
-Param (
-    [Parameter(Mandatory=$true)]
-    [String]
-    $DestDomain,
-    [Parameter(Mandatory=$true)]
-    [String]
-    $DestServer,
-    [Parameter(Mandatory=$true,
-        ValueFromPipelineByPropertyName=$true)]
-    [String[]]
-    $DisplayName,
-    [Parameter(Mandatory=$true)]
-    [ValidateScript({Test-Path $_})]
-    [String]
-    $Path,
-    [Parameter(Mandatory=$true)]
-    [ValidateScript({Test-Path $_})]
-    [String]
-    $MigTablePath
-)
+    Param (
+        [Parameter(Mandatory=$true)]
+        [String]
+        $DestDomain,
+        [Parameter(Mandatory=$true)]
+        [String]
+        $DestServer,
+        [Parameter(Mandatory=$true,
+            ValueFromPipelineByPropertyName=$true)]
+        [String[]]
+        $DisplayName,
+        [Parameter(Mandatory=$true)]
+        [ValidateScript({Test-Path $_})]
+        [String]
+        $Path,
+        [Parameter(Mandatory=$true)]
+        [ValidateScript({Test-Path $_})]
+        [String]
+        $MigTablePath
+    )
     $MigTable = Show-GPOMigrationTable -Path $MigTablePath |
         Select-Object *, `
             @{name='SourceName';expression={($_.Source -split '@')[0]}}, `
@@ -329,53 +328,7 @@ Param (
             @{name='IDName';expression={($_.IdentityReference -split '\\')[-1]}}, `
             @{name='IDDomain';expression={($_.IdentityReference -split '\\')[0]}}
 
-    <#
-    Show-GPOMigrationTable -Path $MigTablePath | ft -auto
-
-    Source                              DestOption   Type           Destination                       
-    ------                              ----------   ----           -----------                       
-    Administrators                      SameAsSource Unknown                                          
-    Domain Admins@wingtiptoys.local     Set          GlobalGroup    Domain Admins@cohovineyard.com    
-    fsogroup@wingtiptoys.local          Set          GlobalGroup    fsogroup@cohovineyard.com         
-    Enterprise Admins@wingtiptoys.local Set          UniversalGroup Enterprise Admins@cohovineyard.com
-    joebobtoo@wingtiptoys.local         Set          User           joebobtoo@cohovineyard.com        
-    anlan@wingtiptoys.local             Set          User           anlan@cohovineyard.com            
-    fsouser@wingtiptoys.local           Set          User           fsouser@cohovineyard.com          
-    anhill@wingtiptoys.local            Set          User           anhill@cohovineyard.com           
-    joebobfoo@wingtiptoys.local         Set          User           joebobfoo@cohovineyard.com 
-
-    Selected and split...
     
-    MigTable
-    
-    Source            : joebobfoo@wingtiptoys.local
-    DestOption        : Set
-    Type              : User
-    Destination       : joebobfoo@cohovineyard.com
-    SourceName        : joebobfoo
-    SourceDomain      : wingtiptoys.local
-    DestinationName   : joebobfoo
-    DestinationDomain : cohovineyard.com       
-
-    ACLs
-
-    Name                  : Starter Computer
-    Path                  : cn={FC18876F-2975-4638-B8DE-D83AB4415A51},cn=policies,c
-                            n=system,DC=wingtiptoys,DC=local
-    ActiveDirectoryRights : CreateChild, DeleteChild, Self, WriteProperty, DeleteTr
-                            ee, Delete, GenericRead, WriteDacl, WriteOwner
-    InheritanceType       : All
-    ObjectType            : 00000000-0000-0000-0000-000000000000
-    InheritedObjectType   : 00000000-0000-0000-0000-000000000000
-    ObjectFlags           : None
-    AccessControlType     : Allow
-    IdentityReference     : WINGTIPTOYS\Enterprise Admins
-    IsInherited           : False
-    InheritanceFlags      : ContainerInherit
-    PropagationFlags      : None
-    IDName              * : Enterprise Admins
-    IDDomain            * : WINGTIPTOYS
-    #>
     ForEach ($Name in $DisplayName) {
 
         "Importing GPO Permissions: $Name"
@@ -427,12 +380,14 @@ Param (
                     # Commit the ACL
                     Set-Acl -Path "AD:\$($GPO.Path)" -AclObject $acl
                 
-                } Else {
+                } 
+                Else {
                 # Else, Log failure to find security principal
                     Write-Warning "ADObject not found.  ACE not set: '$($ACE.IDName)' on '$Name'"    
                 }
                 
-            } Else {
+            } 
+            Else {
             # Else, attempt to set without migration table translation (ie. CREATOR OWNER, etc.)
 
                 "Setting ACE without migration table translation: '$($ACE.IDName)' on '$Name'"
@@ -462,31 +417,7 @@ Param (
                 }
 
             }
-<#
-            # This is how you would set permissions using the GPO cmdlets.
-            # However, they do not support DENY permissions. Not cool.
-                        
-            If ($ACE.'Trustee-SidType' -eq 'WellKnownGroup') {
-                $ACE.'Trustee-SidType' = 'Group'
-            }
 
-            Try {
-                Set-GPPermissions                                                                                     `
-                    -Name            $GPMBackup.GPODisplayName                                                        `
-                    -PermissionLevel $([Microsoft.GroupPolicy.GPPermissionType]$ACE.Permission)                       `
-                    -TargetName      $ACE.'Trustee-Name'                                                              `
-                    -TargetType      $([Microsoft.GroupPolicy.Commands.PermissionTrusteeType]$ACE.'Trustee-SidType')  `
-                    -Domain          $DestDomain                                                                      `
-                    -Server          $DestServer                                                                      `
-                    -Replace |
-                Out-Null
-            }
-            Catch {
-                Write-Warning "Unable to set the following GP permission: '$($ACE.'Trustee-Name')' on '$($GPMBackup.GPODisplayName)'`n$ACE`n$($_.Exception)"
-            }
-#>
-
-""
         } # End ForEach ACE
         # Force the ACL changes to SYSVOL
         $GPO.MakeAclConsistent()
@@ -496,18 +427,18 @@ Param (
 
 #.ExternalHelp GPOMigration.psm1-help.xml
 Function Invoke-RemoveGPO {
-Param (
-    [Parameter(Mandatory=$true)]
-    [String]
-    $DestDomain,
-    [Parameter(Mandatory=$true)]
-    [String]
-    $DestServer,
-    [Parameter(Mandatory=$true)]
-    [ValidateScript({Test-Path $_})]
-    [String]
-    $BackupPath
-)
+    Param (
+        [Parameter(Mandatory=$true)]
+        [String]
+        $DestDomain,
+        [Parameter(Mandatory=$true)]
+        [String]
+        $DestServer,
+        [Parameter(Mandatory=$true)]
+        [ValidateScript({Test-Path $_})]
+        [String]
+        $BackupPath
+    )
     $gpm = New-Object -ComObject GPMgmt.GPM
     $Constants = $gpm.getConstants()
     $GPMBackupDir = $gpm.GetBackupDir($BackupPath)
@@ -534,7 +465,7 @@ Param (
             Continue
         }
     }
-}
+} # End Function
 
 
 #.ExternalHelp GPOMigration.psm1-help.xml

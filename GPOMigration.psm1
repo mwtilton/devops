@@ -2,28 +2,64 @@
 #Import related functions
 
 #.ExternalHelp GPOMigration.psm1-help.xml
-Function Export-WMIFilter {
-    Param(
-        [Parameter(Mandatory=$true)]
-        [String[]]
-        $Name,
+Function Start-GPOImport {
+    Param (
+        [Parameter(Mandatory=$true,HelpMessage="Must be FQDN.")]
+        [ValidateScript({$_ -like "*.*"})]
+        [String]
+        $DestDomain,
         [Parameter(Mandatory=$true)]
         [String]
-        $SrceServer,
+        $DestServer,
         [Parameter(Mandatory=$true)]
         [ValidateScript({Test-Path $_})]
         [String]
-        $Path
+        $Path,
+        [Parameter(Mandatory=$true)]
+        [ValidateScript({Test-Path $_})]
+        [String]
+        $BackupPath,  # Path from GPO backup
+        [Parameter(Mandatory=$true)]
+        [ValidateScript({Test-Path $_})]
+        [String]
+        $MigTableCSVPath,
+        [Parameter()]
+        [Switch]
+        $CopyACL
     )
-    # CN=SOM,CN=WMIPolicy,CN=System,DC=wingtiptoys,DC=local
-    $WMIPath = "CN=SOM,CN=WMIPolicy,$((Get-ADDomain -Server $SrceServer).SystemsContainer)"
+    # Create the migration table
+    # Capture the MigTablePath and MigTableCSVPath for use with subsequent cmdlets
+    $MigTablePath = New-GPOMigrationTable -DestDomain $DestDomain -Path $Path -BackupPath $BackupPath -MigTableCSVPath $MigTableCSVPath
 
-    Get-ADObject -Server $SrceServer -SearchBase $WMIPath -Filter {objectClass -eq 'msWMI-Som'} -Properties msWMI-Author, msWMI-Name, msWMI-Parm1, msWMI-Parm2 |
-     Where-Object {$Name -contains $_."msWMI-Name"} |
-     Select-Object msWMI-Author, msWMI-Name, msWMI-Parm1, msWMI-Parm2 |
-     Export-CSV (Join-Path $Path WMIFilter.csv) -NoTypeInformation
+    # View the migration table
+    Show-GPOMigrationTable -Path $MigTablePath
+
+    # Validate the migration table
+    # No output is good.
+    Test-GPOMigrationTable -Path $MigTablePath
+
+    # OPTIONAL
+    # Remove any pre-existing GPOs of the same name in the destination environment
+    # Use this for these scenarios:
+    # - You want a clean import. Remove any existing policies of the same name first.
+    # - You want to start over and import them again.
+    # - Import-GPO will fail if a GPO of the same name exists in the target.
+    Invoke-RemoveGPO -DestDomain $DestDomain -DestServer $DestServer -BackupPath $BackupPath
+
+    # Import all from backup
+    # This will fail for any policies that are missing migration table accounts in the destination domain.
+    Invoke-ImportGPO -DestDomain $DestDomain -DestServer $DestServer -BackupPath $BackupPath -MigTablePath $MigTablePath -CopyACL
+
+    # Import WMIFilters
+    Import-WMIFilter -DestServer $DestServer -Path $BackupPath
+
+    # Relink the WMI filters to the GPOs
+    Set-GPWMIFilterFromBackup -DestDomain $DestDomain -DestServer $DestServer -BackupPath $BackupPath
+
+    # Link the GPOs to destination OUs of same path
+    # The migration table CSV is used to remap the domain name portion of the OU distinguished name paths.
+    Import-GPLink -DestDomain $DestDomain -DestServer $DestServer -BackupPath $BackupPath -MigTableCSVPath $MigTableCSVPath
 } # End Function
-
 
 #.ExternalHelp GPOMigration.psm1-help.xml
 Function New-GPOMigrationTable {
@@ -116,7 +152,6 @@ Function New-GPOMigrationTable {
         return $MigTablePath
 } # End Function
 
-
 #.ExternalHelp GPOMigration.psm1-help.xml
 Function Show-GPOMigrationTable {
     Param (
@@ -156,18 +191,46 @@ Function Show-GPOMigrationTable {
 
 
 #.ExternalHelp GPOMigration.psm1-help.xml
-Function Test-GPOMigrationTable {
+Function Invoke-RemoveGPO {
     Param (
+        [Parameter(Mandatory=$true)]
+        [String]
+        $DestDomain,
+        [Parameter(Mandatory=$true)]
+        [String]
+        $DestServer,
         [Parameter(Mandatory=$true)]
         [ValidateScript({Test-Path $_})]
         [String]
-        $Path
+        $BackupPath
     )
     $gpm = New-Object -ComObject GPMgmt.GPM
-    $mt = $gpm.GetMigrationTable($Path)
-    $mt.Validate().Status
-} # End Function
+    $Constants = $gpm.getConstants()
+    $GPMBackupDir = $gpm.GetBackupDir($BackupPath)
+    $GPMSearchCriteria = $gpm.CreateSearchCriteria()
+    $BackupList = $GPMBackupDir.SearchBackups($GPMSearchCriteria)
 
+    ForEach ($GPMBackup in $BackupList) {
+        <#
+        ID             : {2DA3E56D-061C-4CB7-95D8-DCA4D023ACF5}
+        GPOID          : {F9A98B0E-12A3-4A1B-AFE9-97CEB089FEBE}
+        GPODomain      : FOO.COM
+        GPODisplayName : Desktop Super Powers
+        Timestamp      : 1/14/2014 1:55:36 PM
+        Comment        : Desktop Super Powers
+        BackupDir      : C:\Some\Temp\folder\Backup\
+        #>
+
+        Write-Host "From domain $DestDomain removing GPO: $($GPMBackup.GPODisplayName)"
+        try {
+            Remove-GPO -Domain $DestDomain -Server $DestServer -Name $GPMBackup.GPODisplayName -ErrorAction Stop
+        }
+        catch {
+            $_.Exception
+            Continue
+        }
+    }
+} # End Function
 
 #.ExternalHelp GPOMigration.psm1-help.xml
 Function Invoke-ImportGPO {
@@ -236,7 +299,6 @@ Function Invoke-ImportGPO {
     } # End ForEach GPMBackup
 } # End Function
 
-
 #.ExternalHelp GPOMigration.psm1-help.xml
 Function Import-WMIFilter {
     Param (
@@ -292,6 +354,218 @@ Function Import-WMIFilter {
         }
     } # End If No WMI filters
 } # End Function
+
+#.ExternalHelp GPOMigration.psm1-help.xml
+Function Set-GPWMIFilterFromBackup {
+    Param (
+        [Parameter(Mandatory=$true)]
+        [String]
+        $DestDomain,
+        [Parameter(Mandatory=$true)]
+        [String]
+        $DestServer,
+        [Parameter(Mandatory=$true)]
+        [ValidateScript({Test-Path $_})]
+        [String]
+        $BackupPath
+    )
+    # Get the WMI Filter associated with each GPO backup
+    $GPOBackups = Get-ChildItem $BackupPath -Filter "backup.xml" -Recurse
+
+    ForEach ($Backup in $GPOBackups) {
+
+        $GPODisplayName = $WMIFilterName = $null
+
+        [xml]$BackupXML = Get-Content $Backup.FullName
+        $GPODisplayName = $BackupXML.GroupPolicyBackupScheme.GroupPolicyObject.GroupPolicyCoreSettings.DisplayName."#cdata-section"
+        $WMIFilterName = $BackupXML.GroupPolicyBackupScheme.GroupPolicyObject.GroupPolicyCoreSettings.WMIFilterName."#cdata-section"
+
+        If ($WMIFilterName) {
+            "Linking WMI filter '$WMIFilterName' to GPO '$GPODisplayName'."
+            $WMIFilter = Get-ADObject -SearchBase "CN=SOM,CN=WMIPolicy,$((Get-ADDomain -Server $DestServer).SystemsContainer)" `
+                -LDAPFilter "(&(objectClass=msWMI-Som)(msWMI-Name=$WMIFilterName))" `
+                -Server $DestServer
+            If ($WMIFilter) {
+                Set-ADObject -Identity (Get-GPO $GPODisplayName).Path `
+                    -Replace @{gPCWQLFilter="[$DestDomain;$($WMIFilter.Name);0]"} `
+                    -Server $DestServer
+            } Else {
+                Write-Warning "WMI filter '$WMIFilterName' NOT FOUND.  Manually create and link the WMI filter."
+            }
+        } Else {
+            "No WMI Filter for GPO '$GPODisplayName'."
+        }
+    }
+}
+
+#.ExternalHelp GPOMigration.psm1-help.xml
+Function Import-GPLink {
+    Param (
+        [Parameter(Mandatory=$true)]
+        [String]
+        $DestDomain,
+        [Parameter(Mandatory=$true)]
+        [String]
+        $DestServer,
+        [Parameter(Mandatory=$true)]
+        [ValidateScript({Test-Path $_})]
+        [String]
+        $BackupPath,
+        [Parameter(Mandatory=$true)]
+        [ValidateScript({Test-Path $_})]
+        [String]
+        $MigTableCSVPath # Path for migration table source for automatic migtable generation
+    )
+    $gpm = New-Object -ComObject GPMgmt.GPM
+    $Constants = $gpm.getConstants()
+    $GPMBackupDir = $gpm.GetBackupDir($BackupPath)
+    $GPMSearchCriteria = $gpm.CreateSearchCriteria()
+    $BackupList = $GPMBackupDir.SearchBackups($GPMSearchCriteria)
+
+    $MigTableCSV = Import-CSV $MigTableCSVPath
+    $MigDomains  = $MigTableCSV | Where-Object {$_.Type -eq "Domain"}        
+
+    ForEach ($GPMBackup in $BackupList) {
+
+        "`n`n$($GPMBackup.GPODisplayName)"
+
+        <#
+        ID             : {2DA3E56D-061C-4CB7-95D8-DCA4D023ACF5}
+        GPOID          : {F9A98B0E-12A3-4A1B-AFE9-97CEB089FEBE}
+        GPODomain      : FOO.COM
+        GPODisplayName : Desktop Super Powers
+        Timestamp      : 1/14/2014 1:55:36 PM
+        Comment        : Desktop Super Powers
+        BackupDir      : C:\Some\Temp\folder\Backup\
+        #>
+        [xml]$GPReport = Get-Content (Join-Path -Path $GPMBackup.BackupDir -ChildPath "$($GPMBackup.ID)\gpreport.xml")
+        
+        $gPLinks = $null
+        $gPLinks = $GPReport.GPO.LinksTo | Select-Object SOMName, SOMPath, Enabled, NoOverride
+        # There may not be any gPLinks in the source domain.
+        If ($gPLinks) {
+            # Parse out the domain name, translate it to the destination domain name.
+            # Create a distinguished name path from the SOMPath
+            # wingtiptoys.local/Testing/SubTest
+            ForEach ($gPLink in $gPLinks) {
+
+                $SplitSOMPath = $gPLink.SOMPath -split '/'
+
+                # Swap the source and destination domain names
+                $DomainName = $SplitSOMPath[0]
+                ForEach ($d in $MigDomains) {
+                    If ($d.Source -eq $SplitSOMPath[0]) {
+                        $DomainName = $d.Destination
+                    }
+                }
+                
+                # Calculate the full OU distinguished name path
+                $DomainDN = 'DC=' + $DomainName.Replace('.',',DC=')
+                $OU_DN = $DomainDN
+                For ($i=1;$i -lt $SplitSOMPath.Length;$i++) {
+                    $OU_DN = "OU=$($SplitSOMPath[$i])," + $OU_DN
+                }
+
+                # Add the DN path as a property on the object
+                Add-Member -InputObject $gPLink -MemberType NoteProperty -Name gPLinkDN -Value $OU_DN
+
+                # Now check to see that the SOM path exists in the destination domain
+                # If Exists, then create the link
+                # If NotExists, then report an error
+                
+                <#  gPLink.
+                SOMName     SOMPath                           Enabled NoOverride gPLinkDN                                    
+                -------     -------                           ------- ---------- --------                                    
+                SubTest     wingtiptoys.local/Testing/SubTest true    false      OU=SubTest,OU=Testing,DC=cohovineyard,DC=com
+                wingtiptoys wingtiptoys.local                 false   false      DC=cohovineyard,DC=com                      
+                #>
+
+                # Put the potential error line outside the context of the IF
+                # so that it doesn't cause the whole construct to error out.
+                # This is a bit of a hack on the error trapping,
+                # but the Get-ADObject does not seem to obey the -ErrorAction parameter
+                # at least with PS v2 on 2008 R2.
+                $SOMPath = $null
+                $ErrorActionPreference = 'SilentlyContinue'
+                $SOMPath = Get-ADObject -Server $DestServer -Identity $gPLink.gPLinkDN -Properties gPLink
+                $ErrorActionPreference = 'Continue'
+
+                # Only attempt to link the policy if the destination path exists.
+                If ($SOMPath) {
+                    "gPLink: $($gPLink.gPLinkDN)"
+                    # It is possible that the policy is already linked to the destination path.
+                    try {
+                        New-GPLink -Domain $DestDomain -Server $DestServer `
+                            -Name $GPMBackup.GPODisplayName `
+                            -Target $gPLink.gPLinkDN `
+                            -LinkEnabled $(If ($gPLink.Enabled -eq 'true') {'Yes'} Else {'No'}) `
+                            -Enforced $(If ($gPLink.NoOverride -eq 'true') {'Yes'} Else {'No'}) `
+                            -Order $(If ($SOMPath.gPLink.Length -gt 1) {$SOMPath.gPLink.Split(']').Length} Else {1}) `
+                            -ErrorAction Stop
+                        # We calculated the order by counting how many gPLinks already exist.
+                        # This ensures that it is always linked last in the order.
+                    }
+                    catch {
+                        Write-Warning "gPLink Error: $($gPLink.gPLinkDN)"
+                        $_.Exception
+                    }
+                } Else {
+                    Write-Warning "gPLink path does not exist: $($gPLink.gPLinkDN)"
+                } # End if SOMPath exists
+            } # End ForEach gPLink
+        } Else {
+            "No gPLinks for GPO: $($GPMBackup.GPODisplayName)."
+        } # End If gPLinks exist
+    }
+} #End Function
+
+#################################################
+#^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+#.ExternalHelp GPOMigration.psm1-help.xml
+Function Export-WMIFilter {
+    Param(
+        [Parameter(Mandatory=$true)]
+        [String[]]
+        $Name,
+        [Parameter(Mandatory=$true)]
+        [String]
+        $SrceServer,
+        [Parameter(Mandatory=$true)]
+        [ValidateScript({Test-Path $_})]
+        [String]
+        $Path
+    )
+    # CN=SOM,CN=WMIPolicy,CN=System,DC=wingtiptoys,DC=local
+    $WMIPath = "CN=SOM,CN=WMIPolicy,$((Get-ADDomain -Server $SrceServer).SystemsContainer)"
+
+    Get-ADObject -Server $SrceServer -SearchBase $WMIPath -Filter {objectClass -eq 'msWMI-Som'} -Properties msWMI-Author, msWMI-Name, msWMI-Parm1, msWMI-Parm2 |
+     Where-Object {$Name -contains $_."msWMI-Name"} |
+     Select-Object msWMI-Author, msWMI-Name, msWMI-Parm1, msWMI-Parm2 |
+     Export-CSV (Join-Path $Path WMIFilter.csv) -NoTypeInformation
+} # End Function
+
+
+
+
+
+
+#.ExternalHelp GPOMigration.psm1-help.xml
+Function Test-GPOMigrationTable {
+    Param (
+        [Parameter(Mandatory=$true)]
+        [ValidateScript({Test-Path $_})]
+        [String]
+        $Path
+    )
+    $gpm = New-Object -ComObject GPMgmt.GPM
+    $mt = $gpm.GetMigrationTable($Path)
+    $mt.Validate().Status
+} # End Function
+
+
+
+
 
 
 #.ExternalHelp GPOMigration.psm1-help.xml
@@ -425,288 +699,23 @@ Function Import-GPPermission {
 } # End Function
 
 
-#.ExternalHelp GPOMigration.psm1-help.xml
-Function Invoke-RemoveGPO {
-    Param (
-        [Parameter(Mandatory=$true)]
-        [String]
-        $DestDomain,
-        [Parameter(Mandatory=$true)]
-        [String]
-        $DestServer,
-        [Parameter(Mandatory=$true)]
-        [ValidateScript({Test-Path $_})]
-        [String]
-        $BackupPath
-    )
-    $gpm = New-Object -ComObject GPMgmt.GPM
-    $Constants = $gpm.getConstants()
-    $GPMBackupDir = $gpm.GetBackupDir($BackupPath)
-    $GPMSearchCriteria = $gpm.CreateSearchCriteria()
-    $BackupList = $GPMBackupDir.SearchBackups($GPMSearchCriteria)
-
-    ForEach ($GPMBackup in $BackupList) {
-        <#
-        ID             : {2DA3E56D-061C-4CB7-95D8-DCA4D023ACF5}
-        GPOID          : {F9A98B0E-12A3-4A1B-AFE9-97CEB089FEBE}
-        GPODomain      : FOO.COM
-        GPODisplayName : Desktop Super Powers
-        Timestamp      : 1/14/2014 1:55:36 PM
-        Comment        : Desktop Super Powers
-        BackupDir      : C:\Some\Temp\folder\Backup\
-        #>
-
-        Write-Host "From domain $DestDomain removing GPO: $($GPMBackup.GPODisplayName)"
-        try {
-            Remove-GPO -Domain $DestDomain -Server $DestServer -Name $GPMBackup.GPODisplayName -ErrorAction Stop
-        }
-        catch {
-            $_.Exception
-            Continue
-        }
-    }
-} # End Function
-
-
-#.ExternalHelp GPOMigration.psm1-help.xml
-Function Import-GPLink {
-Param (
-    [Parameter(Mandatory=$true)]
-    [String]
-    $DestDomain,
-    [Parameter(Mandatory=$true)]
-    [String]
-    $DestServer,
-    [Parameter(Mandatory=$true)]
-    [ValidateScript({Test-Path $_})]
-    [String]
-    $BackupPath,
-    [Parameter(Mandatory=$true)]
-    [ValidateScript({Test-Path $_})]
-    [String]
-    $MigTableCSVPath # Path for migration table source for automatic migtable generation
-)
-    $gpm = New-Object -ComObject GPMgmt.GPM
-    $Constants = $gpm.getConstants()
-    $GPMBackupDir = $gpm.GetBackupDir($BackupPath)
-    $GPMSearchCriteria = $gpm.CreateSearchCriteria()
-    $BackupList = $GPMBackupDir.SearchBackups($GPMSearchCriteria)
-
-    $MigTableCSV = Import-CSV $MigTableCSVPath
-    $MigDomains  = $MigTableCSV | Where-Object {$_.Type -eq "Domain"}        
-
-    ForEach ($GPMBackup in $BackupList) {
-
-        "`n`n$($GPMBackup.GPODisplayName)"
-
-        <#
-        ID             : {2DA3E56D-061C-4CB7-95D8-DCA4D023ACF5}
-        GPOID          : {F9A98B0E-12A3-4A1B-AFE9-97CEB089FEBE}
-        GPODomain      : FOO.COM
-        GPODisplayName : Desktop Super Powers
-        Timestamp      : 1/14/2014 1:55:36 PM
-        Comment        : Desktop Super Powers
-        BackupDir      : C:\Some\Temp\folder\Backup\
-        #>
-        [xml]$GPReport = Get-Content (Join-Path -Path $GPMBackup.BackupDir -ChildPath "$($GPMBackup.ID)\gpreport.xml")
-        
-        $gPLinks = $null
-        $gPLinks = $GPReport.GPO.LinksTo | Select-Object SOMName, SOMPath, Enabled, NoOverride
-        # There may not be any gPLinks in the source domain.
-        If ($gPLinks) {
-            # Parse out the domain name, translate it to the destination domain name.
-            # Create a distinguished name path from the SOMPath
-            # wingtiptoys.local/Testing/SubTest
-            ForEach ($gPLink in $gPLinks) {
-
-                $SplitSOMPath = $gPLink.SOMPath -split '/'
-
-                # Swap the source and destination domain names
-                $DomainName = $SplitSOMPath[0]
-                ForEach ($d in $MigDomains) {
-                    If ($d.Source -eq $SplitSOMPath[0]) {
-                        $DomainName = $d.Destination
-                    }
-                }
-                
-                # Calculate the full OU distinguished name path
-                $DomainDN = 'DC=' + $DomainName.Replace('.',',DC=')
-                $OU_DN = $DomainDN
-                For ($i=1;$i -lt $SplitSOMPath.Length;$i++) {
-                    $OU_DN = "OU=$($SplitSOMPath[$i])," + $OU_DN
-                }
-
-                # Add the DN path as a property on the object
-                Add-Member -InputObject $gPLink -MemberType NoteProperty -Name gPLinkDN -Value $OU_DN
-
-                # Now check to see that the SOM path exists in the destination domain
-                # If Exists, then create the link
-                # If NotExists, then report an error
-                
-                <#  gPLink.
-                SOMName     SOMPath                           Enabled NoOverride gPLinkDN                                    
-                -------     -------                           ------- ---------- --------                                    
-                SubTest     wingtiptoys.local/Testing/SubTest true    false      OU=SubTest,OU=Testing,DC=cohovineyard,DC=com
-                wingtiptoys wingtiptoys.local                 false   false      DC=cohovineyard,DC=com                      
-                #>
-
-                # Put the potential error line outside the context of the IF
-                # so that it doesn't cause the whole construct to error out.
-                # This is a bit of a hack on the error trapping,
-                # but the Get-ADObject does not seem to obey the -ErrorAction parameter
-                # at least with PS v2 on 2008 R2.
-                $SOMPath = $null
-                $ErrorActionPreference = 'SilentlyContinue'
-                $SOMPath = Get-ADObject -Server $DestServer -Identity $gPLink.gPLinkDN -Properties gPLink
-                $ErrorActionPreference = 'Continue'
-
-                # Only attempt to link the policy if the destination path exists.
-                If ($SOMPath) {
-                    "gPLink: $($gPLink.gPLinkDN)"
-                    # It is possible that the policy is already linked to the destination path.
-                    try {
-                        New-GPLink -Domain $DestDomain -Server $DestServer `
-                            -Name $GPMBackup.GPODisplayName `
-                            -Target $gPLink.gPLinkDN `
-                            -LinkEnabled $(If ($gPLink.Enabled -eq 'true') {'Yes'} Else {'No'}) `
-                            -Enforced $(If ($gPLink.NoOverride -eq 'true') {'Yes'} Else {'No'}) `
-                            -Order $(If ($SOMPath.gPLink.Length -gt 1) {$SOMPath.gPLink.Split(']').Length} Else {1}) `
-                            -ErrorAction Stop
-                        # We calculated the order by counting how many gPLinks already exist.
-                        # This ensures that it is always linked last in the order.
-                    }
-                    catch {
-                        Write-Warning "gPLink Error: $($gPLink.gPLinkDN)"
-                        $_.Exception
-                    }
-                } Else {
-                    Write-Warning "gPLink path does not exist: $($gPLink.gPLinkDN)"
-                } # End if SOMPath exists
-            } # End ForEach gPLink
-        } Else {
-            "No gPLinks for GPO: $($GPMBackup.GPODisplayName)."
-        } # End If gPLinks exist
-    }
-}
-
-
-#.ExternalHelp GPOMigration.psm1-help.xml
-Function Set-GPWMIFilterFromBackup {
-Param (
-    [Parameter(Mandatory=$true)]
-    [String]
-    $DestDomain,
-    [Parameter(Mandatory=$true)]
-    [String]
-    $DestServer,
-    [Parameter(Mandatory=$true)]
-    [ValidateScript({Test-Path $_})]
-    [String]
-    $BackupPath
-)
-    # Get the WMI Filter associated with each GPO backup
-    $GPOBackups = Get-ChildItem $BackupPath -Filter "backup.xml" -Recurse
-
-    ForEach ($Backup in $GPOBackups) {
-
-        $GPODisplayName = $WMIFilterName = $null
-
-        [xml]$BackupXML = Get-Content $Backup.FullName
-        $GPODisplayName = $BackupXML.GroupPolicyBackupScheme.GroupPolicyObject.GroupPolicyCoreSettings.DisplayName."#cdata-section"
-        $WMIFilterName = $BackupXML.GroupPolicyBackupScheme.GroupPolicyObject.GroupPolicyCoreSettings.WMIFilterName."#cdata-section"
-
-        If ($WMIFilterName) {
-            "Linking WMI filter '$WMIFilterName' to GPO '$GPODisplayName'."
-            $WMIFilter = Get-ADObject -SearchBase "CN=SOM,CN=WMIPolicy,$((Get-ADDomain -Server $DestServer).SystemsContainer)" `
-                -LDAPFilter "(&(objectClass=msWMI-Som)(msWMI-Name=$WMIFilterName))" `
-                -Server $DestServer
-            If ($WMIFilter) {
-                Set-ADObject -Identity (Get-GPO $GPODisplayName).Path `
-                    -Replace @{gPCWQLFilter="[$DestDomain;$($WMIFilter.Name);0]"} `
-                    -Server $DestServer
-            } Else {
-                Write-Warning "WMI filter '$WMIFilterName' NOT FOUND.  Manually create and link the WMI filter."
-            }
-        } Else {
-            "No WMI Filter for GPO '$GPODisplayName'."
-        }
-    }
-}
 
 
 
 
-#.ExternalHelp GPOMigration.psm1-help.xml
-Function Start-GPOImport {
-Param (
-    [Parameter(Mandatory=$true,HelpMessage="Must be FQDN.")]
-    [ValidateScript({$_ -like "*.*"})]
-    [String]
-    $DestDomain,
-    [Parameter(Mandatory=$true)]
-    [String]
-    $DestServer,
-    [Parameter(Mandatory=$true)]
-    [ValidateScript({Test-Path $_})]
-    [String]
-    $Path,
-    [Parameter(Mandatory=$true)]
-    [ValidateScript({Test-Path $_})]
-    [String]
-    $BackupPath,  # Path from GPO backup
-    [Parameter(Mandatory=$true)]
-    [ValidateScript({Test-Path $_})]
-    [String]
-    $MigTableCSVPath,
-    [Parameter()]
-    [Switch]
-    $CopyACL
-)
-    # Create the migration table
-    # Capture the MigTablePath and MigTableCSVPath for use with subsequent cmdlets
-    $MigTablePath = New-GPOMigrationTable -DestDomain $DestDomain -Path $Path -BackupPath $BackupPath -MigTableCSVPath $MigTableCSVPath
 
-    # View the migration table
-    Show-GPOMigrationTable -Path $MigTablePath
 
-    # Validate the migration table
-    # No output is good.
-    Test-GPOMigrationTable -Path $MigTablePath
 
-    # OPTIONAL
-    # Remove any pre-existing GPOs of the same name in the destination environment
-    # Use this for these scenarios:
-    # - You want a clean import. Remove any existing policies of the same name first.
-    # - You want to start over and import them again.
-    # - Import-GPO will fail if a GPO of the same name exists in the target.
-    Invoke-RemoveGPO -DestDomain $DestDomain -DestServer $DestServer -BackupPath $BackupPath
-
-    # Import all from backup
-    # This will fail for any policies that are missing migration table accounts in the destination domain.
-    Invoke-ImportGPO -DestDomain $DestDomain -DestServer $DestServer -BackupPath $BackupPath -MigTablePath $MigTablePath -CopyACL
-
-    # Import WMIFilters
-    Import-WMIFilter -DestServer $DestServer -Path $BackupPath
-
-    # Relink the WMI filters to the GPOs
-    Set-GPWMIFilterFromBackup -DestDomain $DestDomain -DestServer $DestServer -BackupPath $BackupPath
-
-    # Link the GPOs to destination OUs of same path
-    # The migration table CSV is used to remap the domain name portion of the OU distinguished name paths.
-    Import-GPLink -DestDomain $DestDomain -DestServer $DestServer -BackupPath $BackupPath -MigTableCSVPath $MigTableCSVPath
-} # End Function
 
 
 #.ExternalHelp GPOMigration.psm1-help.xml
 Function Enable-ADSystemOnlyChange {
-Param ([switch]$Disable)
+    Param ([switch]$Disable)
 
-    Write-Warning @'
-This command must run locally on the domain controller where the
-GPOs will be imported. You only need to execute this function if WMI filter
-creation via script has failed. If you continue, the process will finish with
-either restarting the NTDS service or rebooting the server.
-'@
+    Write-Warning 'This command must run locally on the domain controller where the
+    GPOs will be imported. You only need to execute this function if WMI filter
+    creation via script has failed. If you continue, the process will finish with
+    either restarting the NTDS service or rebooting the server.'
     If ((Read-Host "Continue? (y/n)") -ne 'y') {
         Return
     } Else {
@@ -738,7 +747,7 @@ either restarting the NTDS service or rebooting the server.
         }
 
     } # End If
-}
+} # End Function
 
 
 

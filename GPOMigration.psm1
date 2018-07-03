@@ -1,3 +1,6 @@
+$PSDefaultParameterValues=@{'Write-host:BackGroundColor'='Black';'Write-host:ForeGroundColor'='Green'}
+#requires -Version 4.0
+
 ############################################################################
 #Import related functions
 
@@ -61,6 +64,7 @@ Function Start-GPOImport {
     Import-GPLink -DestDomain $DestDomain -DestServer $DestServer -BackupPath $BackupPath -MigTableCSVPath $MigTableCSVPath
 } # End Function
 
+#Start Subsection 1
 #.ExternalHelp GPOMigration.psm1-help.xml
 Function New-GPOMigrationTable {
     Param (
@@ -189,7 +193,21 @@ Function Show-GPOMigrationTable {
         Destination
 } # End Function
 
+#.ExternalHelp GPOMigration.psm1-help.xml
+Function Test-GPOMigrationTable {
+    Param (
+        [Parameter(Mandatory=$true)]
+        [ValidateScript({Test-Path $_})]
+        [String]
+        $Path
+    )
+    $gpm = New-Object -ComObject GPMgmt.GPM
+    $mt = $gpm.GetMigrationTable($Path)
+    $mt.Validate().Status
+} # End Function
+#End SubSection 1
 
+#Start Subsection 2
 #.ExternalHelp GPOMigration.psm1-help.xml
 Function Invoke-RemoveGPO {
     Param (
@@ -232,6 +250,10 @@ Function Invoke-RemoveGPO {
     }
 } # End Function
 
+#End Subsection 2
+
+
+#Start Subsection 3
 #.ExternalHelp GPOMigration.psm1-help.xml
 Function Invoke-ImportGPO {
     Param (
@@ -549,19 +571,6 @@ Function Export-WMIFilter {
 
 
 
-
-#.ExternalHelp GPOMigration.psm1-help.xml
-Function Test-GPOMigrationTable {
-    Param (
-        [Parameter(Mandatory=$true)]
-        [ValidateScript({Test-Path $_})]
-        [String]
-        $Path
-    )
-    $gpm = New-Object -ComObject GPMgmt.GPM
-    $mt = $gpm.GetMigrationTable($Path)
-    $mt.Validate().Status
-} # End Function
 
 
 

@@ -30,6 +30,7 @@ Function Start-GPOImport {
         [Switch]
         $CopyACL
     )
+    Write-host "Starting GPOImport" -fore Red
     # Create the migration table
     # Capture the MigTablePath and MigTableCSVPath for use with subsequent cmdlets
     $MigTablePath = New-GPOMigrationTable -DestDomain $DestDomain -Path $Path -BackupPath $BackupPath -MigTableCSVPath $MigTableCSVPath
@@ -41,6 +42,7 @@ Function Start-GPOImport {
     # No output is good.
     Test-GPOMigrationTable -Path $MigTablePath
 
+    Write-host "Removing Dup GPO's" -fore Red
     # OPTIONAL
     # Remove any pre-existing GPOs of the same name in the destination environment
     # Use this for these scenarios:
@@ -49,18 +51,22 @@ Function Start-GPOImport {
     # - Import-GPO will fail if a GPO of the same name exists in the target.
     Invoke-RemoveGPO -DestDomain $DestDomain -DestServer $DestServer -BackupPath $BackupPath
 
+    Write-host "Invoking the GPOImport" -fore Red
     # Import all from backup
     # This will fail for any policies that are missing migration table accounts in the destination domain.
     Invoke-ImportGPO -DestDomain $DestDomain -DestServer $DestServer -BackupPath $BackupPath -MigTablePath $MigTablePath -CopyACL
 
+    Write-host "Importing WMI filters" -fore Red
     # Import WMIFilters
     Import-WMIFilter -DestServer $DestServer -Path $BackupPath
 
+    Write-host "Setting WMI filters" -fore Red
     # Relink the WMI filters to the GPOs
     Set-GPWMIFilterFromBackup -DestDomain $DestDomain -DestServer $DestServer -BackupPath $BackupPath
 
     # Link the GPOs to destination OUs of same path
     # The migration table CSV is used to remap the domain name portion of the OU distinguished name paths.
+    Write-host "Importing GPLinks" -fore Red
     Import-GPLink -DestDomain $DestDomain -DestServer $DestServer -BackupPath $BackupPath -MigTableCSVPath $MigTableCSVPath
 } # End Function
 
@@ -449,7 +455,8 @@ Function Import-GPLink {
 
     ForEach ($GPMBackup in $BackupList) {
 
-        "`n`n$($GPMBackup.GPODisplayName)"
+        Write-host "Backup GPO Displayname: " -NoNewline
+        Write-host "$($GPMBackup.GPODisplayName)" -fore White
 
         <#
         ID             : {2DA3E56D-061C-4CB7-95D8-DCA4D023ACF5}
@@ -531,11 +538,13 @@ Function Import-GPLink {
                         Write-Warning "gPLink Error: $($gPLink.gPLinkDN)"
                         $_.Exception
                     }
-                } Else {
+                } 
+                Else {
                     Write-Warning "gPLink path does not exist: $($gPLink.gPLinkDN)"
                 } # End if SOMPath exists
             } # End ForEach gPLink
-        } Else {
+        } 
+        Else {
             "No gPLinks for GPO: $($GPMBackup.GPODisplayName)."
         } # End If gPLinks exist
     }
@@ -566,14 +575,6 @@ Function Export-WMIFilter {
      Select-Object msWMI-Author, msWMI-Name, msWMI-Parm1, msWMI-Parm2 |
      Export-CSV (Join-Path $Path WMIFilter.csv) -NoTypeInformation
 } # End Function
-
-
-
-
-
-
-
-
 
 
 
@@ -706,15 +707,6 @@ Function Import-GPPermission {
         $GPO.MakeAclConsistent()
     } # End ForEach DisplayName
 } # End Function
-
-
-
-
-
-
-
-
-
 
 
 #.ExternalHelp GPOMigration.psm1-help.xml

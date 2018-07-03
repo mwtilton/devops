@@ -124,6 +124,7 @@ Function New-GPOMigrationTable {
                 # Search/replace UNC paths from CSV file
                 $Constants.EntryTypeUNCPath {
                     ForEach ($MigUNC in $MigUNCs) {
+                        Write-host $MigUNC -ForegroundColor Cyan
                         If ($Entry.Source -like "$($MigUNC.Source)*") {
                             $mt.UpdateDestination($Entry.Source, $Entry.Source.Replace("$($MigUNC.Source)","$($MigUNC.Destination)")) | Out-Null
                         }
@@ -315,7 +316,8 @@ Function Invoke-ImportGPO {
                 "Error importing GPO: $($_.InvocationInfo.BoundParameters.Item('BackupGpoName'))"
                 "One or more security principals (user, group, etc.) in the migration table are not found in the destination domain."
                 ""
-            } Else {
+            } 
+            Else {
                 ""
                 "An import error occurred:"
                 $_ | fl * -force
@@ -622,14 +624,18 @@ Function Import-GPPermission {
     
     ForEach ($Name in $DisplayName) {
 
-        Write-host "Importing GPO Permissions: " -NoNewline
+        Write-host "  [+] Importing GPO Permissions: " -NoNewline
         Write-host $Name -fore White
         
         $GPO = Get-GPO -Domain $DestDomain -Server $DestServer -DisplayName $Name
 
         ForEach ($ACE in ($GPO_ACEs_CSV | Where-Object {$_.Name -eq $Name})) {
 
-            Write-Host "Setting GPO permission: '$($ACE.IDName)' on '$Name'"    
+            Write-host "     [>]" -ForegroundColor DarkGray -NoNewline
+            Write-host "Setting " -ForegroundColor DarkGray -NoNewline
+            Write-host $($ACE.IDName) -fore White -NoNewline
+            Write-Host " GPO permission for " -NoNewline
+            Write-host $Name -fore White
 
             # Find the CSV ACE identity name in the MigTable
             # Possible zero or one matches, should not be multiple
@@ -674,7 +680,8 @@ Function Import-GPPermission {
                 
                 } 
                 Else {
-                # Else, Log failure to find security principal
+                    # Else, Log failure to find security principal
+                    Write-Host "      "
                     Write-Warning "ADObject not found.  ACE not set: '$($ACE.IDName)' on '$Name'"    
                 }
                 
@@ -682,7 +689,11 @@ Function Import-GPPermission {
             Else {
             # Else, attempt to set without migration table translation (ie. CREATOR OWNER, etc.)
 
-                "Setting ACE without migration table translation: '$($ACE.IDName)' on '$Name'"
+                Write-host "     [=]Setting ACE without migration table translation: " -ForegroundColor Yellow
+                Write-host "         [>]" -ForegroundColor DarkGray -NoNewline
+                Write-host ""$($ACE.IDName) -ForegroundColor White
+                Write-host "         [>]" -ForegroundColor DarkGray -NoNewline
+                Write-host ""$Name -ForegroundColor White
 
                 $sid = $null
                 Try {

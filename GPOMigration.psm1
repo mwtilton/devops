@@ -248,7 +248,7 @@ Function Invoke-RemoveGPO {
         #>
 
         Write-Host "From domain " -NoNewline
-        Write-hsot $DestDomain -fore White
+        Write-host $DestDomain -fore White -NoNewline
         Write-host " removing GPO: " -NoNewline 
         Write-host $($GPMBackup.GPODisplayName) -Fore Red
         try {
@@ -304,7 +304,7 @@ Function Invoke-ImportGPO {
         #>
 
         Write-host "Importing GPO: " -NoNewline
-        Write-hsot "$($GPMBackup.GPODisplayName)" -fore White
+        Write-host "$($GPMBackup.GPODisplayName)" -fore White
         try {
             Import-GPO -Domain $DestDomain -Server $DestServer -BackupGpoName $GPMBackup.GPODisplayName -TargetName $GPMBackup.GPODisplayName -Path $BackupPath -MigrationTable $MigTablePath -CreateIfNeeded
         }

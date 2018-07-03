@@ -681,8 +681,11 @@ Function Import-GPPermission {
                 } 
                 Else {
                     # Else, Log failure to find security principal
-                    Write-Host "      "
-                    Write-Warning "ADObject not found.  ACE not set: '$($ACE.IDName)' on '$Name'"    
+                    Write-Host "         [-]ADObject not found. ACE not set for: " -ForegroundColor Red
+                    Write-Host "            [>]" -ForegroundColor DarkGray -NoNewline
+                    Write-host $($ACE.IDName) -ForegroundColor White
+                    Write-Host "            [>]" -ForegroundColor DarkGray -NoNewline
+                    Write-Host  $Name -ForegroundColor White
                 }
                 
             } 

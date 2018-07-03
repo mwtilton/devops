@@ -30,16 +30,18 @@ Function Start-GPOImport {
         [Switch]
         $CopyACL
     )
-    Write-host "Starting GPOImport" -fore Red
+    Write-host "Starting GPOImport" -fore Yellow
     # Create the migration table
     # Capture the MigTablePath and MigTableCSVPath for use with subsequent cmdlets
     $MigTablePath = New-GPOMigrationTable -DestDomain $DestDomain -Path $Path -BackupPath $BackupPath -MigTableCSVPath $MigTableCSVPath
 
     # View the migration table
+    Write-host "View the migration table" -fore Yellow
     Show-GPOMigrationTable -Path $MigTablePath
 
     # Validate the migration table
     # No output is good.
+    Write-host "Validate the migration table" -fore Yellow
     Test-GPOMigrationTable -Path $MigTablePath
 
     Write-host "Removing Dup GPO's" -fore Red
@@ -51,22 +53,22 @@ Function Start-GPOImport {
     # - Import-GPO will fail if a GPO of the same name exists in the target.
     Invoke-RemoveGPO -DestDomain $DestDomain -DestServer $DestServer -BackupPath $BackupPath
 
-    Write-host "Invoking the GPOImport" -fore Red
+    Write-host "Invoking the GPOImport" -fore Yellow
     # Import all from backup
     # This will fail for any policies that are missing migration table accounts in the destination domain.
     Invoke-ImportGPO -DestDomain $DestDomain -DestServer $DestServer -BackupPath $BackupPath -MigTablePath $MigTablePath -CopyACL
 
-    Write-host "Importing WMI filters" -fore Red
+    Write-host "Importing WMI filters" -fore Yellow
     # Import WMIFilters
     Import-WMIFilter -DestServer $DestServer -Path $BackupPath
 
-    Write-host "Setting WMI filters" -fore Red
+    Write-host "Setting WMI filters" -fore Yellow
     # Relink the WMI filters to the GPOs
     Set-GPWMIFilterFromBackup -DestDomain $DestDomain -DestServer $DestServer -BackupPath $BackupPath
 
     # Link the GPOs to destination OUs of same path
     # The migration table CSV is used to remap the domain name portion of the OU distinguished name paths.
-    Write-host "Importing GPLinks" -fore Red
+    Write-host "Importing GPLinks" -fore Yellow
     Import-GPLink -DestDomain $DestDomain -DestServer $DestServer -BackupPath $BackupPath -MigTableCSVPath $MigTableCSVPath
 } # End Function
 
@@ -245,7 +247,10 @@ Function Invoke-RemoveGPO {
         BackupDir      : C:\Some\Temp\folder\Backup\
         #>
 
-        Write-Host "From domain $DestDomain removing GPO: $($GPMBackup.GPODisplayName)"
+        Write-Host "From domain " -NoNewline
+        Write-hsot $DestDomain -fore White
+        Write-host " removing GPO: " -NoNewline 
+        Write-host $($GPMBackup.GPODisplayName) -Fore Red
         try {
             Remove-GPO -Domain $DestDomain -Server $DestServer -Name $GPMBackup.GPODisplayName -ErrorAction Stop
         }
@@ -298,7 +303,8 @@ Function Invoke-ImportGPO {
         BackupDir      : C:\Some\Temp\folder\Backup\
         #>
 
-        "Importing GPO: $($GPMBackup.GPODisplayName)"
+        Write-host "Importing GPO: " -NoNewline
+        Write-hsot "$($GPMBackup.GPODisplayName)" -fore White
         try {
             Import-GPO -Domain $DestDomain -Server $DestServer -BackupGpoName $GPMBackup.GPODisplayName -TargetName $GPMBackup.GPODisplayName -Path $BackupPath -MigrationTable $MigTablePath -CreateIfNeeded
         }
@@ -521,7 +527,8 @@ Function Import-GPLink {
 
                 # Only attempt to link the policy if the destination path exists.
                 If ($SOMPath) {
-                    "gPLink: $($gPLink.gPLinkDN)"
+                    Write-host "gPLink: " -NoNewline
+                    Write-host "$($gPLink.gPLinkDN)" -fore White
                     # It is possible that the policy is already linked to the destination path.
                     try {
                         New-GPLink -Domain $DestDomain -Server $DestServer `
@@ -615,7 +622,8 @@ Function Import-GPPermission {
     
     ForEach ($Name in $DisplayName) {
 
-        "Importing GPO Permissions: $Name"
+        Write-host "Importing GPO Permissions: " -NoNewline
+        Write-host $Name -fore White
         
         $GPO = Get-GPO -Domain $DestDomain -Server $DestServer -DisplayName $Name
 

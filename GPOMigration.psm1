@@ -507,15 +507,30 @@ Function Import-GPLink {
 
                 $SplitSOMPath = $gPLink.SOMPath -split '/'
                 Write-host $SplitSOMPath -ForegroundColor Red
+                [array]::Reverse($SplitSOMPath)
                 
                 $ou = @()
                 
-                
                 For ($i=0;$i -lt $SplitSOMPath.Length;$i++) {
                     Write-Host $i $SplitSOMPath[$i] -ForegroundColor Red
-                    $ou += $SplitSOMPath[$i]
+                    switch ($i) {
+                        
+                        $SplitSOMPath.Length {
+                            $ou += "DC=" + $SplitSOMPath[$i].Split(".")[1]
+                            $ou += $SplitSOMPath[$i].Split(".")[0]
+                            $ou += ",DC="
+                        }
+                        1 {
+                            $ou += $SplitSOMPath[$i]
+                        }
+                        0 {
+
+                        }
+                        Default {}
+                    }
+                    
                 }
-                Write-Host [array]::reverse($ou) -ForegroundColor Red
+                Write-Host $OU.Replace(",", "") -ForegroundColor Red
                 <#
                 # Swap the source and destination domain names
                 $DomainName = $SplitSOMPath[0]

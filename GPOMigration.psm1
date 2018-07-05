@@ -33,16 +33,16 @@ Function Start-GPOImport {
     Write-host "Starting GPOImport" -fore Yellow
     # Create the migration table
     # Capture the MigTablePath and MigTableCSVPath for use with subsequent cmdlets
-    $MigTablePath = New-GPOMigrationTable -DestDomain $DestDomain -Path $Path -BackupPath $BackupPath -MigTableCSVPath $MigTableCSVPath
+    #$MigTablePath = New-GPOMigrationTable -DestDomain $DestDomain -Path $Path -BackupPath $BackupPath -MigTableCSVPath $MigTableCSVPath
 
     # View the migration table
     Write-host "View the migration table" -fore Yellow
-    Show-GPOMigrationTable -Path $MigTablePath
+    #Show-GPOMigrationTable -Path $MigTablePath
 
     # Validate the migration table
     # No output is good.
     Write-host "Validate the migration table" -fore Yellow
-    Test-GPOMigrationTable -Path $MigTablePath
+    #Test-GPOMigrationTable -Path $MigTablePath
 
     Write-host "Removing Dup GPO's" -fore Red
     # OPTIONAL
@@ -51,12 +51,12 @@ Function Start-GPOImport {
     # - You want a clean import. Remove any existing policies of the same name first.
     # - You want to start over and import them again.
     # - Import-GPO will fail if a GPO of the same name exists in the target.
-    Invoke-RemoveGPO -DestDomain $DestDomain -DestServer $DestServer -BackupPath $BackupPath
+    #Invoke-RemoveGPO -DestDomain $DestDomain -DestServer $DestServer -BackupPath $BackupPath
 
     Write-host "Invoking the GPOImport" -fore Yellow
     # Import all from backup
     # This will fail for any policies that are missing migration table accounts in the destination domain.
-    Invoke-ImportGPO -DestDomain $DestDomain -DestServer $DestServer -BackupPath $BackupPath -MigTablePath $MigTablePath -CopyACL
+    #Invoke-ImportGPO -DestDomain $DestDomain -DestServer $DestServer -BackupPath $BackupPath -MigTablePath $MigTablePath -CopyACL
 
     Write-host "Importing WMI filters" -fore Yellow
     # Import WMIFilters
@@ -513,24 +513,36 @@ Function Import-GPLink {
                 
                 For ($i=0;$i -lt $SplitSOMPath.Length;$i++) {
                     Write-Host $i $SplitSOMPath[$i] -ForegroundColor Red
+                    $middle = @($SplitSOMPath.Length - 1) 
                     switch ($i) {
                         
-                        $SplitSOMPath.Length {
-                            $ou += "DC=" + $SplitSOMPath[$i].Split(".")[1]
-                            $ou += $SplitSOMPath[$i].Split(".")[0]
-                            $ou += ",DC="
-                        }
-                        1 {
-                            $ou += $SplitSOMPath[$i]
-                        }
                         0 {
-
+                            $ou += "OU="
+                            $ou += -join $SplitSOMPath[$i]
+                            break
                         }
-                        Default {}
+                        {(($i  -gt 1) -and ($i -lt $SplitSOMPath.Length))} {
+                            #$ou += ",OU="
+                            #$ou += $SplitSOMPath[$i]
+                            break
+                        }
+                        {$SplitSOMPath.Length} {
+                            #$ou += $SplitSOMPath[$i].Split(".")[1]
+                            #$ou += "DC="
+                            #$ou += $SplitSOMPath[$i].Split(".")[0]
+                            #$ou += ",DC="
+                            
+                            break
+                        }
+                        
+                        
+                        Default {
+                            "Something else happened"
+                        }
                     }
                     
                 }
-                Write-Host $OU.Replace(",", "") -ForegroundColor Red
+                Write-Host $OU -ForegroundColor Red
                 <#
                 # Swap the source and destination domain names
                 $DomainName = $SplitSOMPath[0]

@@ -102,7 +102,10 @@ Function Import-Groups {
         Write-Host $_.name -ForegroundColor White -NoNewline
         Write-Host " at path " -ForegroundColor DarkGray -NoNewline
         Write-Host $_.DistinguishedName -ForegroundColor White 
-
+        
+        $SplitDistName = $_.DistinguishedName -split ','
+        Write-Host @($_.name + $SplitDistName) -ForegroundColor Cyan
+        $SplitDistName.replace()
         Try
         {
             #Check if the Group already exists

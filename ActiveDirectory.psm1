@@ -131,14 +131,11 @@ Function Import-Groups {
         }
 
         $joinPath = $PathArray -join ""
-        
-        
+        Write-Host $joinPath
         #Check if the Group already exists
         Try
         {
             $checkGroup = Get-ADGroup $_.Name
-            
-            
         }
         Catch
         {
@@ -154,10 +151,11 @@ Function Import-Groups {
                 $_.Exception
             }
         }
-        
+        Read-Host "Testing"
         Try{
             #Create the group if it doesn't exist
             #New-ADGroup -Name $_.name -GroupScope $_.GroupType -Path $_.DistinguishedName
+            @($_.DistinguishedName -like $checkGroup)
             If(@($_.DistinguishedName -like $checkGroup)){
                 Write-Host $joinPath -ForegroundColor White -NoNewline
                 Write-Host " already exists! Group creation skipped!"
@@ -185,14 +183,14 @@ Function Import-Groups {
                 
             } 
             Else {
-                "Error"
-                #Write-Warning "An import error occurred:"
-                #$_ | fl * -force
-                #$_.InvocationInfo.BoundParameters | fl * -force
-                #$_.Exception
+                
+                Write-Warning "An import error occurred:"
+                $_ | fl * -force
+                $_.InvocationInfo.BoundParameters | fl * -force
+                $_.Exception
             }
         }
-        
+        Read-Host "Testing"
         
     }
         

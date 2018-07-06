@@ -501,21 +501,21 @@ Function Import-GPLink {
             # Parse out the domain name, translate it to the destination domain name.
             # Create a distinguished name path from the SOMPath
             # wingtiptoys.local/Testing/SubTest
-            $gPLinks | ft
+            #$gPLinks | ft
             ForEach ($gPLink in $gPLinks) {
-                Write-Host $gPLink.SOMPath -ForegroundColor Red
+                #Write-Host $gPLink.SOMPath -ForegroundColor Red
 
                 $SplitSOMPath = $gPLink.SOMPath -split '/'
-                Write-host $SplitSOMPath -ForegroundColor Red
+                #Write-host $SplitSOMPath -ForegroundColor Red
                 [array]::Reverse($SplitSOMPath)
                 
                 $ou = @()
                 
                 For ($i=0;$i -lt $SplitSOMPath.Length;$i++) {
-                    Write-Host $i $SplitSOMPath[$i] ($SplitSOMPath.Length - 1) -ForegroundColor Red
+                    #Write-Host $i $SplitSOMPath[$i] ($SplitSOMPath.Length - 1) -ForegroundColor Red
                     $index = ($SplitSOMPath.Length - 1)
-                    Write-Host ((0 -le $index) -and ($i -eq 0))
-                    Write-Host (($i -eq 0) -and ($index -gt 0) -and ($i -lt 1))
+                    #Write-Host ((0 -le $index) -and ($i -eq 0))
+                    #Write-Host (($i -eq 0) -and ($index -gt 0) -and ($i -lt 1))
                     switch ($i) {
                         
                         {(($i -eq 0) -and ($index -gt 0) -and ($i -lt 1))} {
@@ -545,26 +545,16 @@ Function Import-GPLink {
                     
                 }
                 $finalOU = @($OU -join "")
-                Write-Host $finalOU -ForegroundColor Red
-                <#
-                # Swap the source and destination domain names
-                $DomainName = $SplitSOMPath[0]
-                ForEach ($d in $MigDomains) {
-                    If ($d.Source -eq $SplitSOMPath[0]) {
-                        $DomainName = $d.Destination
-                    }
-                }
                 
-                # Calculate the full OU distinguished name path
-                $DomainDN = 'DC=' + $DomainName.Replace('.',',DC=')
-                $OU_DN = $DomainDN
-                For ($i=1;$i -lt $SplitSOMPath.Length;$i++) {
-                    $OU_DN = "OU=$($SplitSOMPath[$i])," + $OU_DN
+                # Swap the source and destination domain names
+                ForEach ($d in $MigDomains) {
+                    $DomainName = $finalOU.Replace($d.Source, $d.Destination)
                 }
-                #>
+                #Write-Host $DomainName -ForegroundColor Red
+
                 # Add the DN path as a property on the object
                 
-                Add-Member -InputObject $gPLink -MemberType NoteProperty -Name gPLinkDN -Value $finalOU
+                Add-Member -InputObject $gPLink -MemberType NoteProperty -Name gPLinkDN -Value $DomainName
 
                 <#
                 # Now check to see that the SOM path exists in the destination domain
@@ -590,9 +580,11 @@ Function Import-GPLink {
 
                 # Only attempt to link the policy if the destination path exists.
                 If ($SOMPath) {
-                    "gPLink: $($gPLink.gPLinkDN)"
+                    Write-host "gPLink: " -NoNewline
+                    Write-host $($gPLink.gPLinkDN) -ForegroundColor White
                     # It is possible that the policy is already linked to the destination path.
                     try {
+                        Write-Host "Here" -ForegroundColor Red
                         New-GPLink -Domain $DestDomain -Server $DestServer `
                             -Name $GPMBackup.GPODisplayName `
                             -Target $gPLink.gPLinkDN `
@@ -602,6 +594,7 @@ Function Import-GPLink {
                             -ErrorAction Stop
                         # We calculated the order by counting how many gPLinks already exist.
                         # This ensures that it is always linked last in the order.
+                        Write-Host "Here" -ForegroundColor Red
                     }
                     catch {
                         Write-Warning "gPLink Error: $($gPLink.gPLinkDN)"

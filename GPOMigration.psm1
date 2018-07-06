@@ -512,26 +512,22 @@ Function Import-GPLink {
                 $ou = @()
                 
                 For ($i=0;$i -lt $SplitSOMPath.Length;$i++) {
-                    Write-Host $i $SplitSOMPath[$i] -ForegroundColor Red
-                    
+                    Write-Host $i $SplitSOMPath[$i] ($SplitSOMPath.Length - 1) -ForegroundColor Red
+                    $index = ($SplitSOMPath.Length - 1)
                     switch ($i) {
                         
-                        {($i -le 0)} {
+                        {((0 -le $index) -and ($i -eq 0))} {
                             $ou += "OU=" + $SplitSOMPath[$i]
                             break
                         }
-                        {(($i  -ge 1) -and ($i -lt $SplitSOMPath.Length))} {
+                        {(($i  -ge 1) -and ($i -lt $index))} {
                             
                             $ou += ",OU=" + $SplitSOMPath[$i]
                             break
                         }
-                        {($i -eq $SplitSOMPath.Length)} {
-                            $ou += "Bacon"
-                            #$ou += $SplitSOMPath[$i].Split(".")[1]
-                            #$ou += "DC="
-                            #$ou += $SplitSOMPath[$i].Split(".")[0]
-                            #$ou += ",DC="
+                        {(($i -ne 0) -and ($i -eq $index))} {
                             
+                            $ou += "DC=" + $SplitSOMPath[$i].Split(".")[1] + ",DC=" + $SplitSOMPath[$i].Split(".")[0]
                             break
                         }
                         

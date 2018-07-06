@@ -145,7 +145,7 @@ Function Import-Groups {
                 Write-Host $_.CategoryInfo -ForegroundColor White
             } 
             Else {
-                "An import error occurred:"
+                Write-Warning "A group check error occurred:"
                 $_ | fl * -force
                 $_.InvocationInfo.BoundParameters | fl * -force
                 $_.Exception
@@ -155,7 +155,9 @@ Function Import-Groups {
         Try{
             #Create the group if it doesn't exist
             #New-ADGroup -Name $_.name -GroupScope $_.GroupType -Path $_.DistinguishedName
-            @($_.DistinguishedName -like $checkGroup)
+            Write-Host $checkGroup -ForegroundColor Red 
+            Write-Host $_.DistinguishedName -ForegroundColor Red 
+            Write-Host @($_.DistinguishedName -like $checkGroup) -ForegroundColor Red
             If(@($_.DistinguishedName -like $checkGroup)){
                 Write-Host $joinPath -ForegroundColor White -NoNewline
                 Write-Host " already exists! Group creation skipped!"

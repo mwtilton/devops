@@ -113,7 +113,17 @@ Function Import-Groups {
         }
         Catch
         {
-            Write-Host "      [-]"$_.exception -ForegroundColor Red
+            If ($_.Exception.ToString().Contains('0x8007000D')) {
+                $_.Exception
+                "Error importing GPO: $($_.InvocationInfo.BoundParameters.Item('BackupGpoName'))"
+                "One or more security principals (user, group, etc.) in the migration table are not found in the destination domain."
+            } 
+            Else {
+                "An import error occurred:"
+                $_ | fl * -force
+                $_.InvocationInfo.BoundParameters | fl * -force
+                $_.Exception
+            }
         }
         Try{
             #Create the group if it doesn't exist
@@ -132,7 +142,17 @@ Function Import-Groups {
             Write-host " created!" -ForegroundColor DarkGreen
         }
         Catch{
-            Write-Host "      [-]"$_.exception -ForegroundColor Red
+            If ($_.Exception.ToString().Contains('0x8007000D')) {
+                $_.Exception
+                "Error importing GPO: $($_.InvocationInfo.BoundParameters.Item('BackupGpoName'))"
+                "One or more security principals (user, group, etc.) in the migration table are not found in the destination domain."
+            } 
+            Else {
+                "An import error occurred:"
+                $_ | fl * -force
+                $_.InvocationInfo.BoundParameters | fl * -force
+                $_.Exception
+            }
         }
         
         

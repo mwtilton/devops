@@ -93,36 +93,49 @@ Function Import-Groups {
     #Loop through all items in the CSV
     ForEach ($item In $csv)
     #>
+    Write-Host "[>]Checking: " -ForegroundColor DarkGray
     $csv | ForEach-Object {
         #Check if the OU exists
         #$search = "LDAP://" + $($item.GroupLocation) + "," + $($searchbase)
         #Write-Host $search
-        
-        $check = [ADSI]::Exists("LDAP://" + $_.DistinguishedName)
-        
-        If ($check -eq $True)
+        Write-Host "   [>]" -ForegroundColor DarkGray -NoNewline
+        Write-Host $_.name -ForegroundColor White -NoNewline
+        Write-Host " at path " -ForegroundColor DarkGray -NoNewline
+        Write-Host $_.DistinguishedName -ForegroundColor White 
+
+        Try
         {
-            Try
-            {
-                #Check if the Group already exists
-                Get-ADGroup $_.Name
-                Write-Host "Group " -ForegroundColor Yellow -NoNewline
-                Write-host $_.Name -ForegroundColor White -NoNewline
-                Write-Host " already exists! Group creation skipped!" -ForegroundColor Yellow
-            }
-            Catch
-            {
-                #Create the group if it doesn't exist
-                New-ADGroup -Name $_.name -GroupScope $_.GroupType -Path $_.DistinguishedName
-                Write-Host "Group " -NoNewline
-                Write-host $_.name -ForegroundColor White -NoNewline
-                Write-host " created!"
-            }
+            #Check if the Group already exists
+            Get-ADGroup $_.Name | Out-Null
+            Write-Host "      [=]" -ForegroundColor Yellow -NoNewline
+            Write-host $_.Name -ForegroundColor White -NoNewline
+            Write-Host " already exists! Group creation skipped!" -ForegroundColor Yellow
         }
-        Else
+        Catch
         {
-            Write-Warning "Target OU can't be found! Group creation skipped!"
+            Write-Host "      [-]"$_.exception -ForegroundColor Red
         }
+        Try{
+            #Create the group if it doesn't exist
+            #New-ADGroup -Name $_.name -GroupScope $_.GroupType -Path $_.DistinguishedName
+            New-ADGroup `
+                -Name $_.name `
+                -SamAccountName     $_.SamAccountName `
+                -GroupCategory      $_.GroupCategory `
+                -GroupScope         $_.GroupScope `
+                -DisplayName        $_.DisplayName `
+                -Path               $_.DistinguishedName `
+                -Description        $_.Description
+
+            Write-Host "      [+]" -ForegroundColor DarkGreen -NoNewline
+            Write-host $_.name -ForegroundColor White -NoNewline
+            Write-host " created!" -ForegroundColor DarkGreen
+        }
+        Catch{
+            Write-Host "      [-]"$_.exception -ForegroundColor Red
+        }
+        
+        
     }
         
 

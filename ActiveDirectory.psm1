@@ -59,7 +59,7 @@ Function Start-DCImport {
         
     )
     Write-host "Starting DC Import" -fore Yellow
-    Import-Groups -Path $Path
+    Import-Groups -Path $Path -DestDomain $DestDomain -DestServer $DestServer
 
 } # End Function
 
@@ -79,11 +79,51 @@ Function Import-Groups {
         $Path
         
     )
-    $exportedGroups = "$path\Exported-Groups.csv"
     
-    $importGroups = Import-Csv $exportedGroups | % {$_.name }
-    $importGroups | ForEach-Object{
-        $_
+    $exportedGroups = "$path\Exported-Groups.csv"
+    $csv      = @()
+    $csv      = Import-Csv -Path $exportedGroups
+    
+    
+    #Get Domain Base
+    <#
+    $searchbase = Get-ADDomain | ForEach {  $_.DistinguishedName }
+    
+    Write-Host $searchbase
+    #Loop through all items in the CSV
+    ForEach ($item In $csv)
+    #>
+    $csv | ForEach-Object {
+        #Check if the OU exists
+        #$search = "LDAP://" + $($item.GroupLocation) + "," + $($searchbase)
+        #Write-Host $search
+        
+        $check = [ADSI]::Exists("LDAP://" + $_.DistinguishedName)
+        
+        If ($check -eq $True)
+        {
+            Try
+            {
+                #Check if the Group already exists
+                Get-ADGroup $_.Name
+                Write-Host "Group " -ForegroundColor Yellow -NoNewline
+                Write-host $_.Name -ForegroundColor White -NoNewline
+                Write-Host " already exists! Group creation skipped!" -ForegroundColor Yellow
+            }
+            Catch
+            {
+                #Create the group if it doesn't exist
+                New-ADGroup -Name $_.name -GroupScope $_.GroupType -Path $_.DistinguishedName
+                Write-Host "Group " -NoNewline
+                Write-host $_.name -ForegroundColor White -NoNewline
+                Write-host " created!"
+            }
+        }
+        Else
+        {
+            Write-Warning "Target OU can't be found! Group creation skipped!"
+        }
     }
+        
 
 }

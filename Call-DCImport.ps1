@@ -20,7 +20,6 @@ $SrceServer  = "$env:COMPUTERNAME.$env:USERDNSDOMAIN"
 # IMPORT PROCESS
 ###############################################################################
 Start-DCImport `
-    -SrceDomain $SrceDomain `
-    -SrceServer $SrceServer `
-    -Path $Path
-    
+    -DestDomain $DestDomain `
+    -DestServer $DestServer `
+    -Path $Path `

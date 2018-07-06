@@ -513,20 +513,23 @@ Function Import-GPLink {
                 
                 For ($i=0;$i -lt $SplitSOMPath.Length;$i++) {
                     Write-Host $i $SplitSOMPath[$i] -ForegroundColor Red
-                    $ofs = ""
+                    
                     switch ($i) {
                         
-                        0 {
-                            $ou += "OU="
-                            $ou += $SplitSOMPath[$i]
+                        {(($i -eq 0) -and ($SplitSOMPath.Length -gt 0))} {
+                            $ou += "OU=" + $SplitSOMPath[$i]
                             break
                         }
-                        {(($i  -gt 1) -and ($i -lt $SplitSOMPath.Length))} {
-                            #$ou += ",OU="
-                            #$ou += $SplitSOMPath[$i]
+                        {(($i -eq 0) -and ($SplitSOMPath.Length -gt 0))} {
+                            $ou += "OU=" + $SplitSOMPath[$i]
                             break
                         }
-                        {$SplitSOMPath.Length} {
+                        {(($i  -ge 1) -and ($i -lt $SplitSOMPath.Length))} {
+                            $ou += ",OU="+ $SplitSOMPath[$i]
+                            break
+                        }
+                        {(($i -ne 0) -and ($i -eq $SplitSOMPath.Length))} {
+                            $ou += "Bacon"
                             #$ou += $SplitSOMPath[$i].Split(".")[1]
                             #$ou += "DC="
                             #$ou += $SplitSOMPath[$i].Split(".")[0]
@@ -540,10 +543,10 @@ Function Import-GPLink {
                             "Something else happened"
                         }
                     }
-                    $ofs = " "
+                    
                     
                 }
-                Write-Host [array]$OU -ForegroundColor Red
+                Write-Host $OU.Replace(" ,",",") -ForegroundColor Red
                 <#
                 # Swap the source and destination domain names
                 $DomainName = $SplitSOMPath[0]
@@ -559,10 +562,12 @@ Function Import-GPLink {
                 For ($i=1;$i -lt $SplitSOMPath.Length;$i++) {
                     $OU_DN = "OU=$($SplitSOMPath[$i])," + $OU_DN
                 }
-
+                #>
                 # Add the DN path as a property on the object
-                Add-Member -InputObject $gPLink -MemberType NoteProperty -Name gPLinkDN -Value $OU_DN
+                
+                #Add-Member -InputObject $gPLink -MemberType NoteProperty -Name gPLinkDN -Value $OU
 
+                <#
                 # Now check to see that the SOM path exists in the destination domain
                 # If Exists, then create the link
                 # If NotExists, then report an error

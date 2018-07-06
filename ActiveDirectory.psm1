@@ -104,11 +104,38 @@ Function Import-Groups {
         Write-Host $_.DistinguishedName -ForegroundColor White 
         
         $SplitDistName = $_.DistinguishedName -split ','
-        Write-Host @($_.name + $SplitDistName) -ForegroundColor Cyan
-        $SplitDistName.replace()
+        
+        $newPath = @($SplitDistName.replace($SplitDistName[0], ""))
+        $PathArray = @()
+        For ($i=1;$i -lt $newPath.Length;$i++) {
+            $index = ($newPath.Length - 1)
+            Write-Host "   "$i $newPath[$i] $index -ForegroundColor Red
+            
+            switch ($i) {
+                
+                {(($i -eq 1) -and ($index -gt 1) -and ($i -lt 2))} {
+                    $PathArray += $newPath[$i]
+                    break
+                }
+                {($i  -ge 1)} {
+                    
+                    $PathArray += "," + $newPath[$i]
+                    break
+                }
+                
+                Default {
+                    "Something else happened"
+                }
+            }
+
+        }
+
+        $joinPath = @($PathArray -join "")
+        Write-Host "   "$joinPath -ForegroundColor Red
+        
+        #Check if the Group already exists
         Try
         {
-            #Check if the Group already exists
             Get-ADGroup $_.Name | Out-Null
             Write-Host "      [=]" -ForegroundColor Yellow -NoNewline
             Write-host $_.Name -ForegroundColor White -NoNewline
@@ -118,8 +145,8 @@ Function Import-Groups {
         {
             If ($_.Exception.ToString().Contains('0x8007000D')) {
                 $_.Exception
-                "Error importing GPO: $($_.InvocationInfo.BoundParameters.Item('BackupGpoName'))"
-                "One or more security principals (user, group, etc.) in the migration table are not found in the destination domain."
+                "Error "
+                
             } 
             Else {
                 "An import error occurred:"
@@ -128,9 +155,11 @@ Function Import-Groups {
                 $_.Exception
             }
         }
+        <#
         Try{
             #Create the group if it doesn't exist
             #New-ADGroup -Name $_.name -GroupScope $_.GroupType -Path $_.DistinguishedName
+            
             New-ADGroup `
                 -Name $_.name `
                 -SamAccountName     $_.SamAccountName `
@@ -143,6 +172,7 @@ Function Import-Groups {
             Write-Host "      [+]" -ForegroundColor DarkGreen -NoNewline
             Write-host $_.name -ForegroundColor White -NoNewline
             Write-host " created!" -ForegroundColor DarkGreen
+            
         }
         Catch{
             If ($_.Exception.ToString().Contains('0x8007000D')) {
@@ -157,7 +187,7 @@ Function Import-Groups {
                 $_.Exception
             }
         }
-        
+        #>
         
     }
         

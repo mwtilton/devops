@@ -1,5 +1,6 @@
 <##############################################################################
-Setup
+NOTE:
+    Must have exported all necessary items from Original Domain
 
 ##############################################################################>
 $ActiveDirectory = "$env:USERPROFILE\Desktop\ActiveDirectory\ActiveDirectory"
@@ -15,11 +16,11 @@ $Path        = $PWD  # Current folder specified in Set-Location above
 $SrceDomain  = $env:USERDNSDOMAIN
 $SrceServer  = "$env:COMPUTERNAME.$env:USERDNSDOMAIN"
 
-Start-DCExport `
+###############################################################################
+# IMPORT PROCESS
+###############################################################################
+Start-DCImport `
     -SrceDomain $SrceDomain `
     -SrceServer $SrceServer `
     -Path $Path
     
-###############################################################################
-# END
-###############################################################################

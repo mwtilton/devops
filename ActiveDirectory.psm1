@@ -14,7 +14,8 @@ Function Start-DCExport {
         $Path  # Working path to store files
     )
     Write-host "Starting Group Exports" -fore Yellow
-    Export-Groups
+    Export-Groups -Path $Path
+
 } # End Function
 
 
@@ -22,12 +23,6 @@ Function Start-DCExport {
 #Export related functions
 Function Export-Groups {
     Param (
-        [Parameter(Mandatory=$true)]
-        [String]
-        $SrceDomain,
-        [Parameter(Mandatory=$true)]
-        [String]
-        $SrceServer,
         [Parameter(Mandatory=$true)]
         [ValidateScript({Test-Path $_})]
         [String]
@@ -38,8 +33,8 @@ Function Export-Groups {
     $splitDomain = $Domain.Split(".")
     $searchbase = "DC=" + $splitDomain[0] + ",DC=" + $splitDomain[1]
 
-    $exportedGroups = "$env:USERPROFILE\Desktop\Exported-Groups.csv"
-    $Groups = Get-ADGroup -Properties * -Filter * -SearchBase $searchbase |  Export-Csv -Path $exportedGroups -NoTypeInformation
+    $exportedGroups = "$path\Exported-Groups.csv"
+    Get-ADGroup -Properties * -Filter * -SearchBase $searchbase |  Export-Csv -Path $exportedGroups -NoTypeInformation
 
     Import-Csv $exportedGroups | % {$_.name } | ft
 
@@ -60,11 +55,11 @@ Function Start-DCImport {
         [Parameter(Mandatory=$true)]
         [ValidateScript({Test-Path $_})]
         [String]
-        $Path,
+        $Path
         
     )
     Write-host "Starting DC Import" -fore Yellow
-    
+    Import-Groups -Path $Path
 
 } # End Function
 
@@ -81,9 +76,14 @@ Function Import-Groups {
         [Parameter(Mandatory=$true)]
         [ValidateScript({Test-Path $_})]
         [String]
-        $Path,
+        $Path
         
     )
-
+    $exportedGroups = "$path\Exported-Groups.csv"
+    
+    $importGroups = Import-Csv $exportedGroups | % {$_.name }
+    $importGroups | ForEach-Object{
+        $_
+    }
 
 }

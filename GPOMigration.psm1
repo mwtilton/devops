@@ -477,7 +477,8 @@ Function Import-GPLink {
 
     $MigTableCSV = Import-CSV $MigTableCSVPath
     $MigDomains  = $MigTableCSV | Where-Object {$_.Type -eq "Domain"}
-    Write-Host "Domain: "$DestDomain "server: "$DestServer.Split(".")[1] -ForegroundColor Black -BackgroundColor Yellow
+    #Testing for new domain names
+    #Write-Host "Domain: "$DestDomain "server: "$DestServer.Split(".")[1] -ForegroundColor Black -BackgroundColor Yellow
     ForEach ($GPMBackup in $BackupList) {
 
         Write-host "Backup GPO Displayname: " -NoNewline
@@ -584,21 +585,21 @@ Function Import-GPLink {
                     Write-host $($gPLink.gPLinkDN) -ForegroundColor White
                     # It is possible that the policy is already linked to the destination path.
                     try {
-                        Write-Host "Here" -ForegroundColor Red
+                        
                         New-GPLink -Domain $DestDomain -Server $DestServer `
                             -Name $GPMBackup.GPODisplayName `
                             -Target $gPLink.gPLinkDN `
                             -LinkEnabled $(If ($gPLink.Enabled -eq 'true') {'Yes'} Else {'No'}) `
                             -Enforced $(If ($gPLink.NoOverride -eq 'true') {'Yes'} Else {'No'}) `
                             -Order $(If ($SOMPath.gPLink.Length -gt 1) {$SOMPath.gPLink.Split(']').Length} Else {1}) `
-                            -ErrorAction Stop
+                            -ErrorAction Stop | Out-Null
                         # We calculated the order by counting how many gPLinks already exist.
                         # This ensures that it is always linked last in the order.
-                        Write-Host "Here" -ForegroundColor Red
+                        
                     }
                     catch {
                         Write-Warning "gPLink Error: $($gPLink.gPLinkDN)"
-                        $_.Exception
+                        Write-host "   [=]"$_.Exception -ForegroundColor Yellow
                     }
                 } 
                 Else {

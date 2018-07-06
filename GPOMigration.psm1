@@ -514,9 +514,11 @@ Function Import-GPLink {
                 For ($i=0;$i -lt $SplitSOMPath.Length;$i++) {
                     Write-Host $i $SplitSOMPath[$i] ($SplitSOMPath.Length - 1) -ForegroundColor Red
                     $index = ($SplitSOMPath.Length - 1)
+                    Write-Host ((0 -le $index) -and ($i -eq 0))
+                    Write-Host (($i -eq 0) -and ($index -gt 0) -and ($i -lt 1))
                     switch ($i) {
                         
-                        {((0 -le $index) -and ($i -eq 0))} {
+                        {(($i -eq 0) -and ($index -gt 0) -and ($i -lt 1))} {
                             $ou += "OU=" + $SplitSOMPath[$i]
                             break
                         }
@@ -527,11 +529,14 @@ Function Import-GPLink {
                         }
                         {(($i -ne 0) -and ($i -eq $index))} {
                             
-                            $ou += "DC=" + $SplitSOMPath[$i].Split(".")[1] + ",DC=" + $SplitSOMPath[$i].Split(".")[0]
+                            $ou += ",DC=" + $SplitSOMPath[$i].Split(".")[0] + ",DC=" + $SplitSOMPath[$i].Split(".")[1]
                             break
                         }
-                        
-                        
+                        {(($i -eq 0) -and ($i -eq $index))} {
+                            
+                            $ou += "DC=" + $SplitSOMPath[$i].Split(".")[0] + ",DC=" + $SplitSOMPath[$i].Split(".")[1]
+                            break
+                        }
                         Default {
                             "Something else happened"
                         }
@@ -559,7 +564,7 @@ Function Import-GPLink {
                 #>
                 # Add the DN path as a property on the object
                 
-                #Add-Member -InputObject $gPLink -MemberType NoteProperty -Name gPLinkDN -Value $OU
+                Add-Member -InputObject $gPLink -MemberType NoteProperty -Name gPLinkDN -Value $OU
 
                 <#
                 # Now check to see that the SOM path exists in the destination domain
@@ -571,7 +576,7 @@ Function Import-GPLink {
                 -------     -------                           ------- ---------- --------                                    
                 SubTest     wingtiptoys.local/Testing/SubTest true    false      OU=SubTest,OU=Testing,DC=cohovineyard,DC=com
                 wingtiptoys wingtiptoys.local                 false   false      DC=cohovineyard,DC=com                      
-                
+                #>
 
                 # Put the potential error line outside the context of the IF
                 # so that it doesn't cause the whole construct to error out.

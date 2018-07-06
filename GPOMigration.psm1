@@ -33,16 +33,16 @@ Function Start-GPOImport {
     Write-host "Starting GPOImport" -fore Yellow
     # Create the migration table
     # Capture the MigTablePath and MigTableCSVPath for use with subsequent cmdlets
-    #$MigTablePath = New-GPOMigrationTable -DestDomain $DestDomain -Path $Path -BackupPath $BackupPath -MigTableCSVPath $MigTableCSVPath
+    $MigTablePath = New-GPOMigrationTable -DestDomain $DestDomain -Path $Path -BackupPath $BackupPath -MigTableCSVPath $MigTableCSVPath
 
     # View the migration table
     Write-host "View the migration table" -fore Yellow
-    #Show-GPOMigrationTable -Path $MigTablePath
+    Show-GPOMigrationTable -Path $MigTablePath
 
     # Validate the migration table
     # No output is good.
     Write-host "Validate the migration table" -fore Yellow
-    #Test-GPOMigrationTable -Path $MigTablePath
+    Test-GPOMigrationTable -Path $MigTablePath
 
     Write-host "Removing Dup GPO's" -fore Red
     # OPTIONAL
@@ -51,12 +51,12 @@ Function Start-GPOImport {
     # - You want a clean import. Remove any existing policies of the same name first.
     # - You want to start over and import them again.
     # - Import-GPO will fail if a GPO of the same name exists in the target.
-    #Invoke-RemoveGPO -DestDomain $DestDomain -DestServer $DestServer -BackupPath $BackupPath
+    Invoke-RemoveGPO -DestDomain $DestDomain -DestServer $DestServer -BackupPath $BackupPath
 
     Write-host "Invoking the GPOImport" -fore Yellow
     # Import all from backup
     # This will fail for any policies that are missing migration table accounts in the destination domain.
-    #Invoke-ImportGPO -DestDomain $DestDomain -DestServer $DestServer -BackupPath $BackupPath -MigTablePath $MigTablePath -CopyACL
+    Invoke-ImportGPO -DestDomain $DestDomain -DestServer $DestServer -BackupPath $BackupPath -MigTablePath $MigTablePath -CopyACL
 
     Write-host "Importing WMI filters" -fore Yellow
     # Import WMIFilters
@@ -564,7 +564,7 @@ Function Import-GPLink {
                 #>
                 # Add the DN path as a property on the object
                 
-                Add-Member -InputObject $gPLink -MemberType NoteProperty -Name gPLinkDN -Value $OU
+                Add-Member -InputObject $gPLink -MemberType NoteProperty -Name gPLinkDN -Value $finalOU
 
                 <#
                 # Now check to see that the SOM path exists in the destination domain

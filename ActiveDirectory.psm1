@@ -52,6 +52,7 @@ Function Start-DCImport {
         [Parameter(Mandatory=$true)]
         [String]
         $DestServer,
+        
         [Parameter(Mandatory=$true)]
         [ValidateScript({Test-Path $_})]
         [String]
@@ -73,6 +74,7 @@ Function Import-Groups {
         [Parameter(Mandatory=$true)]
         [String]
         $DestServer,
+        
         [Parameter(Mandatory=$true)]
         [ValidateScript({Test-Path $_})]
         [String]
@@ -115,6 +117,7 @@ Function Import-Groups {
                 
                 {(($i -eq 1) -and ($index -gt 1) -and ($i -lt 2))} {
                     $PathArray += $newPath[$i]
+                    
                     break
                 }
                 {($i  -ge 1)} {
@@ -127,12 +130,14 @@ Function Import-Groups {
                     "Something else happened"
                 }
             }
-
+            
         }
 
         $joinPath = $PathArray -join ""
-        Write-Host $joinPath
+        Write-Host $joinPath.Replace("LandGraphics", $DestDomain.Split(".")[0])
+        
         #Check if the Group already exists
+        <#
         Try
         {
             $checkGroup = Get-ADGroup $_.Name
@@ -193,7 +198,7 @@ Function Import-Groups {
             }
         }
         Read-Host "Testing"
-        
+        #>
     }
         
 

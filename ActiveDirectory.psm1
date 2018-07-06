@@ -130,22 +130,38 @@ Function Import-Groups {
 
         }
 
+<<<<<<< HEAD
         $joinPath = @($PathArray -join "")
         Write-Host $joinPath -ForegroundColor White
+=======
+        $joinPath = $PathArray -join ""
+        
+>>>>>>> errorhandling
         
         #Check if the Group already exists
         Try
         {
+<<<<<<< HEAD
             Get-ADGroup $_.Name | Out-Null
             Write-Host "      [--]" -ForegroundColor Yellow -NoNewline
             Write-host $_.Name -ForegroundColor White -NoNewline
             Write-Host " already exists! Group creation skipped!" -ForegroundColor Yellow
+=======
+            $checkGroup = Get-ADGroup $_.Name
+            
+            
+>>>>>>> errorhandling
         }
         Catch
         {
             If ($_.CategoryInfo.ToString().Contains('ObjectNotFound')) {
+<<<<<<< HEAD
                 
                 Write-Host "      [>]" -NoNewline
+=======
+                Write-host ""
+                Write-Host "      [+] " -NoNewline
+>>>>>>> errorhandling
                 Write-Host $_.CategoryInfo -ForegroundColor White
             } 
             Else {
@@ -159,7 +175,26 @@ Function Import-Groups {
         Try{
             #Create the group if it doesn't exist
             #New-ADGroup -Name $_.name -GroupScope $_.GroupType -Path $_.DistinguishedName
+            If(@($_.DistinguishedName -like $checkGroup)){
+                Write-Host $joinPath -ForegroundColor White -NoNewline
+                Write-Host " already exists! Group creation skipped!"
+            }
+            Else{
+                New-ADGroup `
+                    -Name $_.name `
+                    -SamAccountName     $_.SamAccountName `
+                    -GroupCategory      $_.GroupCategory `
+                    -GroupScope         $_.GroupScope `
+                    -DisplayName        $_.DisplayName `
+                    -Path               $joinPath `
+                    -Description        $_.Description
+
+                Write-Host "      [+] " -ForegroundColor DarkGreen -NoNewline
+                Write-host $_.name -ForegroundColor White -NoNewline
+                Write-host " created!" -ForegroundColor DarkGreen
+            }
             
+<<<<<<< HEAD
             New-ADGroup `
                 -Name $_.name `
                 -SamAccountName     $_.SamAccountName `
@@ -172,6 +207,8 @@ Function Import-Groups {
             Write-Host "      [+]" -ForegroundColor DarkGreen -NoNewline
             Write-host $_.name -ForegroundColor White -NoNewline
             Write-host " created!" -ForegroundColor DarkGreen
+=======
+>>>>>>> errorhandling
             
         }
         Catch{
@@ -180,10 +217,18 @@ Function Import-Groups {
                 
             } 
             Else {
+<<<<<<< HEAD
                 Write-Warning "An import error occurred:"
                 $_ | fl * -force
                 $_.InvocationInfo.BoundParameters | fl * -force
                 $_.Exception
+=======
+                "Error"
+                #Write-Warning "An import error occurred:"
+                #$_ | fl * -force
+                #$_.InvocationInfo.BoundParameters | fl * -force
+                #$_.Exception
+>>>>>>> errorhandling
             }
         }
         

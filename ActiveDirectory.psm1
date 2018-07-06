@@ -101,7 +101,7 @@ Function Import-Groups {
         Write-Host "   [>]" -ForegroundColor DarkGray -NoNewline
         Write-Host $_.name -ForegroundColor White -NoNewline
         Write-Host " at path " -ForegroundColor DarkGray -NoNewline
-        Write-Host $_.DistinguishedName -ForegroundColor White 
+        #Write-Host $_.DistinguishedName -ForegroundColor White 
         
         $SplitDistName = $_.DistinguishedName -split ','
         
@@ -109,7 +109,7 @@ Function Import-Groups {
         $PathArray = @()
         For ($i=1;$i -lt $newPath.Length;$i++) {
             $index = ($newPath.Length - 1)
-            Write-Host "   "$i $newPath[$i] $index -ForegroundColor Red
+            #Write-Host "   "$i $newPath[$i] $index -ForegroundColor Red
             
             switch ($i) {
                 
@@ -131,22 +131,22 @@ Function Import-Groups {
         }
 
         $joinPath = @($PathArray -join "")
-        Write-Host "   "$joinPath -ForegroundColor Red
+        Write-Host "   "$joinPath -ForegroundColor Magenta
         
         #Check if the Group already exists
         Try
         {
             Get-ADGroup $_.Name | Out-Null
-            Write-Host "      [=]" -ForegroundColor Yellow -NoNewline
+            Write-Host "      [--]" -ForegroundColor Yellow -NoNewline
             Write-host $_.Name -ForegroundColor White -NoNewline
             Write-Host " already exists! Group creation skipped!" -ForegroundColor Yellow
         }
         Catch
         {
-            If ($_.Exception.ToString().Contains('0x8007000D')) {
-                $_.Exception
-                "Error "
+            If ($_.CategoryInfo.ToString().Contains('ObjectNotFound')) {
                 
+                Write-Host "      [>]" -NoNewline
+                Write-Host $_.CategoryInfo -ForegroundColor White
             } 
             Else {
                 "An import error occurred:"

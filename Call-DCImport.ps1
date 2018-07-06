@@ -9,7 +9,7 @@ New-Item -ItemType Directory $ActiveDirectoryWorkingDirectory -ea SilentlyContin
 Set-Location $ActiveDirectoryWorkingDirectory
 
 Import-Module ActiveDirectory
-Import-Module $ActiveDirectory -Force -Verbose
+Import-Module $ActiveDirectory -Force
 
 # This path must be absolute, not relative
 $Path        = $PWD  # Current folder specified in Set-Location above

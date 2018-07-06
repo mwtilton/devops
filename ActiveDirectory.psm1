@@ -130,22 +130,21 @@ Function Import-Groups {
 
         }
 
-        $joinPath = @($PathArray -join "")
-        Write-Host "   "$joinPath -ForegroundColor Magenta
+        $joinPath = $PathArray -join ""
+        
         
         #Check if the Group already exists
         Try
         {
-            Get-ADGroup $_.Name | Out-Null
-            Write-Host "      [--]" -ForegroundColor Yellow -NoNewline
-            Write-host $_.Name -ForegroundColor White -NoNewline
-            Write-Host " already exists! Group creation skipped!" -ForegroundColor Yellow
+            $checkGroup = Get-ADGroup $_.Name
+            
+            
         }
         Catch
         {
             If ($_.CategoryInfo.ToString().Contains('ObjectNotFound')) {
-                
-                Write-Host "      [>]" -NoNewline
+                Write-host ""
+                Write-Host "      [+] " -NoNewline
                 Write-Host $_.CategoryInfo -ForegroundColor White
             } 
             Else {
@@ -155,39 +154,45 @@ Function Import-Groups {
                 $_.Exception
             }
         }
-        <#
+        
         Try{
             #Create the group if it doesn't exist
             #New-ADGroup -Name $_.name -GroupScope $_.GroupType -Path $_.DistinguishedName
-            
-            New-ADGroup `
-                -Name $_.name `
-                -SamAccountName     $_.SamAccountName `
-                -GroupCategory      $_.GroupCategory `
-                -GroupScope         $_.GroupScope `
-                -DisplayName        $_.DisplayName `
-                -Path               $_.DistinguishedName `
-                -Description        $_.Description
+            If(@($_.DistinguishedName -like $checkGroup)){
+                Write-Host $joinPath -ForegroundColor White -NoNewline
+                Write-Host " already exists! Group creation skipped!"
+            }
+            Else{
+                New-ADGroup `
+                    -Name $_.name `
+                    -SamAccountName     $_.SamAccountName `
+                    -GroupCategory      $_.GroupCategory `
+                    -GroupScope         $_.GroupScope `
+                    -DisplayName        $_.DisplayName `
+                    -Path               $joinPath `
+                    -Description        $_.Description
 
-            Write-Host "      [+]" -ForegroundColor DarkGreen -NoNewline
-            Write-host $_.name -ForegroundColor White -NoNewline
-            Write-host " created!" -ForegroundColor DarkGreen
+                Write-Host "      [+] " -ForegroundColor DarkGreen -NoNewline
+                Write-host $_.name -ForegroundColor White -NoNewline
+                Write-host " created!" -ForegroundColor DarkGreen
+            }
+            
             
         }
         Catch{
             If ($_.Exception.ToString().Contains('0x8007000D')) {
                 $_.Exception
-                "Error importing GPO: $($_.InvocationInfo.BoundParameters.Item('BackupGpoName'))"
-                "One or more security principals (user, group, etc.) in the migration table are not found in the destination domain."
+                
             } 
             Else {
-                "An import error occurred:"
-                $_ | fl * -force
-                $_.InvocationInfo.BoundParameters | fl * -force
-                $_.Exception
+                "Error"
+                #Write-Warning "An import error occurred:"
+                #$_ | fl * -force
+                #$_.InvocationInfo.BoundParameters | fl * -force
+                #$_.Exception
             }
         }
-        #>
+        
         
     }
         

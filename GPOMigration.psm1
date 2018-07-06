@@ -516,19 +516,16 @@ Function Import-GPLink {
                     
                     switch ($i) {
                         
-                        {(($i -eq 0) -and ($SplitSOMPath.Length -gt 0))} {
-                            $ou += "OU=" + $SplitSOMPath[$i]
-                            break
-                        }
-                        {(($i -eq 0) -and ($SplitSOMPath.Length -gt 0))} {
+                        {($i -le 0)} {
                             $ou += "OU=" + $SplitSOMPath[$i]
                             break
                         }
                         {(($i  -ge 1) -and ($i -lt $SplitSOMPath.Length))} {
-                            $ou += ",OU="+ $SplitSOMPath[$i]
+                            
+                            $ou += ",OU=" + $SplitSOMPath[$i]
                             break
                         }
-                        {(($i -ne 0) -and ($i -eq $SplitSOMPath.Length))} {
+                        {($i -eq $SplitSOMPath.Length)} {
                             $ou += "Bacon"
                             #$ou += $SplitSOMPath[$i].Split(".")[1]
                             #$ou += "DC="
@@ -546,7 +543,8 @@ Function Import-GPLink {
                     
                     
                 }
-                Write-Host $OU.Replace(" ,",",") -ForegroundColor Red
+                $finalOU = @($OU -join "")
+                Write-Host $finalOU -ForegroundColor Red
                 <#
                 # Swap the source and destination domain names
                 $DomainName = $SplitSOMPath[0]

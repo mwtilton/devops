@@ -15,6 +15,7 @@ Import-Module $ActiveDirectory -Force
 $Path        = $PWD  # Current folder specified in Set-Location above
 $DestDomain  = $env:USERDNSDOMAIN
 $DestServer  = "$env:COMPUTERNAME.$env:USERDNSDOMAIN"
+$CSVPath = "$ActiveDirectoryWorkingDirectory\Import.csv"
 
 ###############################################################################
 # IMPORT PROCESS
@@ -22,4 +23,5 @@ $DestServer  = "$env:COMPUTERNAME.$env:USERDNSDOMAIN"
 Start-DCImport `
     -DestDomain $DestDomain `
     -DestServer $DestServer `
+    -CSVPath $CSVPath `
     -Path $Path

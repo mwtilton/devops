@@ -55,11 +55,15 @@ Function Start-DCImport {
         [Parameter(Mandatory=$true)]
         [ValidateScript({Test-Path $_})]
         [String]
+        $CSVPath,
+        [Parameter(Mandatory=$true)]
+        [ValidateScript({Test-Path $_})]
+        [String]
         $Path
         
     )
     Write-host "Starting DC Import" -fore Yellow
-    Import-Groups -Path $Path -DestDomain $DestDomain -DestServer $DestServer
+    Import-Groups -Path $Path -DestDomain $DestDomain -DestServer $DestServer -CSVPath $CSVPath
 
 } # End Function
 
@@ -76,6 +80,10 @@ Function Import-Groups {
         [Parameter(Mandatory=$true)]
         [ValidateScript({Test-Path $_})]
         [String]
+        $CSVPath,
+        [Parameter(Mandatory=$true)]
+        [ValidateScript({Test-Path $_})]
+        [String]
         $Path
         
     )
@@ -83,7 +91,8 @@ Function Import-Groups {
     $exportedGroups = "$path\Exported-Groups.csv"
     $csv      = @()
     $csv      = Import-Csv -Path $exportedGroups
-    
+    $ImportCSV = Import-CSV $CSVPath
+    $ImportDomains  = $ImportCSV | Where-Object {$_.Type -eq "Domain"}
     
     #Get Domain Base
     <#
@@ -115,6 +124,7 @@ Function Import-Groups {
                 
                 {(($i -eq 1) -and ($index -gt 1) -and ($i -lt 2))} {
                     $PathArray += $newPath[$i]
+                    
                     break
                 }
                 {($i  -ge 1)} {
@@ -127,12 +137,18 @@ Function Import-Groups {
                     "Something else happened"
                 }
             }
-
+            
         }
 
         $joinPath = $PathArray -join ""
-        
+        #Write-Host $joinPath.Replace("LandGraphics", $DestDomain.Split(".")[0])
+        ForEach ($d in $ImportDomains) {
+            $DomainName = $joinPath.Replace($d.Source, $d.Destination)
+        }
+        Write-Host $DomainName -ForegroundColor Red
+
         #Check if the Group already exists
+        <#
         Try
         {
             $checkGroup = Get-ADGroup $_.Name
@@ -145,16 +161,19 @@ Function Import-Groups {
                 Write-Host $_.CategoryInfo -ForegroundColor White
             } 
             Else {
-                "An import error occurred:"
+                Write-Warning "A group check error occurred:"
                 $_ | fl * -force
                 $_.InvocationInfo.BoundParameters | fl * -force
                 $_.Exception
             }
         }
-        
+        Read-Host "Testing"
         Try{
             #Create the group if it doesn't exist
             #New-ADGroup -Name $_.name -GroupScope $_.GroupType -Path $_.DistinguishedName
+            Write-Host $checkGroup -ForegroundColor Red 
+            Write-Host $_.DistinguishedName -ForegroundColor Red 
+            Write-Host @($_.DistinguishedName -like $checkGroup) -ForegroundColor Red
             If(@($_.DistinguishedName -like $checkGroup)){
                 Write-Host $joinPath -ForegroundColor White -NoNewline
                 Write-Host " already exists! Group creation skipped!"
@@ -189,8 +208,8 @@ Function Import-Groups {
                 $_.Exception
             }
         }
-        
-        
+        Read-Host "Testing"
+        #>
     }
         
 

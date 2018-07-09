@@ -9,9 +9,6 @@ ModuleVersion = '1.1.4'
 # Author of this module
 Author = 'mwtilton'
 
-# Company or vendor of this module
-CompanyName = 'Microsoft'
-
 # Functions to export from this module
 FunctionsToExport = '*'
 

@@ -15,12 +15,7 @@ Function Start-FilesFolders {
     )
     Write-host "Starting FilesFolders" -fore Yellow
     Get-FilesFolders -path $path
-
-
-    
 } # End Function
-
-
 
 function Test-FileLock {
     param (

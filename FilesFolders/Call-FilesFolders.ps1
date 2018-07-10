@@ -4,10 +4,6 @@ Setup
 Notes:
 
 ##############################################################################>
+#Import-Module "$env:WORKINGFOLDER\DevOps\FilesFolders\FilesFolders\FilesFolders.psm1" -Force -Verbose
 
-Import-Module "env:WORKINGFOLDER\FilesFolders\root\*" -Force
-
-$Path        = $env:WORKINGFOLDER  
-
-Start-FilesFolders `
-    -Path $Path
+Invoke-Pester -CodeCoverage $env:WORKINGFOLDER\DevOps\FilesFolders\FilesFolders\FilesFolders.psm1

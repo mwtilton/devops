@@ -1,20 +1,31 @@
 Import-Module $env:WORKINGFOLDER\Devops\FilesFolders\FilesFolders -Force -ErrorAction Stop
 
 InModuleScope "FilesFolders" {
-    Describe "Start-FilesFolders" {
-        Context "Error Handling" {
+    Describe "Test-FileLock" {
+        Context "Test-Path" {
 
-            Mock IsAdmin -MockWith {$false}
-            It "should throw an exception" {
-                { New-Item -Path $env:WORKINGFOLDER\Devops\FilesFolders\FilesFolders -ItemType Directory -ErrorAction Stop} | Should Throw
+            It "should find the folder" {
+                $path = $env:WORKINGFOLDER
+                Test-FileLock -Path $path | Should Be $true
             }
-            It "should fail"{
-                {Get-GPOreport -ErrorAction Stop} | Should Throw
+            It "should return an error" {
+                {Test-FileLock -ErrorAction Stop } | Should throw   
             }
-            
+            It "should return false" {
+                $falsepath = "d:\"
+                Test-FileLock -Path $falsepath | Should Be $false
+            }
+
         }
-               
-        
+        Context "Open the file" {
+            Mock -MockWith Test-FileLock {return $false}
+            It "not able to open the file" {
+                $result = Test-FileLock -Path "c:\"
+                $result | Should Be $false
+            }
+        }
+
+
     }
-    
+
 }

@@ -142,11 +142,11 @@ Function Import-Groups {
 
         $joinPath = $PathArray -join ""
         #Write-Host $joinPath.Replace("LandGraphics", $DestDomain.Split(".")[0])
+        
         ForEach ($d in $ImportDomains) {
             $DomainName = $joinPath.Replace($d.Source, $d.Destination)
         }
         Write-Host $DomainName -ForegroundColor Red
-
         #Check if the Group already exists
         <#
         Try

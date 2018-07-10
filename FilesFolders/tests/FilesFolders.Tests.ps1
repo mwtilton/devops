@@ -1,30 +1,20 @@
-Import-Module $env:WORKINGFOLDER\Devops\FilesFolders\FilesFolders -Force -Verbose
+Import-Module $env:WORKINGFOLDER\Devops\FilesFolders\FilesFolders -Force -ErrorAction Stop
 
 InModuleScope "FilesFolders" {
     Describe "Start-FilesFolders" {
-        Context "Test files" {
-            It "finds test files in current directory" {
-                $expected = dir *.\test
-                Start-FilesFolders | Should Be $expected            
+        Context "Error Handling" {
+
+            Mock IsAdmin -MockWith {$false}
+            It "should throw an exception" {
+                { New-Item -Path $env:WORKINGFOLDER\Devops\FilesFolders\FilesFolders -ItemType Directory -ErrorAction Stop} | Should Throw
             }
-            It "test files are in the working folder" {
-                $furtherexpectations = gci $env:WORKINGFOLDER -Filter *.ps1
-                Start-FilesFolders | Should Be $furtherexpectations
+            It "should fail"{
+                {Get-GPOreport -ErrorAction Stop} | Should Throw
             }
-            It "finds a powershell file" {
-                Mock Start-FilesFolders -MockWith {'gfgfds'}
-                (Get-ChildItem).Extension | Should Be '.ps1'
-            }
+            
         }
-        Context "Parent Directory" {
-            It "tells me the current parent directory" {
-                $here = "$env:WORKINGFOLDER\FilesFolders\Root"
-                $here | Should Be $true
-            }
-        }
-        
+               
         
     }
     
-
 }

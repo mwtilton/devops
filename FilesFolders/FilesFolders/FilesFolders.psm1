@@ -14,9 +14,7 @@ Function Start-FilesFolders {
         
     )
     Write-host "Starting FilesFolders" -fore Yellow
-    
-    
-    Start-FilesFolders -path $path
+    Get-FilesFolders -path $path
 
 
     
@@ -58,7 +56,7 @@ function Get-OpenFiles {
     Remove-Item C:\temp\openfiles.csv
 }
 
-function Start-FilesFolders {
+function Get-FilesFolders {
     Param(
         [Parameter(Mandatory=$true)]
         [ValidateScript({$_ -like "*.*"})]

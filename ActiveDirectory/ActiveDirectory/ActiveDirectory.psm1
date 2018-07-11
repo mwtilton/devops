@@ -171,10 +171,10 @@ Function Import-Groups {
         
         Try{
             #Create the group if it doesn't exist
-            #New-ADGroup -Name $_.name -GroupScope $_.GroupType -Path $_.DistinguishedName
+            #New-ADGroup -Name $_.name -GroupScope $_.GroupType -Path $DomainName
             Write-Host $checkGroup -ForegroundColor Red 
             #Write-Host $_.DistinguishedName -ForegroundColor Red 
-            Write-Host @($DomainName -like $checkGroup) -ForegroundColor Red
+            Write-Host @($DomainName -like $checkGroup) -ForegroundColor Cyan
             If(@($DomainName -like $checkGroup)){
                 Write-Host $joinPath -ForegroundColor White -NoNewline
                 Write-Host " already exists! Group creation skipped!"
@@ -186,7 +186,7 @@ Function Import-Groups {
                     -GroupCategory      $_.GroupCategory `
                     -GroupScope         $_.GroupScope `
                     -DisplayName        $_.DisplayName `
-                    -Path               $joinPath `
+                    -Path               $DomainName `
                     -Description        $_.Description
 
                 Write-Host "      [+] " -ForegroundColor DarkGreen -NoNewline
@@ -197,8 +197,8 @@ Function Import-Groups {
             
         }
         Catch{
-            If ($_.Exception.ToString().Contains('0x8007000D')) {
-                $_.Exception
+            If ($_.CategoryInfo.ToString().Contains('NotSpecified')) {
+                Write-host $_.CategoryInfo
                 
             } 
             Else {

@@ -107,7 +107,7 @@ Function Import-Groups {
         #Check if the OU exists
         #$search = "LDAP://" + $($item.GroupLocation) + "," + $($searchbase)
         #Write-Host $search
-        Write-Host "   [>]" -ForegroundColor DarkGray -NoNewline
+        Write-Host "   [>] " -ForegroundColor DarkGray -NoNewline
         Write-Host $_.name -ForegroundColor White -NoNewline
         Write-Host " at path " -ForegroundColor DarkGray -NoNewline
         #Write-Host $_.DistinguishedName -ForegroundColor White 
@@ -148,9 +148,10 @@ Function Import-Groups {
         }
         Write-Host $DomainName -ForegroundColor Red
         #Check if the Group already exists
-        <#
+        
         Try
         {
+            
             $checkGroup = Get-ADGroup $_.Name
         }
         Catch
@@ -167,14 +168,14 @@ Function Import-Groups {
                 $_.Exception
             }
         }
-        Read-Host "Testing"
+        
         Try{
             #Create the group if it doesn't exist
             #New-ADGroup -Name $_.name -GroupScope $_.GroupType -Path $_.DistinguishedName
             Write-Host $checkGroup -ForegroundColor Red 
-            Write-Host $_.DistinguishedName -ForegroundColor Red 
-            Write-Host @($_.DistinguishedName -like $checkGroup) -ForegroundColor Red
-            If(@($_.DistinguishedName -like $checkGroup)){
+            #Write-Host $_.DistinguishedName -ForegroundColor Red 
+            Write-Host @($DomainName -like $checkGroup) -ForegroundColor Red
+            If(@($DomainName -like $checkGroup)){
                 Write-Host $joinPath -ForegroundColor White -NoNewline
                 Write-Host " already exists! Group creation skipped!"
             }
@@ -208,7 +209,7 @@ Function Import-Groups {
                 $_.Exception
             }
         }
-        Read-Host "Testing"
+        
         #>
     }
         

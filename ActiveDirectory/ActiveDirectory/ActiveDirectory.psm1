@@ -2,10 +2,10 @@ $PSDefaultParameterValues=@{'Write-host:BackGroundColor'='Black';'Write-host:For
 #requires -Version 5.1
 Function Start-DCExport {
     Param (
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory=$false)]
         [String]
         $SrceDomain,
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory=$false)]
         [String]
         $SrceServer,
         [Parameter(Mandatory=$true)]

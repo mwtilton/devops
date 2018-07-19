@@ -1,4 +1,46 @@
+Function Start-Connection {
+    Try {
+        Invoke-RestMethod -Uri "" -ContentType application/x-www-form-urlencoded -Method POST -SessionVariable WebSession
+    }
+    Catch {
+        If($_.exception.tostring().contains("200")){
+            $statuscode = 404
+        }
+        Elseif ($_.exception.tostring().contains("404")){
+            $statuscode = 404
+        }
+        Elseif ($_.exception.tostring().contains("500")) {
+            $statuscode = 500
+        }
+        Else{
+            Write-host $_.exception -ForegroundColor red
+        }
+    }
+    return $statuscode
+
+}
+Function Get-Connection {
+
+    $wbreq = Invoke-WebRequest "" -method get -UseBasicParsing
+
+    return $wbreq.statuscode
+}
+
 Function Restart-Device {
+
+    $rebootXML = "<obj><att id=`"type`"><val>user-defined</val></att><att id=`"name`"><val>reboot</val></att></obj>"
+
+
+
+
+
+
+    <#
+    Invoke-RestMethod `
+
+            -Method 'post'`
+            -SessionVariable websession
+
 
     Measure-Command {
 
@@ -37,8 +79,7 @@ Function Restart-Device {
 
     ping $ipaddress
     }
-
+    #>
 
 
 }
-Restart-Device

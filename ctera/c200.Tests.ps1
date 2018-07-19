@@ -30,18 +30,18 @@ Describe "Unit testing c200" -Tags "Unit" {
 
     }
     $values = "500","200","404"
-<#
-     $values | ForEach-Object{
 
-        Context "Foreach-Object Restmethod returns $_ code" {
+    $values | ForEach-Object{
+        $myitem = $_
+        Context "Foreach-Object Restmethod returns $myitem code" {
             Mock Invoke-RestMethod {
-                "$_"
+                $myitem
             }
 
             $result = Restart-Device
 
-            It "returns $_" {
-                $($result) | Should Be $($_)
+            It "returns $myitem" {
+                $($result) | Should Be $($myitem)
             }
             It "should be a string" {
                 $result.gettype() | Should beoftype System.Object
@@ -49,8 +49,8 @@ Describe "Unit testing c200" -Tags "Unit" {
             It "Should not be empty" {
                 $result | Should not be ""
             }
-            It "$_ should be a valid entry" {
-                $_ | Should BeExactly $_
+            It "$myitem should be a valid entry" {
+                $myitem | Should BeExactly $myitem
             }
             it 'should be mocked' {
                 $assMParams = @{
@@ -66,7 +66,7 @@ Describe "Unit testing c200" -Tags "Unit" {
         }
 
     }
-#>
+
     Foreach($value in $values){
 
         Context "Foreach Restmethod returns $value code" {
@@ -127,8 +127,8 @@ Describe "Acceptance testing for c200" -tags "Acceptance" {
         It "should not be 404" {
             $wbs[0] | Should not be 404
         }
-        It "should return 200" {
-            $wbs | Should be 200
+        It "should return 6.0 html code" {
+            $wbs | Should -BeOfType [string]
         }
         It "Should not throw an error" {
             {$wbs} | Should -not throw

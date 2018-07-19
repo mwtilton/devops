@@ -1,12 +1,11 @@
 Function Start-Connection {
     Try {
-        Invoke-RestMethod -Uri "" -ContentType application/x-www-form-urlencoded -Method POST -SessionVariable WebSession
+        Invoke-RestMethod -Uri "http://172.16.20.218/admingui/login.html?j_username=tilt&j_password=develop1" -ContentType application/x-www-form-urlencoded -Method POST -SessionVariable WebSession -ErrorAction stop
+
     }
     Catch {
-        If($_.exception.tostring().contains("200")){
-            $statuscode = 404
-        }
-        Elseif ($_.exception.tostring().contains("404")){
+
+        if ($_.exception.tostring().contains("404")){
             $statuscode = 404
         }
         Elseif ($_.exception.tostring().contains("500")) {
@@ -15,13 +14,19 @@ Function Start-Connection {
         Else{
             Write-host $_.exception -ForegroundColor red
         }
+        return $statuscode
     }
-    return $statuscode
+    If($statuscode -eq $null) {
+        return $websession
+    }
+    else{
+
+    }
 
 }
 Function Get-Connection {
 
-    $wbreq = Invoke-WebRequest "" -method get -UseBasicParsing
+    $wbreq = Invoke-WebRequest "http://172.16.20.218/" -method get -UseBasicParsing
 
     return $wbreq.statuscode
 }
@@ -31,7 +36,7 @@ Function Restart-Device {
     $rebootXML = "<obj><att id=`"type`"><val>user-defined</val></att><att id=`"name`"><val>reboot</val></att></obj>"
 
 
-
+    Invoke-RestMethod -Uri "http://172.16.20.218/admingui/login.html?j_username=tilt&j_password=develop1" -ContentType application/x-www-form-urlencoded -Method POST -SessionVariable WebSession -ErrorAction stop
 
 
 

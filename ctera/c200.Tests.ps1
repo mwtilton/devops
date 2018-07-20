@@ -2,9 +2,9 @@ $here = Split-Path -Parent $MyInvocation.MyCommand.Path
 $sut = (Split-Path -Leaf $MyInvocation.MyCommand.Path) -replace '\.Tests\.', '.'
 . "$here\$sut"
 
-
+$ip = "172.16.20.218"
 Describe "Unit testing c200" -Tags "Unit" {
-    $ip = "172.16.20.218"
+
     Context "Test the connection" {
         Mock Restart-Device -MockWith {"192.1.1.x"}
         It "does not use a valid IP" {
@@ -116,6 +116,7 @@ Describe "Unit testing c200" -Tags "Unit" {
 }
 
 Describe "Acceptance testing for c200" -tags "Acceptance" {
+
     Context "Gets a connection" {
         $gc = Get-Connection
         It "gets a status code of 200" {
@@ -135,12 +136,26 @@ Describe "Acceptance testing for c200" -tags "Acceptance" {
         }
 
     }
-    Context "" {
+    Context "device is down" {
 
+        It "is down" {
+            Restart-Device
+            (Test-Connection $ip -Quiet -Count 1) | Should Be $false
+        }
     }
     Context "host is back up" {
+
+        It "can loop ping the device" {
+            do{
+                "rebooting $ip"
+            }Until (!(Test-Connection $ip -Quiet -Count 1))
+
+            (Test-Connection $ip -Quiet -Count 1) | Should Be $true
+
+        }
         It "can ping the dev device after reboot" {
-            Test-Connection $ip -Quiet -Count 1 | Should Be $true
+
+            (Test-Connection $ip -Quiet -Count 1) | Should Be $true
         }
 
     }

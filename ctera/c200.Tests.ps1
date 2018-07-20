@@ -146,16 +146,17 @@ Describe "Acceptance testing for c200" -tags "Acceptance" {
     Context "host is back up" {
 
         It "can loop ping the device" {
+
             do{
                 "rebooting $ip"
-            }Until (!(Test-Connection $ip -Quiet -Count 1))
+            }Until (!(Test-Connection $ip -Quiet -Count 5))
 
-            (Test-Connection $ip -Quiet -Count 1) | Should Be $true
+            (Test-Connection $ip -Quiet -Count 3) | Should Be $true
 
         }
         It "can ping the dev device after reboot" {
 
-            (Test-Connection $ip -Quiet -Count 1) | Should Be $true
+            (Test-Connection $ip -Quiet -Count 3) | Should Be $true
         }
 
     }

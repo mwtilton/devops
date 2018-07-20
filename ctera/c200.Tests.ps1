@@ -1,8 +1,24 @@
 $here = Split-Path -Parent $MyInvocation.MyCommand.Path
 $sut = (Split-Path -Leaf $MyInvocation.MyCommand.Path) -replace '\.Tests\.', '.'
-. "$here\$sut"
 
-$ip = "172.16.20.218"
+. "$here\$sut"
+. "$PSScriptRoot\C200.Machine.ps1"
+
+Describe "Required Setup and files" -Tags "Acceptance","Unit" {
+    Context "Machine file" {
+        It "should have a machine file" {
+            "$PSScriptRoot\C200.Machine.ps1" | Should Exist
+        }
+        It "should have a script root" {
+            $PSScriptRoot | Should not Be $null
+        }
+        It "should not throw importing the machine file" {
+
+            {. "$PSScriptRoot\C200.Machine.ps1" } | Should -not -Throw
+        }
+    }
+}
+
 Describe "Unit testing c200" -Tags "Unit" {
 
     Context "Test the connection" {
@@ -18,7 +34,7 @@ Describe "Unit testing c200" -Tags "Unit" {
             {Invoke-RestMethod -Uri } | Should throw
         }
         It "can ping the dev device" {
-            Test-Connection $ip -Quiet -Count 1 | Should Be $true
+            Test-Connection $devserverinfo.ipaddress -Quiet -Count 1 | Should Be $true
         }
     }
     Context "Has valid API text" {
@@ -140,7 +156,7 @@ Describe "Acceptance testing for c200" -tags "Acceptance" {
 
         It "is down" {
             Restart-Device
-            (Test-Connection $ip -Quiet -Count 1) | Should Be $false
+            (Test-Connection $devserverinfo.ipaddress -Quiet -Count 1) | Should Be $false
         }
     }
     Context "host is back up" {
@@ -148,15 +164,15 @@ Describe "Acceptance testing for c200" -tags "Acceptance" {
         It "can loop ping the device" {
 
             do{
-                "rebooting $ip"
-            }Until (!(Test-Connection $ip -Quiet -Count 5))
 
-            (Test-Connection $ip -Quiet -Count 3) | Should Be $true
+            }Until (!(Test-Connection $devserverinfo.ipaddress -Quiet -Count 5))
+
+            (Test-Connection $devserverinfo.ipaddress -Quiet -Count 3) | Should Be $true
 
         }
         It "can ping the dev device after reboot" {
 
-            (Test-Connection $ip -Quiet -Count 3) | Should Be $true
+            (Test-Connection $devserverinfo.ipaddress -Quiet -Count 3) | Should Be $true
         }
 
     }

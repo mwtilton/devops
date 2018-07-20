@@ -1,7 +1,10 @@
 
-. ".\C200.Machine.ps1"
+. $PSScriptRoot\C200.Machine.ps1
+
 $loginurl = $urls.loginurl
 $rebooturl = $urls.rebooturl
+
+
 Function Get-Connection {
 
     $wbreq = Invoke-WebRequest $devserverinfo.ipaddress -method get -UseBasicParsing
@@ -39,7 +42,7 @@ Function Start-Connection {
 
 Function Restart-Device {
 
-    [xml]$rebootXML = "<obj><att id=`"type`"><val>user-defined</val></att><att id=`"name`"><val>reboot</val></att></obj>"
+    [xml]$rebootXML = $devserverinfo.rebootxml
     [hashtable]$body = @{
         j_username = $devserverinfo.j_username
         j_password = $devserverinfo.j_password

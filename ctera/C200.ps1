@@ -1,12 +1,17 @@
+
+. ".\C200.Machine.ps1"
+$loginurl = $urls.loginurl
+$rebooturl = $urls.rebooturl
 Function Get-Connection {
 
-    $wbreq = Invoke-WebRequest "http://172.16.20.218/" -method get -UseBasicParsing
+    $wbreq = Invoke-WebRequest $devserverinfo.ipaddress -method get -UseBasicParsing
 
     return $wbreq.statuscode
 }
 Function Start-Connection {
+
     Try {
-        Invoke-RestMethod -Uri "http://172.16.20.218/admingui/login.html?j_username=tilt&j_password=develop1" -ContentType application/x-www-form-urlencoded -Method POST -SessionVariable WebSession -ErrorAction stop
+        Invoke-RestMethod -Uri $loginurl -ContentType application/x-www-form-urlencoded -Method POST -SessionVariable WebSession -ErrorAction stop
 
     }
     Catch {
@@ -33,23 +38,24 @@ Function Start-Connection {
 
 
 Function Restart-Device {
-    $ipaddress = "172.16.20.218"
+
     [xml]$rebootXML = "<obj><att id=`"type`"><val>user-defined</val></att><att id=`"name`"><val>reboot</val></att></obj>"
     [hashtable]$body = @{
-        j_username = "tilt"
-        j_password = "develop1"
+        j_username = $devserverinfo.j_username
+        j_password = $devserverinfo.j_password
     }
 
-    Invoke-RestMethod -Uri "http://$ipaddress/admingui/api/login" -Body $body -ContentType "application/x-www-form-urlencoded" -Method POST -SessionVariable WebSession
+    #login
+    Invoke-RestMethod -Uri $loginurl -Body $body -ContentType "application/x-www-form-urlencoded" -Method POST -SessionVariable WebSession
 
-    $rebooturl = "http://$ipaddress/admingui/api/status/device"
+    #reboot
     Invoke-RestMethod -Uri $rebooturl -Method 'post' -Body $rebootXML -ContentType text/xml -WebSession $websession
 
     do{
-        "rebooting $ipaddress"
-    }Until (!(Test-Connection $ipaddress -Quiet -Count 1))
+        "rebooting " + $devserverinfo.ipaddress
+    }Until (!(Test-Connection $devserverinfo.ipaddress -Quiet -Count 1))
 
-    ping $ipaddress
+    ping $devserverinfo.ipaddress
 
 
 }

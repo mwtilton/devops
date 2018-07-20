@@ -2,8 +2,9 @@ $here = Split-Path -Parent $MyInvocation.MyCommand.Path
 $sut = (Split-Path -Leaf $MyInvocation.MyCommand.Path) -replace '\.Tests\.', '.'
 . "$here\$sut"
 
-Describe "Unit testing c200" -Tags "Unit" {
 
+Describe "Unit testing c200" -Tags "Unit" {
+    $ip = "172.16.20.218"
     Context "Test the connection" {
         Mock Restart-Device -MockWith {"192.1.1.x"}
         It "does not use a valid IP" {
@@ -17,7 +18,7 @@ Describe "Unit testing c200" -Tags "Unit" {
             {Invoke-RestMethod -Uri } | Should throw
         }
         It "can ping the dev device" {
-            Test-Connection "172.16.20.218" -Quiet -Count 1 | Should Be $true
+            Test-Connection $ip -Quiet -Count 1 | Should Be $true
         }
     }
     Context "Has valid API text" {
@@ -26,7 +27,9 @@ Describe "Unit testing c200" -Tags "Unit" {
         It "Hardcoded string contains reboot" {
             $rebootXML | Should Match "reboot"
         }
-
+        It "is text/html" {
+            $rebootXML.GetType() | Should be [text/html]
+        }
 
     }
     $values = "500","200","404"
@@ -104,7 +107,7 @@ Describe "Unit testing c200" -Tags "Unit" {
     }
     Context "host is back up" {
         It "can ping the dev device after reboot" {
-            Test-Connection "172.16.20.218" -Quiet -Count 1 | Should Be $true
+            Test-Connection $ip -Quiet -Count 1 | Should Be $true
         }
 
     }
@@ -119,7 +122,7 @@ Describe "Acceptance testing for c200" -tags "Acceptance" {
             $gc | Should be 200
         }
     }
-    Context "Invoking the rest-method" {
+    Context "Starting the connection" {
         $wbs = Start-Connection
         It "should not return null" {
             $wbs | Should not be $null
@@ -127,12 +130,20 @@ Describe "Acceptance testing for c200" -tags "Acceptance" {
         It "should not be 404" {
             $wbs[0] | Should not be 404
         }
-        It "should return 6.0 html code" {
-            $wbs | Should -BeOfType [string]
-        }
         It "Should not throw an error" {
-            {$wbs} | Should -not throw
+            {$wbs} | Should -not -Throw
         }
+
     }
+    Context "" {
+
+    }
+    Context "host is back up" {
+        It "can ping the dev device after reboot" {
+            Test-Connection $ip -Quiet -Count 1 | Should Be $true
+        }
+
+    }
+
 
 }

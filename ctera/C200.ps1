@@ -36,11 +36,16 @@ Function Restart-Device {
     $rebootXML = "<obj><att id=`"type`"><val>user-defined</val></att><att id=`"name`"><val>reboot</val></att></obj>"
 
 
-    Invoke-RestMethod -Uri "http://172.16.20.218/admingui/login.html?j_username=tilt&j_password=develop1" -ContentType application/x-www-form-urlencoded -Method POST -SessionVariable WebSession -ErrorAction stop
+    #Invoke-RestMethod -Uri "http://172.16.20.218/admingui/login.html?j_username=tilt&j_password=develop1" -ContentType application/x-www-form-urlencoded -Method POST -SessionVariable WebSession -ErrorAction stop
+
+    $url = "http://172.16.20.218/admingui/login.html?j_username=tilt&j_password=develop1"
+    Invoke-RestMethod -Uri $url -Method 'post' -SessionVariable websession
 
 
 
     <#
+    $rebooturl = "http://172.16.20.218/admingui/api/status/device"
+    Invoke-RestMethod -Uri $rebooturl -Method 'post' -Body $rebootXML -ContentType text/xml -WebSession $websession
     Invoke-RestMethod `
 
             -Method 'post'`

@@ -11,3 +11,4 @@ Set-Location $workingfolder
 
 Import-Module "$env:WORKINGFOLDER\OpenStack\OpenStack" -Force
 
+Start-OpenStack -DestServer $OpenStackInfo.Compute

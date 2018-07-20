@@ -7,22 +7,14 @@ $PSDefaultParameterValues=@{'Write-host:BackGroundColor'='Black';'Write-host:For
 #.ExternalHelp OpenStack.psm1-help.xml
 Function Start-OpenStack {
     Param (
-        [Parameter(Mandatory=$true,HelpMessage="Must be FQDN.")]
-        [ValidateScript({$_ -like "*.*"})]
-        [String]
-        $DestDomain,
         [Parameter(Mandatory=$true)]
         [String]
-        $DestServer,
-        [Parameter(Mandatory=$true)]
-        [ValidateScript({Test-Path $_})]
-        [String]
-        $Path
+        $DestServer
 
     )
     Write-host "Starting OpenStack" -fore Yellow
 
-
+    Invoke-RestMethod -uri $DestServer -Method GET
 
 
 

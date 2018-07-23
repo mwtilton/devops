@@ -51,7 +51,7 @@ Describe "Unit testing for OpenStack" -Tags 'Unit'{
                 It "$myitem should be a valid entry" {
                     $myitem | Should BeExactly $myitem
                 }
-                it 'should be mocked' {
+                it "should be mocked 1 times" {
                     $assMParams = @{
                         CommandName = 'Invoke-Restmethod'
                         Times = 1
@@ -68,6 +68,33 @@ Describe "Unit testing for OpenStack" -Tags 'Unit'{
             It "Contains a hashtable" {
                 $OpenStackinfo | Should beoftype [Hashtable]
 
+            }
+            It "has values" {
+                $OpenStackinfo.Values | Should not be $null
+            }
+            It "has keys" {
+                $OpenStackinfo.Keys | Should not be $null
+            }
+            $OpenStackinfo | ForEach-Object {
+                It "has some keys" {
+
+                    $_.Keys | Should not be $null
+                }
+                It "has some values" {
+
+                    $_.Values | Should not be $null
+                }
+                It "the values should have an HTTP address in it" {
+                    $_.Values | Should BeLike "*http*://*"
+                }
+
+            }
+        }#End Context
+        Context "Hitting the API" {
+            It "invoke the restsss" {
+                $_.values | ForEach-Object {
+                    Invoke-RestMethod -Uri $_ -Method GET
+                } | Should throw
             }
         }
     } #End Inmodule scope

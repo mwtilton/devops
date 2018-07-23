@@ -64,17 +64,13 @@ Describe "Unit testing for OpenStack" -Tags 'Unit'{
                 }
             } #End Context
         } # End Foreach
+        Context "Machine File seccuessfully imported" {
+            It "Contains a hashtable" {
+                $OpenStackinfo | Should beoftype [Hashtable]
+
+            }
+        }
     } #End Inmodule scope
 
 } #End Describe
 
-Describe "Acceptance Testing for Openstack API" -Tags "Acceptance" {
-    InModuleScope OpenStack {
-        Context "API Unit Testing" {
-            It "Connects to the API" {
-                Start-OpenStack -DestServer $OpenStackinfo.Compute
-
-            }
-        }
-    }
-}

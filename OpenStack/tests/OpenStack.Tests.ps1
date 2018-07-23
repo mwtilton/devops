@@ -62,54 +62,11 @@ Describe "Unit testing for OpenStack" -Tags 'Unit'{
                 It "should not throw an exception" {
                     {$result }| Should not throw
                 }
-            }
+            } #End Context
+        } # End Foreach
+    } #End Inmodule scope
 
-        }
-
-        Foreach($value in $values){
-
-            Context "Foreach Restmethod returns $value code" {
-                Mock Invoke-RestMethod {
-                    "$value"
-                }
-
-                $result = Start-OpenStack -DestServer $OpenStackInfo.Compute
-
-                It "returns $value" {
-                    $result | Should Be $value
-                }
-                It "should be a string" {
-                    $result.gettype() | Should beoftype System.Object
-                }
-                It "Should not be empty" {
-                    $result | Should not be ""
-                }
-                It "$value should be a valid entry" {
-                    $value | Should BeExactly $value
-                }
-                it 'should be mocked' {
-                    $assMParams = @{
-                        CommandName = 'Invoke-Restmethod'
-                        Times = 1
-                        Exactly = $true
-                    }
-                    Assert-MockCalled @assMParams
-                }
-                It "should not throw an exception" {
-                    {$result }| Should not throw
-                }
-            }
-
-        }
-
-
-
-
-
-
-    }
-
-}
+} #End Describe
 
 Describe "Acceptance Testing for Openstack API" -Tags "Acceptance" {
     InModuleScope OpenStack {

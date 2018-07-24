@@ -31,10 +31,10 @@ function Test-FileLock {
 }
 
 
-  
+
 function Get-OpenFiles {
     #openfiles /query /s fileserver01 /u matthewt | findstr /i /c:"LG-PST-BACKUPS"
-    
+
     openfiles /query /s $args[0] /fo csv /V | Out-File -Force C:\temp\openfiles.csv
     $search = $args[1]
     Import-CSV C:\temp\openfiles.csv | Select "Accessed By", "Open Mode", "Open File (Path\executable)" | Where-Object {$_."Open File (Path\executable)" -match $search} | format-table -auto
@@ -52,7 +52,7 @@ function Get-FilesFolders {
 
 
     Begin{
-        $getFilesFolders = Get-ChildItem $path -Recurse 
+        $getFilesFolders = Get-ChildItem $path -Recurse
         $getFilesFolders | ForEach-Object {
             $_
 

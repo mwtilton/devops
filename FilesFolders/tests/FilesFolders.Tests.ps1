@@ -1,3 +1,4 @@
+Get-Module FilesFolders | Remove-Module -Force
 Import-Module $env:WORKINGFOLDER\Devops\FilesFolders\FilesFolders -Force -ErrorAction Stop
 
 InModuleScope "FilesFolders" {
@@ -9,7 +10,7 @@ InModuleScope "FilesFolders" {
                 Test-FileLock -Path $path | Should Be $true
             }
             It "should return an error" {
-                {Test-FileLock -ErrorAction Stop } | Should throw   
+                {Test-FileLock -ErrorAction Stop } | Should throw
             }
             It "should return false" {
                 $falsepath = "d:\"

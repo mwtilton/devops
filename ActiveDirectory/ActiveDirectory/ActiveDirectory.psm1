@@ -13,10 +13,11 @@ Function Start-DCExport {
         [String]
         $Path  # Working path to store files
     )
-    Write-host "Starting Group Exports" -fore Yellow
-    Export-Groups -Path $Path
     Write-host "Starting OU Exports" -fore Yellow
     Export-OUs -Path $path
+    Write-host "Starting Group Exports" -fore Yellow
+    Export-Groups -Path $Path
+
 } # End Function
 
 ############################################################################
@@ -78,11 +79,11 @@ Function Start-DCImport {
         $Path
 
     )
-    Write-host "Starting DC Import" -ForegroundColor Yellow
-    Write-host "Starting Group Import" -ForegroundColor Yellow
-    Import-Groups -Path $Path -DestDomain $DestDomain -DestServer $DestServer -CSVPath $CSVPath
     Write-Host "Starting OU Import" -ForegroundColor Yellow
     Import-OUs -Path $Path -DestDomain $DestDomain -DestServer $DestServer -CSVPath $CSVPath
+    Write-host "Starting Group Import" -ForegroundColor Yellow
+    Import-Groups -Path $Path -DestDomain $DestDomain -DestServer $DestServer -CSVPath $CSVPath
+
 } # End Function
 
 Function Import-Groups {
@@ -159,7 +160,7 @@ Function Import-Groups {
         }
 
         $joinPath = $PathArray -join ""
-        #Write-Host $joinPath.Replace("LandGraphics", $DestDomain.Split(".")[0])
+
 
         ForEach ($d in $ImportDomains) {
             $DomainName = $joinPath.Replace($d.Source, $d.Destination)
@@ -223,6 +224,11 @@ Function Import-Groups {
             If ($_.Exception.ToString().Contains("already exists")) {
                 Write-Host " already exists! Group creation skipped!"
 
+            }
+            elseif ($_.Exception.ToString().Contains("Directory object not found")) {
+                Write-Host "      [-] " -ForegroundColor Red -NoNewline
+                Write-host "There is an issue with the specified path. Check that the OU exists. " -ForegroundColor DarkYellow -NoNewline
+                Write-Host $_.TargetObject -ForegroundColor White
             }
             Else {
                 Write-Host ""
@@ -304,22 +310,20 @@ Function Import-OUs {
         }
 
         $joinPath = $PathArray -join ""
-        #Write-Host $joinPath.Replace("LandGraphics", $DestDomain.Split(".")[0])
+
 
         ForEach ($d in $ImportDomains) {
             $DomainName = $joinPath.Replace($d.Source, $d.Destination)
         }
         #Write-Host $DomainName -ForegroundColor Red -NoNewline
         #Check if the Group already exists
-        <#
-        Try
-        {
 
-            $checkGroup = Get-ADGroup $_.Name
+        Try {
+
+            $checkGroup = Get-ADOrganizationalUnit -Filter "Name -like '$($_.Name)'"
             #Write-Host $checkGroup -ForegroundColor White -NoNewline
         }
-        Catch
-        {
+        Catch {
             If ($_.CategoryInfo.ToString().Contains('ObjectNotFound')) {
                 Write-host ""
                 Write-Host "      [+] " -NoNewline
@@ -347,23 +351,20 @@ Function Import-OUs {
             }
             Else{
 
-            New-ADGroup `
-                -Name $_.name `
-                -SamAccountName     $_.SamAccountName `
-                -GroupCategory      $_.GroupCategory `
-                -GroupScope         $_.GroupScope `
-                -DisplayName        $_.DisplayName `
-                -Path               $DomainName `
-                -Description        $_.Description
-
-            Write-Host "      [+] " -ForegroundColor DarkGreen -NoNewline
-            Write-host $_.name -ForegroundColor White -NoNewline
-            Write-host " created!" -ForegroundColor DarkGreen
-
+                New-ADOrganizationalUnit `
+                    -Name $_.name `
+                    -ProtectedFromAccidentalDeletion $False `
+                    -Path               $DomainName `
+                    -Description        $_.Description
+                Write-Host ""
+                Write-Host "      [+] " -ForegroundColor DarkGreen -NoNewline
+                Write-host $_.name -ForegroundColor White -NoNewline
+                Write-host " created!" -ForegroundColor DarkGreen
+            }
 
 
         }
-        Catch{
+        Catch {
 
             If ($_.Exception.ToString().Contains("already exists")) {
                 Write-Host " already exists! Group creation skipped!"
@@ -378,8 +379,6 @@ Function Import-OUs {
             }
 
         }
-
-        #>
     }
 }
 

@@ -41,12 +41,12 @@ function Get-OpenFiles {
     Remove-Item C:\temp\openfiles.csv
 }
 
+
 function Get-FilesFolders {
     Param(
-        [Parameter(Mandatory=$true)]
-        [ValidateScript({$_ -like "*.*"})]
+        [Parameter(Mandatory=$false)]
         [String]
-        $path
+        $path = "$env:TEMP\FFTEST"
     )
 
 
@@ -54,7 +54,14 @@ function Get-FilesFolders {
     Begin{
         $getFilesFolders = Get-ChildItem $path -Recurse
         $getFilesFolders | ForEach-Object {
-            $_
+            $spaces = @()
+            Write-Host $_.Length -ForegroundColor Cyan -NoNewline
+            (1..$_.Length) | ForEach-Object {
+                $spaces += " "
+            }
+            $spaces += "END"
+            Write-Host $spaces -ForegroundColor Cyan
+            Write-host ($_.FullName).Replace($path, $spaces) -ForegroundColor Red
 
         }
     }

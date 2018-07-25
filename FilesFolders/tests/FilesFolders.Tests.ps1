@@ -1,29 +1,19 @@
 Get-Module FilesFolders | Remove-Module -Force
 Import-Module $env:WORKINGFOLDER\Devops\FilesFolders\FilesFolders -Force -ErrorAction Stop
+Describe "Unit testing FilesFolders Module" -Tags "UNIT" {
 
-InModuleScope "FilesFolders" {
-    Describe "Test-FileLock" {
-        Context "Test-Path" {
+    InModuleScope FilesFolders {
 
-            It "should find the folder" {
-                $path = $env:WORKINGFOLDER
-                Test-FileLock -Path $path | Should Be $true
+        Context "finds files" {
+            $gff = Get-FilesFolders
+            It "GCI on the c:\" {
+                {gci "c:\"}| Should Not throw
+
             }
-            It "should return an error" {
-                {Test-FileLock -ErrorAction Stop } | Should throw
-            }
-            It "should return false" {
-                $falsepath = "d:\"
-                Test-FileLock -Path $falsepath | Should Be $false
+            It "GFF function should not throw" {
+                {$gff} | Should Not throw
             }
 
-        }
-        Context "Open the file" {
-            Mock -MockWith Test-FileLock {return $false}
-            It "not able to open the file" {
-                $result = Test-FileLock -Path "c:\"
-                $result | Should Be $false
-            }
         }
 
 

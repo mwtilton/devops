@@ -213,7 +213,7 @@ Function Import-Groups {
                 -Description        $_.Description
 
             Write-Host "      [+] " -ForegroundColor DarkGreen -NoNewline
-            Write-host $_.name -ForegroundColor White -NoNewline
+            Write-host $DomainName -ForegroundColor White -NoNewline
             Write-host " created!" -ForegroundColor DarkGreen
 
 
@@ -358,7 +358,7 @@ Function Import-OUs {
                     -Description        $_.Description
                 Write-Host ""
                 Write-Host "      [+] " -ForegroundColor DarkGreen -NoNewline
-                Write-host $_.name -ForegroundColor White -NoNewline
+                Write-host $DomainName -ForegroundColor White -NoNewline
                 Write-host " created!" -ForegroundColor DarkGreen
             }
 

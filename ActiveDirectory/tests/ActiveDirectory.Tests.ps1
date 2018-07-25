@@ -1,21 +1,8 @@
 Import-Module $env:WORKINGFOLDER\Devops\ActiveDirectory\ActiveDirectory -Force -ErrorAction Stop
 
-$here = Split-Path -Parent $MyInvocation.MyCommand.Path
-$module ""
-Describe "" {
-    Context "" {
-        It "" {
+Describe "Start-DCImport" -Tags "UNIT" {
+    InModuleScope "ActiveDirectory" {
 
-        }
-        It "" {
-
-        }
-    }
-}
-
-
-InModuleScope "ActiveDirectory" {
-    Describe "Start-DCImport" {
         Context "Test-Path" {
             It "should find the folder" {
                 $path = $env:WORKINGFOLDER

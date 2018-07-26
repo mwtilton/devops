@@ -81,8 +81,8 @@ Function Start-DCImport {
     )
     Write-Host "Starting OU Import" -ForegroundColor Yellow
     Import-OUs -Path $Path -DestDomain $DestDomain -DestServer $DestServer -CSVPath $CSVPath
-    Write-host "Starting Group Import" -ForegroundColor Yellow
-    Import-Groups -Path $Path -DestDomain $DestDomain -DestServer $DestServer -CSVPath $CSVPath
+    #Write-host "Starting Group Import" -ForegroundColor Yellow
+    #Import-Groups -Path $Path -DestDomain $DestDomain -DestServer $DestServer -CSVPath $CSVPath
 
 } # End Function
 
@@ -268,9 +268,9 @@ Function Import-OUs {
     $exportedOUs = "$path\Exported-OUs.csv"
     $csv      = @()
     $csv      = Import-Csv -Path $exportedOUs
-    $ImportCSV = Import-CSV $CSVPath
+    $ImportCSV = Import-CSV $CSVPath | select * | sort {($_.DistinguishedName).length} -descending
     $ImportDomains  = $ImportCSV | Where-Object {$_.Type -eq "Domain"}
-
+    Write-Host $ImportCSV -ForegroundColor Yellow
     Write-Host "[>]Checking: " -ForegroundColor DarkGray
     $csv | ForEach-Object {
         #Check if the OU exists
@@ -279,7 +279,7 @@ Function Import-OUs {
         Write-Host "   [>] " -ForegroundColor DarkGray -NoNewline
         Write-Host $_.name -ForegroundColor White -NoNewline
         #Write-Host " at path " -ForegroundColor DarkGray -NoNewline
-        #Write-Host $_.DistinguishedName -ForegroundColor White
+        #Write-Host $_.DistinguishedName -ForegroundColor Red
 
         $SplitDistName = $_.DistinguishedName -split ','
 
@@ -313,9 +313,11 @@ Function Import-OUs {
 
 
         ForEach ($d in $ImportDomains) {
+            #$DomainName = ($_.DistinguishedName).Replace($d.Source, $d.Destination)
             $DomainName = $joinPath.Replace($d.Source, $d.Destination)
         }
-        #Write-Host $DomainName -ForegroundColor Red -NoNewline
+        Write-Host " at " -ForegroundColor DarkGray -NoNewline
+        #Write-host $DomainName -ForegroundColor Magenta -NoNewline
         #Check if the Group already exists
 
         Try {
@@ -329,8 +331,16 @@ Function Import-OUs {
                 Write-Host "      [+] " -NoNewline
                 Write-Host $_.CategoryInfo -ForegroundColor White
             }
+            <#
+            elseif ($_.Exception.ToString().Contains("Directory object not found")) {
+                Write-host " "
+                Write-Host "      [-] " -ForegroundColor Red -NoNewline
+                Write-host "There is an issue with the specified path. Check that the OU exists. " -ForegroundColor DarkYellow -NoNewline
+                Write-Host $_.TargetObject -ForegroundColor White
+            }
+            #>
             Else {
-                Write-Warning "A group check error occurred:"
+                Write-Warning "An OU check error occurred:"
                 $_ | fl * -force
                 $_.InvocationInfo.BoundParameters | fl * -force
                 $_.Exception
@@ -338,25 +348,24 @@ Function Import-OUs {
         }
 
         Try{
-            #Create the group if it doesn't exist
-            #New-ADGroup -Name $_.name -GroupScope $_.GroupType -Path $DomainName
-            #Write-Host $checkGroup -ForegroundColor Red
+            Write-Host $DomainName -ForegroundColor Red
+            Write-Host $checkGroup -ForegroundColor Red
             #Write-Host $_.DistinguishedName -ForegroundColor Red
 
-            #Write-Host @($DomainName -like $checkGroup) -ForegroundColor Red
+            Write-Host @($DomainName -like $checkGroup) -ForegroundColor Red
 
             If(@($DomainName -like $checkGroup)){
                 Write-Host $joinPath -ForegroundColor White -NoNewline
-                Write-Host " already exists! Group creation skipped!"
+                Write-Host " already exists! OU creation skipped!"
             }
             Else{
 
                 New-ADOrganizationalUnit `
                     -Name $_.name `
-                    -ProtectedFromAccidentalDeletion $False `
+                    -ProtectedFromAccidentalDeletion $false `
                     -Path               $DomainName `
-                    -Description        $_.Description
-                Write-Host ""
+
+
                 Write-Host "      [+] " -ForegroundColor DarkGreen -NoNewline
                 Write-host $DomainName -ForegroundColor White -NoNewline
                 Write-host " created!" -ForegroundColor DarkGreen
@@ -367,8 +376,14 @@ Function Import-OUs {
         Catch {
 
             If ($_.Exception.ToString().Contains("already exists")) {
-                Write-Host " already exists! Group creation skipped!"
+                Write-Host " fdsfds"
+                Write-Host " already exists! OU creation skipped!"
 
+            }
+            elseif ($_.Exception.ToString().Contains("Directory object not found")) {
+                Write-Host "      [-] " -ForegroundColor Red -NoNewline
+                Write-host "There is an issue with the specified path. Check that the OU exists. " -ForegroundColor DarkYellow -NoNewline
+                Write-Host $_.TargetObject -ForegroundColor White
             }
             Else {
                 Write-Host ""

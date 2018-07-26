@@ -4,7 +4,7 @@ NOTE:
 
 ##############################################################################>
 $ActiveDirectory = "$env:USERPROFILE\Desktop\ActiveDirectory\ActiveDirectory"
-$ActiveDirectoryWorkingDirectory = "$ActiveDirectory\WorkingFolder"
+$ActiveDirectoryWorkingDirectory = "$env:USERPROFILE\Desktop\ActiveDirectory\WorkingFolder"
 New-Item -ItemType Directory $ActiveDirectoryWorkingDirectory -ea SilentlyContinue
 Set-Location $ActiveDirectoryWorkingDirectory
 

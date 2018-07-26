@@ -325,6 +325,9 @@ Function Import-OUs {
         }
         Write-Host "   [>] Setting New Path: " -ForegroundColor DarkGray -NoNewline
         Write-Host $NewOUPath -ForegroundColor Magenta
+        $newOUString = @("OU=" + $_.Name + "," + $NewOUPath)
+        Write-Host "   [>] Creating New OU string: " -ForegroundColor DarkGray -NoNewline
+        Write-Host $newOUString -ForegroundColor DarkGreen
         #Write-Host " at " -ForegroundColor DarkGray -NoNewline
         #Write-host $NewOUPath -ForegroundColor Magenta -NoNewline
         #Check if the Group already exists
@@ -332,6 +335,8 @@ Function Import-OUs {
         Try {
 
             $checkOU = Get-ADOrganizationalUnit -Filter "Name -like '$($_.Name)'"
+            Write-Host "   [>] Checking Original Path: " -ForegroundColor DarkGray -NoNewline
+            Write-Host $checkOU -ForegroundColor Red
             #Write-Host $checkOU -ForegroundColor White -NoNewline
         }
         Catch {
@@ -358,17 +363,16 @@ Function Import-OUs {
 
         Try{
 
-            Write-Host "   [>] Checking Original Path: " -ForegroundColor DarkGray -NoNewline
-            Write-Host $checkOU -ForegroundColor Red
+
             Write-Host "   [>] New Path: " -ForegroundColor DarkGray -NoNewline
             Write-Host $joinPath -ForegroundColor Red
             Write-Host "   [>] Checking checking if they match: " -ForegroundColor DarkGray -NoNewline
-            Write-Host @($NewOUPath -like $checkOU) -ForegroundColor Red
+            Write-Host @($newOUString -like $checkOU) -ForegroundColor Red
             #Write-Host $_.DistinguishedName -ForegroundColor Red
 
 
 
-            If(@($NewOUPath -like $checkOU)){
+            If(@($newOUString -like $checkOU)){
                 Write-Host $joinPath -ForegroundColor White -NoNewline
                 Write-Host " already exists! OU creation skipped!"
             }

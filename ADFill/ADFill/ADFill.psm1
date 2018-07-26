@@ -339,7 +339,7 @@ Function Import-OUs {
 
         Try {
 
-            $checkOU = Get-ADOrganizationalUnit -Filter "Name -like '$($_.Name)'"
+            $checkOU = Get-ADOrganizationalUnit -Filter "Name -like '$newName'"
             #Write-Host "    [>] Checking Original Path: " -ForegroundColor DarkGray -NoNewline
             #Write-Host $checkOU -ForegroundColor Red
             #Write-Host $checkOU -ForegroundColor White -NoNewline

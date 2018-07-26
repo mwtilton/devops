@@ -42,6 +42,7 @@ Function Start-GPOImport {
 
     # Validate the migration table
     # No output is good.
+    <#
     Write-host "Validate the migration table" -ForegroundColor Yellow
     Test-GPOMigrationTable -Path $MigTablePath
 
@@ -75,7 +76,7 @@ Function Start-GPOImport {
     Else{
         Write-Warning "WMI Filter import returned nothing."
     }
-
+    #>
 
     # Link the GPOs to destination OUs of same path
     # The migration table CSV is used to remap the domain name portion of the OU distinguished name paths.
@@ -492,8 +493,10 @@ Function Import-GPLink {
     $MigDomains  = $MigTableCSV | Where-Object {$_.Type -eq "Domain"}
     #Testing for new domain names
     #Write-Host "Domain: "$DestDomain "server: "$DestServer.Split(".")[1] -ForegroundColor Black -BackgroundColor Yellow
-    ForEach ($GPMBackup in $BackupList) {
 
+    $n = 0
+    ForEach ($GPMBackup in $BackupList) {
+        Write-host $n -NoNewline
         Write-host " [>] Backup GPO Displayname: " -ForegroundColor DarkGray -NoNewline
         Write-host "$($GPMBackup.GPODisplayName)" -ForegroundColor White -NoNewline
 
@@ -506,18 +509,20 @@ Function Import-GPLink {
         Comment        : Desktop Super Powers
         BackupDir      : C:\temp\Backup\
         #>
+
         [xml]$GPReport = Get-Content (Join-Path -Path $GPMBackup.BackupDir -ChildPath "$($GPMBackup.ID)\gpreport.xml")
 
         $gPLinks = $null
         $gPLinks = $GPReport.GPO.LinksTo | Select-Object SOMName, SOMPath, Enabled, NoOverride
         # There may not be any gPLinks in the source domain.
+        #Write-host $gPLinks
         If ($gPLinks) {
             # Parse out the domain name, translate it to the destination domain name.
             # Create a distinguished name path from the SOMPath
             # wingtiptoys.local/Testing/SubTest
             #$gPLinks | ft
             ForEach ($gPLink in $gPLinks) {
-                #Write-Host $gPLink.SOMPath -ForegroundColor Red
+                Write-Host $gPLink.SOMPath -ForegroundColor Red
 
                 $SplitSOMPath = $gPLink.SOMPath -split '/'
                 #Write-host $SplitSOMPath -ForegroundColor Red
@@ -570,11 +575,11 @@ Function Import-GPLink {
 
                 Add-Member -InputObject $gPLink -MemberType NoteProperty -Name gPLinkDN -Value $DomainName
 
-                <#
+
                 # Now check to see that the SOM path exists in the destination domain
                 # If Exists, then create the link
                 # If NotExists, then report an error
-
+                <#
                 .gPLink.
                 SOMName     SOMPath                           Enabled NoOverride gPLinkDN
                 -------     -------                           ------- ---------- --------
@@ -625,13 +630,15 @@ Function Import-GPLink {
                 Else {
                     Write-Host "gPLink path does not exist: "$($gPLink.gPLinkDN).replace($SplitSOMPath[0], $DestServer.Split(".")[1])
                 } # End if SOMPath exists
-                #>
+
             } # End ForEach gPLink
         }
         Else {
             "No gPLinks for GPO: $($GPMBackup.GPODisplayName)."
         } # End If gPLinks exist
+        $n++
     }
+
 } #End Function
 
 #################################################

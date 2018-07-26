@@ -126,7 +126,7 @@ Function Import-Groups {
         #Check if the OU exists
         #$search = "LDAP://" + $($item.GroupLocation) + "," + $($searchbase)
         #Write-Host $search
-        Write-Host "   [>] " -ForegroundColor DarkGray -NoNewline
+        Write-Host "    [>] " -ForegroundColor DarkGray -NoNewline
         Write-Host $_.name -ForegroundColor White -NoNewline
         #Write-Host " at path " -ForegroundColor DarkGray -NoNewline
         #Write-Host $_.DistinguishedName -ForegroundColor White
@@ -270,16 +270,17 @@ Function Import-OUs {
     $csv      = Import-Csv -Path $exportedOUs | select * | sort {($_.DistinguishedName).length}
     $ImportCSV = Import-CSV $CSVPath
     $ImportDomains  = $ImportCSV | Where-Object {$_.Type -eq "Domain"}
-    Write-Host $CSV -ForegroundColor Yellow
-    Write-Host "[>]Checking: " -ForegroundColor DarkGray
+    #Write-Host $CSV -ForegroundColor Yellow
+    Write-Host "[>] Checking: " -ForegroundColor DarkGray
     $csv | ForEach-Object {
         #Check if the OU exists
         #$search = "LDAP://" + $($item.GroupLocation) + "," + $($searchbase)
         #Write-Host $search
-        Write-Host "   [>] Original Name: " -ForegroundColor DarkGray -NoNewline
-        Write-Host $_.name -ForegroundColor White
-        Write-Host "   [>] Original Path: " -ForegroundColor DarkGray -NoNewline
-        Write-host $_.DistinguishedName -ForegroundColor White
+        #Write-Host "    [>] Original Name: " -ForegroundColor DarkGray -NoNewline
+        Write-Host "    [>] " -ForegroundColor DarkGray -NoNewline
+        Write-Host $_.name"" -ForegroundColor White -NoNewline
+        #Write-Host "    [>] Original Path: " -ForegroundColor DarkGray -NoNewline
+        #Write-host $_.DistinguishedName -ForegroundColor White
         #Write-Host " at path " -ForegroundColor DarkGray -NoNewline
         #Write-Host $_.DistinguishedName -ForegroundColor Red
 
@@ -313,21 +314,25 @@ Function Import-OUs {
 
         $joinPath = $PathArray -join ""
 
-        Write-Host "   [>] Setting Join Path: " -ForegroundColor DarkGray -NoNewline
-        Write-Host $joinPath -ForegroundColor Magenta
+        #Write-Host "    [>] Setting Join Path: " -ForegroundColor DarkGray -NoNewline
+        #Write-Host $joinPath -ForegroundColor Magenta
         ForEach ($d in $ImportDomains) {
             #$NewOUPath = ($_.DistinguishedName).Replace($d.Source, $d.Destination)
-            Write-Host "      [>] Replacing Source: " -ForegroundColor DarkGray -NoNewline
-            Write-Host $d.Source -ForegroundColor Magenta
+
+            #Write-Host "      [>] Replacing Source: " -ForegroundColor DarkGray -NoNewline
+            #Write-Host $d.Source -ForegroundColor Magenta
             $NewOUPath = $joinPath.Replace($d.Source, $d.Destination)
-            Write-Host "      [>] With Destination: " -ForegroundColor DarkGray -NoNewline
-            Write-Host $d.Destination -ForegroundColor Magenta
+            #Write-Host "      [>] With Destination: " -ForegroundColor DarkGray -NoNewline
+            #Write-Host $d.Destination -ForegroundColor Magenta
+            $newName = ($_.name).Replace($d.Source, $d.Destination)
         }
-        Write-Host "   [>] Setting New Path: " -ForegroundColor DarkGray -NoNewline
-        Write-Host $NewOUPath -ForegroundColor Magenta
-        $newOUString = @("OU=" + $_.Name + "," + $NewOUPath)
-        Write-Host "   [>] Creating New OU string: " -ForegroundColor DarkGray -NoNewline
-        Write-Host $newOUString -ForegroundColor DarkGreen
+        #Write-Host "    [>] Setting New Path: " -ForegroundColor DarkGray -NoNewline
+        #Write-Host $NewOUPath -ForegroundColor Magenta
+        #Write-Host "    [>] Setting New Name for OU: " -ForegroundColor DarkGray -NoNewline
+        #Write-Host $newName -ForegroundColor DarkGreen
+        $newOUString = @("OU=" + $newName + "," + $NewOUPath)
+        #Write-Host "    [>] Creating New OU string: " -ForegroundColor DarkGray -NoNewline
+        #Write-Host $newOUString -ForegroundColor DarkGreen
         #Write-Host " at " -ForegroundColor DarkGray -NoNewline
         #Write-host $NewOUPath -ForegroundColor Magenta -NoNewline
         #Check if the Group already exists
@@ -335,8 +340,8 @@ Function Import-OUs {
         Try {
 
             $checkOU = Get-ADOrganizationalUnit -Filter "Name -like '$($_.Name)'"
-            Write-Host "   [>] Checking Original Path: " -ForegroundColor DarkGray -NoNewline
-            Write-Host $checkOU -ForegroundColor Red
+            #Write-Host "    [>] Checking Original Path: " -ForegroundColor DarkGray -NoNewline
+            #Write-Host $checkOU -ForegroundColor Red
             #Write-Host $checkOU -ForegroundColor White -NoNewline
         }
         Catch {
@@ -348,7 +353,7 @@ Function Import-OUs {
 
             elseif ($_.Exception.ToString().Contains("Directory object not found")) {
                 Write-host " "
-                Write-Host "      [-] " -ForegroundColor Red -NoNewline
+                Write-Host "        [-] " -ForegroundColor Red -NoNewline
                 Write-host "There is an issue with the specified path. Check that the OU exists. " -ForegroundColor DarkYellow -NoNewline
                 Write-Host $_.TargetObject -ForegroundColor White
             }
@@ -364,29 +369,30 @@ Function Import-OUs {
         Try{
 
 
-            Write-Host "   [>] New Path: " -ForegroundColor DarkGray -NoNewline
-            Write-Host $joinPath -ForegroundColor Red
-            Write-Host "   [>] Checking checking if they match: " -ForegroundColor DarkGray -NoNewline
-            Write-Host @($newOUString -like $checkOU) -ForegroundColor Red
-            #Write-Host $_.DistinguishedName -ForegroundColor Red
+            #Write-Host "    [>] New Path: " -ForegroundColor DarkGray -NoNewline
+            #Write-Host $NewOUPath -ForegroundColor Red
+            #Write-Host "    [>] Checking checking if they match: " -ForegroundColor DarkGray -NoNewline
+            #Write-Host @($newOUString -like $checkOU) -ForegroundColor Red
+            #Write-Host $newOUString -ForegroundColor Red
 
 
 
-            If(@($newOUString -like $checkOU)){
-                Write-Host $newOUString -ForegroundColor White -NoNewline
+            If($newOUString -match $checkOU){
+                #Write-Host "    [+]" -ForegroundColor DarkGreen -NoNewline
+                Write-Host $newOUString -ForegroundColor DarkGreen -NoNewline
                 Write-Host " already exists! OU creation skipped!"
             }
             Else{
 
                 New-ADOrganizationalUnit `
-                    -Name $_.name `
+                    -Name $newName `
                     -ProtectedFromAccidentalDeletion $false `
-                    -Path               $NewOUPath `
+                    -Path $NewOUPath `
 
 
-                Write-Host "      [+] " -ForegroundColor DarkGreen -NoNewline
+                Write-Host "    [+] " -NoNewline
                 Write-host $newOUString -ForegroundColor White -NoNewline
-                Write-host " created!" -ForegroundColor DarkGreen
+                Write-host " created!"
             }
 
 
@@ -394,7 +400,7 @@ Function Import-OUs {
         Catch {
 
             If ($_.Exception.ToString().Contains("already exists")) {
-                Write-Host "      [-] " -ForegroundColor Red -NoNewline
+                Write-Host "`r`n      [-] " -ForegroundColor Red -NoNewline
                 Write-Host $newOUString -ForegroundColor White -NoNewline
                 Write-Host " wasn't created and raised an exception! `r`n`t`tThere is an issue with the OU pathing. OU creation skipped!" -ForegroundColor Yellow
 

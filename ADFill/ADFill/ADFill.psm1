@@ -81,8 +81,8 @@ Function Start-DCImport {
     )
     Write-Host "Starting OU Import" -ForegroundColor Yellow
     Import-OUs -Path $Path -DestDomain $DestDomain -DestServer $DestServer -CSVPath $CSVPath
-    #Write-host "Starting Group Import" -ForegroundColor Yellow
-    #Import-Groups -Path $Path -DestDomain $DestDomain -DestServer $DestServer -CSVPath $CSVPath
+    Write-host "Starting Group Import" -ForegroundColor Yellow
+    Import-Groups -Path $Path -DestDomain $DestDomain -DestServer $DestServer -CSVPath $CSVPath
 
 } # End Function
 
@@ -377,7 +377,7 @@ Function Import-OUs {
 
 
 
-            If($newOUString -match $checkOU){
+            If($newOUString -eq $checkOU){
                 #Write-Host "    [+]" -ForegroundColor DarkGreen -NoNewline
                 Write-Host $newOUString -ForegroundColor DarkGreen -NoNewline
                 Write-Host " already exists! OU creation skipped!"
@@ -390,7 +390,7 @@ Function Import-OUs {
                     -Path $NewOUPath `
 
 
-                Write-Host "    [+] " -NoNewline
+                Write-Host "`r`n        [+] " -NoNewline
                 Write-host $newOUString -ForegroundColor White -NoNewline
                 Write-host " created!"
             }

@@ -62,19 +62,19 @@ Function Start-GPOImport {
     # Import WMIFilters
     $impWMI = Import-WMIFilter -DestServer $DestServer -Path $BackupPath
 
-    
+
     # Relink the WMI filters to the GPOs
     if($impWMI -eq $true){
         Write-host "Setting WMI filters" -fore Yellow
         Set-GPWMIFilterFromBackup -DestDomain $DestDomain -DestServer $DestServer -BackupPath $BackupPath
     }
     elseif ($impWMI -eq $false) {
-        
+
     }
     Else{
         Write-Warning "WMI Filter import returned nothing."
     }
-    
+
 
     # Link the GPOs to destination OUs of same path
     # The migration table CSV is used to remap the domain name portion of the OU distinguished name paths.
@@ -130,7 +130,7 @@ Function New-GPOMigrationTable {
         ForEach ($Entry in $mt.GetEntries()) {
 
             Switch ($Entry.EntryType) {
-                
+
                 # Search/replace UNC paths from CSV file
                 $Constants.EntryTypeUNCPath {
                     ForEach ($MigUNC in $MigUNCs) {
@@ -138,7 +138,7 @@ Function New-GPOMigrationTable {
                         If ($Entry.Source -like "$($MigUNC.Source)*") {
                             $mt.UpdateDestination($Entry.Source, $Entry.Source.Replace("$($MigUNC.Source)","$($MigUNC.Destination)"))
                         }
-                        
+
                     }
                 }
 
@@ -261,7 +261,7 @@ Function Invoke-RemoveGPO {
 
         Write-Host "From domain " -NoNewline
         Write-host $DestDomain -fore White -NoNewline
-        Write-host " removing GPO: " -NoNewline 
+        Write-host " removing GPO: " -NoNewline
         Write-host $($GPMBackup.GPODisplayName) -Fore Red
         try {
             Remove-GPO -Domain $DestDomain -Server $DestServer -Name $GPMBackup.GPODisplayName -ErrorAction Stop
@@ -318,9 +318,9 @@ Function Invoke-ImportGPO {
         Write-host "Importing GPO: " -NoNewline
         Write-host "$($GPMBackup.GPODisplayName)" -fore White
         try {
-            
+
             Import-GPO -Domain $DestDomain -Server $DestServer -BackupGpoName $GPMBackup.GPODisplayName -TargetName $GPMBackup.GPODisplayName -Path $BackupPath -MigrationTable $MigTablePath -CreateIfNeeded | Out-Null
-            
+
         }
         catch {
             If ($_.Exception.ToString().Contains('0x8007000D')) {
@@ -329,7 +329,7 @@ Function Invoke-ImportGPO {
                 "Error importing GPO: $($_.InvocationInfo.BoundParameters.Item('BackupGpoName'))"
                 "One or more security principals (user, group, etc.) in the migration table are not found in the destination domain."
                 ""
-            } 
+            }
             Else {
                 ""
                 "An import error occurred:"
@@ -364,9 +364,9 @@ Function Import-WMIFilter {
 
         Write-Warning "No WMI filters to import."
         return $false
-    } 
+    }
     Else {
-    
+
         $WMIImport = Import-Csv $WMIExportFile
         $WMIPath = "CN=SOM,CN=WMIPolicy,$((Get-ADDomain -Server $DestServer).SystemsContainer)"
 
@@ -378,11 +378,11 @@ Function Import-WMIFilter {
 
             If ($ExistingWMIFilters | Where-Object {$_.'msWMI-Name' -eq $WMIFilter.'msWMI-Name'}) {
                 Write-Host "WMI filter already exists: $($WMIFilter."msWMI-Name")"
-            } 
+            }
             Else {
                 $msWMICreationDate = (Get-Date).ToUniversalTime().ToString("yyyyMMddhhmmss.ffffff-000")
                 $WMIGUID = "{$([System.Guid]::NewGuid())}"
-    
+
                 $Attr = @{
                     "msWMI-Name" = $WMIFilter."msWMI-Name";
                     "msWMI-Parm2" = $WMIFilter."msWMI-Parm2";
@@ -390,10 +390,10 @@ Function Import-WMIFilter {
                     "msWMI-ID"= $WMIGUID;
                     "instanceType" = 4;
                     "showInAdvancedViewOnly" = "TRUE";
-                    "msWMI-ChangeDate" = $msWMICreationDate; 
+                    "msWMI-ChangeDate" = $msWMICreationDate;
                     "msWMI-CreationDate" = $msWMICreationDate
                 }
-    
+
                 # The Description in the GUI (Parm1) may be null. If so, that will botch the New-ADObject.
                 If ($WMIFilter."msWMI-Parm1") {
                     $Attr.Add("msWMI-Parm1",$WMIFilter."msWMI-Parm1")
@@ -404,7 +404,7 @@ Function Import-WMIFilter {
             }
         }
         return $true
-    
+
     } # End If No WMI filters
 } # End Function
 
@@ -494,7 +494,7 @@ Function Import-GPLink {
         BackupDir      : C:\temp\Backup\
         #>
         [xml]$GPReport = Get-Content (Join-Path -Path $GPMBackup.BackupDir -ChildPath "$($GPMBackup.ID)\gpreport.xml")
-        
+
         $gPLinks = $null
         $gPLinks = $GPReport.GPO.LinksTo | Select-Object SOMName, SOMPath, Enabled, NoOverride
         # There may not be any gPLinks in the source domain.
@@ -509,32 +509,32 @@ Function Import-GPLink {
                 $SplitSOMPath = $gPLink.SOMPath -split '/'
                 #Write-host $SplitSOMPath -ForegroundColor Red
                 [array]::Reverse($SplitSOMPath)
-                
+
                 $ou = @()
-                
+
                 For ($i=0;$i -lt $SplitSOMPath.Length;$i++) {
                     #Write-Host $i $SplitSOMPath[$i] ($SplitSOMPath.Length - 1) -ForegroundColor Red
                     $index = ($SplitSOMPath.Length - 1)
                     #Write-Host ((0 -le $index) -and ($i -eq 0))
                     #Write-Host (($i -eq 0) -and ($index -gt 0) -and ($i -lt 1))
                     switch ($i) {
-                        
+
                         {(($i -eq 0) -and ($index -gt 0) -and ($i -lt 1))} {
                             $ou += "OU=" + $SplitSOMPath[$i]
                             break
                         }
                         {(($i  -ge 1) -and ($i -lt $index))} {
-                            
+
                             $ou += ",OU=" + $SplitSOMPath[$i]
                             break
                         }
                         {(($i -ne 0) -and ($i -eq $index))} {
-                            
+
                             $ou += ",DC=" + $SplitSOMPath[$i].Split(".")[0] + ",DC=" + $SplitSOMPath[$i].Split(".")[1]
                             break
                         }
                         {(($i -eq 0) -and ($i -eq $index))} {
-                            
+
                             $ou += "DC=" + $SplitSOMPath[$i].Split(".")[0] + ",DC=" + $SplitSOMPath[$i].Split(".")[1]
                             break
                         }
@@ -542,11 +542,11 @@ Function Import-GPLink {
                             "Something else happened"
                         }
                     }
-                    
-                    
+
+
                 }
                 $finalOU = @($OU -join "")
-                
+
                 # Swap the source and destination domain names
                 ForEach ($d in $MigDomains) {
                     $DomainName = $finalOU.Replace($d.Source, $d.Destination)
@@ -554,19 +554,19 @@ Function Import-GPLink {
                 #Write-Host $DomainName -ForegroundColor Red
 
                 # Add the DN path as a property on the object
-                
+
                 Add-Member -InputObject $gPLink -MemberType NoteProperty -Name gPLinkDN -Value $DomainName
 
                 <#
                 # Now check to see that the SOM path exists in the destination domain
                 # If Exists, then create the link
                 # If NotExists, then report an error
-                
+
                 .gPLink.
-                SOMName     SOMPath                           Enabled NoOverride gPLinkDN                                    
-                -------     -------                           ------- ---------- --------                                    
+                SOMName     SOMPath                           Enabled NoOverride gPLinkDN
+                -------     -------                           ------- ---------- --------
                 SubTest     wingtiptoys.local/Testing/SubTest true    false      OU=SubTest,OU=Testing,DC=cohovineyard,DC=com
-                wingtiptoys wingtiptoys.local                 false   false      DC=cohovineyard,DC=com                      
+                wingtiptoys wingtiptoys.local                 false   false      DC=cohovineyard,DC=com
                 #>
 
                 # Put the potential error line outside the context of the IF
@@ -585,7 +585,7 @@ Function Import-GPLink {
                     Write-host $($gPLink.gPLinkDN) -ForegroundColor White
                     # It is possible that the policy is already linked to the destination path.
                     try {
-                        
+
                         New-GPLink -Domain $DestDomain -Server $DestServer `
                             -Name $GPMBackup.GPODisplayName `
                             -Target $gPLink.gPLinkDN `
@@ -595,19 +595,19 @@ Function Import-GPLink {
                             -ErrorAction Stop | Out-Null
                         # We calculated the order by counting how many gPLinks already exist.
                         # This ensures that it is always linked last in the order.
-                        
+
                     }
                     catch {
                         Write-Warning "gPLink Error: $($gPLink.gPLinkDN)"
                         Write-host "   [=]"$_.Exception -ForegroundColor Yellow
                     }
-                } 
+                }
                 Else {
                     Write-Host "gPLink path does not exist: "$($gPLink.gPLinkDN).replace($SplitSOMPath[0], $DestServer.Split(".")[1])
                 } # End if SOMPath exists
                 #>
             } # End ForEach gPLink
-        } 
+        }
         Else {
             "No gPLinks for GPO: $($GPMBackup.GPODisplayName)."
         } # End If gPLinks exist
@@ -664,7 +664,7 @@ Function Import-GPPermission {
         [String]
         $MigTablePath
     )
-    
+
     $MigTable = Show-GPOMigrationTable -Path $MigTablePath |
         Select-Object *, `
             @{name='SourceName';expression={($_.Source -split '@')[0]}}, `
@@ -677,12 +677,12 @@ Function Import-GPPermission {
             @{name='IDName';expression={($_.IdentityReference -split '\\')[-1]}}, `
             @{name='IDDomain';expression={($_.IdentityReference -split '\\')[0]}}
 
-    
+
     ForEach ($Name in $DisplayName) {
 
         Write-host "  [+] Importing GPO Permissions: " -NoNewline
         Write-host $Name -fore White
-        
+
         $GPO = Get-GPO -Domain $DestDomain -Server $DestServer -DisplayName $Name
 
         ForEach ($ACE in ($GPO_ACEs_CSV | Where-Object {$_.Name -eq $Name})) {
@@ -696,7 +696,7 @@ Function Import-GPPermission {
             # Find the CSV ACE identity name in the MigTable
             # Possible zero or one matches, should not be multiple
             $MigID = $MigTable | Where-Object {$_.SourceName -eq $ACE.IDName}
-            
+
             # If entry, then attempt to set it
             If ($MigID) {
                 # Find the AD object based on the type listed in the MigTable
@@ -716,28 +716,28 @@ Function Import-GPPermission {
                 Catch {
                     # AD object not found. Warning written below.
                 }
-                
+
                 # If we found the object, then attempt to set the permission.
                 If ($ADObject) {
 
                     Write-Host "        [+] ADObject found for " -ForegroundColor DarkGreen -NoNewline
                     Write-host $($ADObject.Name) -ForegroundColor White -NoNewline
                     Write-Host " Writing permission." -ForegroundColor DarkGreen
-                    
+
                     # Same effect as using Get-ACL "AD:\..."
                     $acl = $GPO | Select-Object -ExpandProperty Path | Get-ADObject -Properties NTSecurityDescriptor | Select-Object -ExpandProperty NTSecurityDescriptor
-                    
+
                     $ObjectType = [GUID]$($ACE.ObjectType)
                     $InheritedObjectType = [GUID]$($ACE.InheritedObjectType)
                     $ace = New-Object System.DirectoryServices.ActiveDirectoryAccessRule `
                         $ADObject.SID, $ACE.ActiveDirectoryRights, $ACE.AccessControlType, $ObjectType, `
                         $ACE.InheritanceType, $InheritedObjectType
                     $acl.AddAccessRule($ace)
-                    
+
                     # Commit the ACL
                     Set-Acl -Path "AD:\$($GPO.Path)" -AclObject $acl
-                
-                } 
+
+                }
                 Else {
                     # Else, Log failure to find security principal
                     Write-Host "        [-] ADObject not found. ACE not set for: " -ForegroundColor Red
@@ -746,8 +746,8 @@ Function Import-GPPermission {
                     Write-Host "            [>]" -ForegroundColor DarkGray -NoNewline
                     Write-Host  $Name -ForegroundColor White
                 }
-                
-            } 
+
+            }
             Else {
             # Else, attempt to set without migration table translation (ie. CREATOR OWNER, etc.)
 
@@ -764,9 +764,9 @@ Function Import-GPPermission {
                 Catch {
                     Write-Warning "Error.  Cannot set: '$($ACE.IDName)' on '$Name'"
                 }
-                
+
                 If ($sid) {
-                
+
                     # Same effect as using Get-ACL "AD:\..."
                     $acl = $GPO | Select-Object -ExpandProperty Path | Get-ADObject -Properties NTSecurityDescriptor | Select-Object -ExpandProperty NTSecurityDescriptor
 
@@ -776,7 +776,7 @@ Function Import-GPPermission {
                         $sid, $ACE.ActiveDirectoryRights, $ACE.AccessControlType, $ObjectType, `
                         $ACE.InheritanceType, $InheritedObjectType
                     $acl.AddAccessRule($ace)
-                    
+
                     # Commit the ACL
                     Set-Acl -Path "AD:\$($GPO.Path)" -AclObject $acl
                 }
@@ -858,7 +858,7 @@ Function Start-GPOExport {
     # Capture the backup path for subsequent cmdlets
     # Dump the WMI filters also
     $BackupPath = Invoke-BackupGPO -SrceDomain $SrceDomain -SrceServer $SrceServer -DisplayName $DisplayName -Path $Path
-    
+
     # Dump the permissions
     Export-GPPermission -SrceDomain $SrceDomain -SrceServer $SrceServer -DisplayName $DisplayName -Path $BackupPath
 
@@ -896,12 +896,12 @@ function Invoke-BackupGPO {
         $Path # Base path where backup folder will be created
     )
 
-    $BackupPath = Join-Path $Path "\GPO Backup $SrceDomain $(Get-Date -Format 'yyyy-MM-dd-HH-mm-ss')\"
+    $BackupPath = Join-Path $Path "\GPO Backup $(Get-Date -Format 'yyyy-MM-dd-HH-mm-ss')\"
     New-Item -Path $BackupPath -ItemType Directory -Force | Out-Null
-    
+
     If ($All) {
         Backup-GPO -Server $SrceServer -Domain $SrceDomain -Path $BackupPath -All | Out-Null
-    } 
+    }
     Else {
         ForEach ($Name in $DisplayName) {
             Backup-GPO -Server $SrceServer -Domain $SrceDomain -Path $BackupPath -Name $Name | Out-Null
@@ -914,7 +914,7 @@ function Invoke-BackupGPO {
             Where-Object {$_.WmiFilter} |
             Select-Object -ExpandProperty WmiFilter |
             Select-Object -ExpandProperty Name -Unique
-    } 
+    }
     Else {
         $WMIFilterNames = Get-GPO -All |
             Where-Object {$DisplayName -contains $_.DisplayName -and $_.WmiFilter} |
@@ -923,7 +923,7 @@ function Invoke-BackupGPO {
     }
     If ($WMIFilterNames) {
         Export-WMIFilter -Name $WMIFilterNames -SrceServer $SrceServer -Path $BackupPath
-    } 
+    }
     Else {
         Write-Host "No WMI filters to export."
     }
@@ -957,7 +957,7 @@ function Export-GPPermission {
         $Path
     )
     $GPO_ACEs = @()
-    
+
     If ($All) {
         $DisplayName = Get-GPO -Server $SrceServer -Domain $SrceDomain -All |
             Select-Object -ExpandProperty DisplayName
@@ -972,8 +972,8 @@ function Export-GPPermission {
         $GPO_ACEs += $ACL | Select-Object `
                 @{name='Name';expression={$Name}}, `
                 @{name='Path';expression={$GPO.Path}}, `
-                *                
+                *
     }
-    
+
     $GPO_ACEs | Export-CSV (Join-Path $Path GPPermissions.csv) -NoTypeInformation
 }

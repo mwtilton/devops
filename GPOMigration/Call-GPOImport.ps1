@@ -8,8 +8,8 @@ Source,Destination,Type
 "\\foo\server","\\baz\server","UNC"
 
 ##############################################################################>
-New-Item -ItemType Directory $env:USERPROFILE\Desktop\GPOMigrationWorkingFolder -ea SilentlyContinue
-Set-Location $env:USERPROFILE\Desktop\GPOMigrationWorkingFolder
+New-Item -ItemType Directory $env:USERPROFILE\Desktop\WorkingFolder -ea SilentlyContinue
+Set-Location $env:USERPROFILE\Desktop\WorkingFolder
 
 Import-Module GroupPolicy
 Import-Module ActiveDirectory
@@ -18,15 +18,15 @@ Import-Module $env:USERPROFILE\Desktop\GPOMigration\GPOMigration -Force
 # This path must be absolute, not relative
 $date = (get-date).ToString("mmddyyyy")
 $Path        = $PWD  # Current folder specified in Set-Location above
-$BackupPath  = "C:\Users\Administrator\Desktop\GPOMigrationWorkingFolder\GPO Backup DEMOCLOUD.LOCAL 2018-07-02-14-45-54\"
-New-Item -ItemType Directory $BackupPath -ea SilentlyContinue 
+$BackupPath  = ""
+New-Item -ItemType Directory $BackupPath -ea SilentlyContinue
 
 ###############################################################################
 # IMPORT PROCESS
 ###############################################################################
 $DestDomain  = $env:USERDNSDOMAIN
 $DestServer  = "$env:COMPUTERNAME.$env:USERDNSDOMAIN"
-$MigTableCSVPath = "$env:USERPROFILE\Desktop\GPOMigration\MigTable_sample.csv"
+$MigTableCSVPath = "$env:USERPROFILE\Desktop\WorkingFolder\Import.csv"
 
 Start-GPOImport `
     -DestDomain $DestDomain `

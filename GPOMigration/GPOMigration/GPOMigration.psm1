@@ -30,21 +30,22 @@ Function Start-GPOImport {
         [Switch]
         $CopyACL
     )
-    Write-host "Starting GPOImport" -fore Yellow
+    Write-host "Starting GPOImport" -ForegroundColor Yellow
     # Create the migration table
     # Capture the MigTablePath and MigTableCSVPath for use with subsequent cmdlets
     $MigTablePath = New-GPOMigrationTable -DestDomain $DestDomain -Path $Path -BackupPath $BackupPath -MigTableCSVPath $MigTableCSVPath
 
     # View the migration table
-    Write-host "View the migration table" -fore Yellow
-    Show-GPOMigrationTable -Path $MigTablePath
+
+    #Write-host "View the migration table" -ForegroundColor Yellow
+    #Show-GPOMigrationTable -Path $MigTablePath
 
     # Validate the migration table
     # No output is good.
-    Write-host "Validate the migration table" -fore Yellow
+    Write-host "Validate the migration table" -ForegroundColor Yellow
     Test-GPOMigrationTable -Path $MigTablePath
 
-    Write-host "Removing Dup GPO's" -fore Red
+    Write-host "Removing Duplicate GPO's" -ForegroundColor Red
     # OPTIONAL
     # Remove any pre-existing GPOs of the same name in the destination environment
     # Use this for these scenarios:
@@ -53,19 +54,19 @@ Function Start-GPOImport {
     # - Import-GPO will fail if a GPO of the same name exists in the target.
     Invoke-RemoveGPO -DestDomain $DestDomain -DestServer $DestServer -BackupPath $BackupPath
 
-    Write-host "Invoking the GPOImport" -fore Yellow
+    Write-host "Invoking the GPOImport" -ForegroundColor Yellow
     # Import all from backup
     # This will fail for any policies that are missing migration table accounts in the destination domain.
     Invoke-ImportGPO -DestDomain $DestDomain -DestServer $DestServer -BackupPath $BackupPath -MigTablePath $MigTablePath -CopyACL
 
-    Write-host "Importing WMI filters" -fore Yellow
+    Write-host "Importing WMI filters" -ForegroundColor Yellow
     # Import WMIFilters
     $impWMI = Import-WMIFilter -DestServer $DestServer -Path $BackupPath
 
 
     # Relink the WMI filters to the GPOs
     if($impWMI -eq $true){
-        Write-host "Setting WMI filters" -fore Yellow
+        Write-host "Setting WMI filters" -ForegroundColor Yellow
         Set-GPWMIFilterFromBackup -DestDomain $DestDomain -DestServer $DestServer -BackupPath $BackupPath
     }
     elseif ($impWMI -eq $false) {
@@ -78,8 +79,9 @@ Function Start-GPOImport {
 
     # Link the GPOs to destination OUs of same path
     # The migration table CSV is used to remap the domain name portion of the OU distinguished name paths.
-    Write-host "Importing GPLinks" -fore Yellow
+    Write-host "Importing GPLinks" -ForegroundColor Yellow
     Import-GPLink -DestDomain $DestDomain -DestServer $DestServer -BackupPath $BackupPath -MigTableCSVPath $MigTableCSVPath
+
 } # End Function
 
 #Start Subsection 1
@@ -189,7 +191,7 @@ Function Show-GPOMigrationTable {
 
     # http://technet.microsoft.com/en-us/library/cc739066(v=WS.10).aspx
     # $Constants = $gpm.getConstants()
-    $mt.GetEntries() |
+    $entries = $mt.GetEntries() |
         Select-Object Source, `
         @{name='DestOption';expression={
             Switch ($_.DestinationOption) {
@@ -211,6 +213,7 @@ Function Show-GPOMigrationTable {
             }
         }},
         Destination
+
 } # End Function
 
 #.ExternalHelp GPOMigration.psm1-help.xml
@@ -258,17 +261,27 @@ Function Invoke-RemoveGPO {
         Comment        : Desktop Super Powers
         BackupDir      : C:\temp\Backup\
         #>
+        Write-host " [>] Removing GPO: " -ForegroundColor DarkGray -NoNewline
+        Write-host $($GPMBackup.GPODisplayName) -ForegroundColor White
 
-        Write-Host "From domain " -NoNewline
-        Write-host $DestDomain -fore White -NoNewline
-        Write-host " removing GPO: " -NoNewline
-        Write-host $($GPMBackup.GPODisplayName) -Fore Red
+
         try {
             Remove-GPO -Domain $DestDomain -Server $DestServer -Name $GPMBackup.GPODisplayName -ErrorAction Stop
         }
         catch {
-            $_.Exception
-            Continue
+            If($_.Exception.ToString().Contains("GPO was not found")){
+
+            }
+            elseif ($_.Exception.ToString().Contains("0x80072035")) {
+
+            }
+            Else{
+                Write-Warning "A GPO removal error occurred for $($GPMBackup.GPODisplayName)"
+                $_ | fl * -force
+                $_.InvocationInfo.BoundParameters | fl * -force
+                $_.Exception
+                Continue
+            }
         }
     }
 } # End Function
@@ -316,7 +329,7 @@ Function Invoke-ImportGPO {
         #>
 
         Write-host "Importing GPO: " -NoNewline
-        Write-host "$($GPMBackup.GPODisplayName)" -fore White
+        Write-host "$($GPMBackup.GPODisplayName)" -ForegroundColor White
         try {
 
             Import-GPO -Domain $DestDomain -Server $DestServer -BackupGpoName $GPMBackup.GPODisplayName -TargetName $GPMBackup.GPODisplayName -Path $BackupPath -MigrationTable $MigTablePath -CreateIfNeeded | Out-Null
@@ -481,8 +494,8 @@ Function Import-GPLink {
     #Write-Host "Domain: "$DestDomain "server: "$DestServer.Split(".")[1] -ForegroundColor Black -BackgroundColor Yellow
     ForEach ($GPMBackup in $BackupList) {
 
-        Write-host "Backup GPO Displayname: " -NoNewline
-        Write-host "$($GPMBackup.GPODisplayName)" -fore White
+        Write-host " [>] Backup GPO Displayname: " -ForegroundColor DarkGray -NoNewline
+        Write-host "$($GPMBackup.GPODisplayName)" -ForegroundColor White -NoNewline
 
         <#
         ID             : {2DA3E56D-061C-4CB7-95D8-DCA4D023ACF5}
@@ -581,8 +594,8 @@ Function Import-GPLink {
 
                 # Only attempt to link the policy if the destination path exists.
                 If ($SOMPath) {
-                    Write-host "gPLink: " -NoNewline
-                    Write-host $($gPLink.gPLinkDN) -ForegroundColor White
+                    Write-host " gPLink location " -ForegroundColor DarkGray -NoNewline
+                    Write-host $($gPLink.gPLinkDN) -ForegroundColor White -NoNewline
                     # It is possible that the policy is already linked to the destination path.
                     try {
 
@@ -595,11 +608,18 @@ Function Import-GPLink {
                             -ErrorAction Stop | Out-Null
                         # We calculated the order by counting how many gPLinks already exist.
                         # This ensures that it is always linked last in the order.
-
+                        Write-Host " created!"
                     }
                     catch {
-                        Write-Warning "gPLink Error: $($gPLink.gPLinkDN)"
-                        Write-host "   [=]"$_.Exception -ForegroundColor Yellow
+                        If($_.Exception.ToString().Contains("already linked")){
+                            Write-Host " already exists. Skipping!" -ForegroundColor DarkGreen
+                        }
+                        Else{
+
+                            Write-host $_.Exception -ForegroundColor Yellow
+                        }
+
+
                     }
                 }
                 Else {
@@ -681,7 +701,7 @@ Function Import-GPPermission {
     ForEach ($Name in $DisplayName) {
 
         Write-host "  [+] Importing GPO Permissions: " -NoNewline
-        Write-host $Name -fore White
+        Write-host $Name -ForegroundColor White
 
         $GPO = Get-GPO -Domain $DestDomain -Server $DestServer -DisplayName $Name
 
@@ -689,9 +709,9 @@ Function Import-GPPermission {
 
             Write-host "     [>]" -ForegroundColor DarkGray -NoNewline
             Write-host "Setting " -ForegroundColor DarkGray -NoNewline
-            Write-host $($ACE.IDName) -fore White -NoNewline
+            Write-host $($ACE.IDName) -ForegroundColor White -NoNewline
             Write-Host " GPO permission for " -NoNewline
-            Write-host $Name -fore White
+            Write-host $Name -ForegroundColor White
 
             # Find the CSV ACE identity name in the MigTable
             # Possible zero or one matches, should not be multiple

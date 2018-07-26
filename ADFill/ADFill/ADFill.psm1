@@ -373,7 +373,7 @@ Function Import-OUs {
 
 
             If(@($newOUString -like $checkOU)){
-                Write-Host $joinPath -ForegroundColor White -NoNewline
+                Write-Host $newOUString -ForegroundColor White -NoNewline
                 Write-Host " already exists! OU creation skipped!"
             }
             Else{
@@ -385,7 +385,7 @@ Function Import-OUs {
 
 
                 Write-Host "      [+] " -ForegroundColor DarkGreen -NoNewline
-                Write-host $NewOUPath -ForegroundColor White -NoNewline
+                Write-host $newOUString -ForegroundColor White -NoNewline
                 Write-host " created!" -ForegroundColor DarkGreen
             }
 
@@ -395,7 +395,7 @@ Function Import-OUs {
 
             If ($_.Exception.ToString().Contains("already exists")) {
                 Write-Host "      [-] " -ForegroundColor Red -NoNewline
-                Write-Host $NewOUPath -ForegroundColor White -NoNewline
+                Write-Host $newOUString -ForegroundColor White -NoNewline
                 Write-Host " wasn't created and raised an exception! `r`n`t`tThere is an issue with the OU pathing. OU creation skipped!" -ForegroundColor Yellow
 
             }

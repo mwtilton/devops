@@ -25,7 +25,37 @@ Describe "DCImport Unit Tests" -Tags "UNIT" {
                 ($getOU -eq "OU=DEMOCLOUD,DC=DEMOCLOUD,DC=LOCAL") | Should Be $true
             }
         }
+        Context "Moving Modules Unit testing" {
+            Mock Get-ChildItem {return "$env:USERPROFILE\Desktop\ADFill\ADFill\ADFill.psm1"} -Verifiable
+            Mock Get-ChildItem {return "$env:USERPROFILE\Desktop\ADFill\ADFill\ADFill.psd1"} -Verifiable
+            $result = Move-Modules -path "$env:USERPROFILE\Desktop"
+            It "Calls the gci 1 time" {
+                $Params = @{
+                    CommandName = 'Get-ChildItem'
+                    Times = 1
+                    Exactly = $true
+                }
+                Assert-MockCalled @Params
+            }
+            It "Looks in the users desktop" {
+                $result | Should belike "*.ps*1"
+            }
+            It "has the program module folder" {
+                ($env:PSModulePath).Split(";")[1] | Should belike "c:\Program*"
+            }
 
+        }
+        Context "Copy's the module to the users module folder" {
+            Mock Copy-Item {return $true} -ParameterFilter { $path -eq "$testdrive\testfile.psm1" -and $destination -eq "$testdrive\Module\testfile.psm1"}
+            It "calls copy-item" {
+                $Params = @{
+                    CommandName = 'Copy-Item'
+                    Times = 1
+                    Exactly = $true
+                }
+                Assert-MockCalled @Params
+            }
+        }
 
     }
 

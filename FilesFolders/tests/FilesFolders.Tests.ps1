@@ -15,6 +15,22 @@ Describe "Unit testing FilesFolders Module" -Tags "UNIT" {
             }
 
         }
+        Context "Finds the fileshares" {
+            Mock Get-FileShare -MockWith {}
+            It "returns shares" {
+                Should not be $null
+            }
+        }
+        Context "Importing Shares" {
+            It "imports the shares" {
+
+            }
+        }
+        Context "Creates New Shares" {
+            It "New path exists" {
+
+            }
+        }
 
 
     }

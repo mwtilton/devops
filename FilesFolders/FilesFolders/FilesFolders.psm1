@@ -72,3 +72,37 @@ function Get-FilesFolders {
     }
 
 }
+
+Function Invoke-FileShares {
+
+}
+
+Function Import-FileShares {
+
+}
+
+Function Export-FileShares {
+    return 1
+}
+
+Function Set-SharesACL {
+    if ($ComputerName -eq '.'){
+        $Path = $Folder
+    }
+
+    else {
+        $Path = "\\$ComputerName\$Folder"
+    }
+
+    $Output = @()
+    $Output += get-acl $Path
+    $Output += GCI $Path | ?{$_.PSIsContainer} | Get-ACL
+
+    if ($OutputFile){
+        $Output | sort PSParentPath| Select-Object @{Name="Path";Expression={$_.PSPath.Substring($_.PSPath.IndexOf(":")+2) }},@{Name="Type";Expression={$_.GetType()}},Owner -ExpandProperty Access | Export-CSV $OutputFile -NoType
+    }
+
+    else{
+        $Output | sort PSParentPath| Select-Object @{Name="Path";Expression={$_.PSPath.Substring($_.PSPath.IndexOf(":")+2) }},@{Name="Type";Expression={$_.GetType()}},Owner -ExpandProperty Access | FT -Auto
+    }
+}

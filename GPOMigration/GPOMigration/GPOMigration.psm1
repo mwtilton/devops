@@ -42,7 +42,7 @@ Function Start-GPOImport {
 
     # Validate the migration table
     # No output is good.
-
+    <#
     Write-host "Validate the migration table" -ForegroundColor Yellow
     Test-GPOMigrationTable -Path $MigTablePath
 
@@ -76,7 +76,7 @@ Function Start-GPOImport {
     Else{
         Write-Warning "WMI Filter import returned nothing."
     }
-
+    #>
 
     # Link the GPOs to destination OUs of same path
     # The migration table CSV is used to remap the domain name portion of the OU distinguished name paths.
@@ -494,11 +494,15 @@ Function Import-GPLink {
     #Testing for new domain names
     #Write-Host "Domain: "$DestDomain "server: "$DestServer.Split(".")[1] -ForegroundColor Black -BackgroundColor Yellow
 
-    $n = 0
-    ForEach ($GPMBackup in $BackupList) {
+    $n = 1
+    Write-Host $BackupList.Count -ForegroundColor Cyan
+    ForEach ($GPMBackup in $BackupList)
+    {
 
-
-        Write-host "`r`n$($GPMBackup.GPODisplayName)" -ForegroundColor White -NoNewline
+        #Write-Host ($GPMBackup | ConvertTo-Json)  -ForegroundColor White
+        Write-host $n -NoNewline
+        Write-host " [>] GPO: " -ForegroundColor DarkGray -NoNewline
+        Write-host "$($GPMBackup.GPODisplayName)" -ForegroundColor White -NoNewline
 
         <#
         ID             : {2DA3E56D-061C-4CB7-95D8-DCA4D023ACF5}
@@ -516,14 +520,22 @@ Function Import-GPLink {
         $gPLinks = $GPReport.GPO.LinksTo | Select-Object SOMName, SOMPath, Enabled, NoOverride
         # There may not be any gPLinks in the source domain.
         $newGpLinks = $gPLinks | ConvertTo-Json
-        Write-Host $newGpLinks -ForegroundColor White
+
+        #Write-Host $newGpLinks -ForegroundColor White
+        $gPLinks | ForEach-Object {
+
+            Write-Host "`r`n    [>] SOMPath" -ForegroundColor DarkGray -NoNewline
+            Write-Host $_.SOMPath -ForegroundColor Cyan
+        }
         If ($gPLinks) {
             # Parse out the domain name, translate it to the destination domain name.
             # Create a distinguished name path from the SOMPath
             # wingtiptoys.local/Testing/SubTest
-            #$gPLinks | ft
-            ForEach ($gPLink in $gPLinks) {
-                Write-host $n -NoNewline
+
+            <#
+            ForEach ($gPLink in $gPLinks)
+            {
+
                 Write-host " [>] GPO: " -ForegroundColor DarkGray -NoNewline
                 #Write-host "$($gPLink.GPODisplayName)" -ForegroundColor White -NoNewline
                 #Write-Host $gPLink.SOMPath -ForegroundColor Red
@@ -534,7 +546,8 @@ Function Import-GPLink {
 
                 $ou = @()
 
-                For ($i=0;$i -lt $SplitSOMPath.Length;$i++) {
+                For ($i=0;$i -lt $SplitSOMPath.Length;$i++)
+                {
                     #Write-Host $i $SplitSOMPath[$i] ($SplitSOMPath.Length - 1) -ForegroundColor Red
                     $index = ($SplitSOMPath.Length - 1)
                     #Write-Host ((0 -le $index) -and ($i -eq 0))
@@ -580,56 +593,56 @@ Function Import-GPLink {
 
                 # Add the DN path as a property on the object
 
+                <#
                 Add-Member -InputObject $gPLink -MemberType NoteProperty -Name gPLinkDN -Value $DomainName
 
 
-                # Now check to see that the SOM path exists in the destination domain
-                # If Exists, then create the link
-                # If NotExists, then report an error
-                <#
-                .gPLink.
-                SOMName     SOMPath                           Enabled NoOverride gPLinkDN
-                -------     -------                           ------- ---------- --------
-                SubTest     wingtiptoys.local/Testing/SubTest true    false      OU=SubTest,OU=Testing,DC=cohovineyard,DC=com
-                wingtiptoys wingtiptoys.local                 false   false      DC=cohovineyard,DC=com
-                #>
+                #.gPLink.
+                #SOMName     SOMPath                           Enabled NoOverride gPLinkDN
+                #-------     -------                           ------- ---------- --------
+                #SubTest     wingtiptoys.local/Testing/SubTest true    false      OU=SubTest,OU=Testing,DC=cohovineyard,DC=com
+                #wingtiptoys wingtiptoys.local                 false   false      DC=cohovineyard,DC=com
 
-                # Put the potential error line outside the context of the IF
-                # so that it doesn't cause the whole construct to error out.
-                # This is a bit of a hack on the error trapping,
-                # but the Get-ADObject does not seem to obey the -ErrorAction parameter
-                # at least with PS v2 on 2008 R2.
+
+
                 $SOMPath = $null
                 #$ErrorActionPreference = 'SilentlyContinue'
                 Try{
                     $SOMPath = Get-ADObject -Server $DestServer -Identity $gPLink.gPLinkDN -Properties gPLink
-                    Write-host " gPLink location " -ForegroundColor DarkGray -NoNewline
-                    Write-host $($gPLink.gPLinkDN) -ForegroundColor White -NoNewline
-                    # It is possible that the policy is already linked to the destination path.
-                    try {
+                    If($SOMPath){
+                        Write-host " gPLink location " -ForegroundColor DarkGray -NoNewline
+                        Write-host $($gPLink.gPLinkDN) -ForegroundColor White -NoNewline
+                        # It is possible that the policy is already linked to the destination path.
+                        try {
 
-                        New-GPLink -Domain $DestDomain -Server $DestServer `
-                            -Name $GPMBackup.GPODisplayName `
-                            -Target $gPLink.gPLinkDN `
-                            -LinkEnabled $(If ($gPLink.Enabled -eq 'true') {'Yes'} Else {'No'}) `
-                            -Enforced $(If ($gPLink.NoOverride -eq 'true') {'Yes'} Else {'No'}) `
-                            -Order $(If ($SOMPath.gPLink.Length -gt 1) {$SOMPath.gPLink.Split(']').Length} Else {1}) `
-                            -ErrorAction Stop | Out-Null
-                        # We calculated the order by counting how many gPLinks already exist.
-                        # This ensures that it is always linked last in the order.
-                        Write-Host " created!"
-                    }
-                    catch {
-                        If($_.Exception.ToString().Contains("already linked")){
-                            Write-Host " already exists. Skipping!" -ForegroundColor DarkGreen
+                            New-GPLink -Domain $DestDomain -Server $DestServer `
+                                -Name $GPMBackup.GPODisplayName `
+                                -Target $gPLink.gPLinkDN `
+                                -LinkEnabled $(If ($gPLink.Enabled -eq 'true') {'Yes'} Else {'No'}) `
+                                -Enforced $(If ($gPLink.NoOverride -eq 'true') {'Yes'} Else {'No'}) `
+                                -Order $(If ($SOMPath.gPLink.Length -gt 1) {$SOMPath.gPLink.Split(']').Length} Else {1}) `
+                                -ErrorAction Stop | Out-Null
+                            # We calculated the order by counting how many gPLinks already exist.
+                            # This ensures that it is always linked last in the order.
+                            Write-Host " created!"
                         }
-                        Else{
+                        catch {
+                            If($_.Exception.ToString().Contains("already linked")){
+                                Write-Host " already exists. Skipping!" -ForegroundColor DarkGreen
+                            }
+                            Else{
 
-                            Write-host $_.Exception -ForegroundColor Yellow
+                                Write-host $_.Exception -ForegroundColor Yellow
+                            }
+
+
                         }
 
+                    }
+                    Else{
 
                     }
+
                 }
                 Catch {
                     If($_.Exception.ToString().Contains("Directory object not found")){
@@ -642,14 +655,17 @@ Function Import-GPLink {
 
                     }
                 }
-                $n++
+
+
             } # End ForEach gPLink
+            #>
+
         }
         Else {
             "No gPLinks for GPO: $($GPMBackup.GPODisplayName)."
         } # End If gPLinks exist
-
-    }
+        $n++
+    } # End Foreach GPMBackup
 
 } #End Function
 

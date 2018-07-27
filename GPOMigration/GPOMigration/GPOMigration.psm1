@@ -42,7 +42,7 @@ Function Start-GPOImport {
 
     # Validate the migration table
     # No output is good.
-    <#
+
     Write-host "Validate the migration table" -ForegroundColor Yellow
     Test-GPOMigrationTable -Path $MigTablePath
 
@@ -76,7 +76,7 @@ Function Start-GPOImport {
     Else{
         Write-Warning "WMI Filter import returned nothing."
     }
-    #>
+
 
     # Link the GPOs to destination OUs of same path
     # The migration table CSV is used to remap the domain name portion of the OU distinguished name paths.
@@ -601,11 +601,8 @@ Function Import-GPLink {
                 # at least with PS v2 on 2008 R2.
                 $SOMPath = $null
                 #$ErrorActionPreference = 'SilentlyContinue'
-                $SOMPath = Get-ADObject -Server $DestServer -Identity $gPLink.gPLinkDN -Properties gPLink
-                #$ErrorActionPreference = 'Continue'
-
-                # Only attempt to link the policy if the destination path exists.
-                If ($SOMPath) {
+                Try{
+                    $SOMPath = Get-ADObject -Server $DestServer -Identity $gPLink.gPLinkDN -Properties gPLink
                     Write-host " gPLink location " -ForegroundColor DarkGray -NoNewline
                     Write-host $($gPLink.gPLinkDN) -ForegroundColor White -NoNewline
                     # It is possible that the policy is already linked to the destination path.
@@ -634,9 +631,17 @@ Function Import-GPLink {
 
                     }
                 }
-                Else {
-                    Write-Host "gPLink path does not exist: "$($gPLink.gPLinkDN).replace($SplitSOMPath[0], $DestServer.Split(".")[1])
-                } # End if SOMPath exists
+                Catch {
+                    If($_.Exception.ToString().Contains("Directory object not found")){
+                        Write-Host "`r`n      [-] " -ForegroundColor Red -NoNewline
+                        Write-host "There is an issue with the specified path. Check that the OU exists. " -ForegroundColor DarkYellow -NoNewline
+                        Write-Host $_.TargetObject -ForegroundColor White
+                    }
+                    Else{
+                        Write-Host $_.Exception
+
+                    }
+                }
                 $n++
             } # End ForEach gPLink
         }

@@ -59,7 +59,7 @@ Function Start-GPOImport {
     # Import all from backup
     # This will fail for any policies that are missing migration table accounts in the destination domain.
     Invoke-ImportGPO -DestDomain $DestDomain -DestServer $DestServer -BackupPath $BackupPath -MigTablePath $MigTablePath -CopyACL
-    <#
+
     Write-host "Importing WMI filters" -ForegroundColor Yellow
     # Import WMIFilters
     $impWMI = Import-WMIFilter -DestServer $DestServer -Path $BackupPath
@@ -76,7 +76,7 @@ Function Start-GPOImport {
     Else{
         Write-Warning "WMI Filter import returned nothing."
     }
-    #>
+
 
     # Link the GPOs to destination OUs of same path
     # The migration table CSV is used to remap the domain name portion of the OU distinguished name paths.

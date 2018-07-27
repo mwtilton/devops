@@ -498,7 +498,7 @@ Function Import-GPLink {
     ForEach ($GPMBackup in $BackupList) {
 
 
-        #Write-host "$($GPMBackup.GPODisplayName)" -ForegroundColor White -NoNewline
+        Write-host "`r`n$($GPMBackup.GPODisplayName)" -ForegroundColor White -NoNewline
 
         <#
         ID             : {2DA3E56D-061C-4CB7-95D8-DCA4D023ACF5}
@@ -515,7 +515,8 @@ Function Import-GPLink {
         $gPLinks = $null
         $gPLinks = $GPReport.GPO.LinksTo | Select-Object SOMName, SOMPath, Enabled, NoOverride
         # There may not be any gPLinks in the source domain.
-        #Write-host $gPLinks
+        $newGpLinks = $gPLinks | ConvertTo-Json
+        Write-Host $newGpLinks -ForegroundColor White
         If ($gPLinks) {
             # Parse out the domain name, translate it to the destination domain name.
             # Create a distinguished name path from the SOMPath
@@ -524,8 +525,9 @@ Function Import-GPLink {
             ForEach ($gPLink in $gPLinks) {
                 Write-host $n -NoNewline
                 Write-host " [>] GPO: " -ForegroundColor DarkGray -NoNewline
+                #Write-host "$($gPLink.GPODisplayName)" -ForegroundColor White -NoNewline
                 #Write-Host $gPLink.SOMPath -ForegroundColor Red
-                Write-Host $gPLink.SOMName -ForegroundColor White -NoNewline
+
                 $SplitSOMPath = $gPLink.SOMPath -split '/'
                 #Write-host $SplitSOMPath -ForegroundColor Red
                 [array]::Reverse($SplitSOMPath)
@@ -570,7 +572,10 @@ Function Import-GPLink {
                 # Swap the source and destination domain names
                 ForEach ($d in $MigDomains) {
                     $DomainName = $finalOU.Replace($d.Source, $d.Destination)
+                    $newSOMName = ($gPLink.SOMName).Replace($d.Source, $d.Destination)
                 }
+                Write-Host $newSOMName -ForegroundColor White -NoNewline
+
                 #Write-Host $DomainName -ForegroundColor Red
 
                 # Add the DN path as a property on the object

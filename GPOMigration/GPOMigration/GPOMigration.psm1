@@ -502,7 +502,7 @@ Function Import-GPLink {
         #Write-Host ($GPMBackup | ConvertTo-Json)  -ForegroundColor White
         Write-host $n -NoNewline
         Write-host " [>] GPO: " -ForegroundColor DarkGray -NoNewline
-        Write-host "$($GPMBackup.GPODisplayName)" -ForegroundColor White -NoNewline
+        Write-host "$($GPMBackup.GPODisplayName)`r`n" -ForegroundColor White -NoNewline
 
         <#
         ID             : {2DA3E56D-061C-4CB7-95D8-DCA4D023ACF5}
@@ -524,146 +524,107 @@ Function Import-GPLink {
         #Write-Host $newGpLinks -ForegroundColor White
         $gPLinks | ForEach-Object {
 
-            Write-Host "`r`n    [>] SOMPath" -ForegroundColor DarkGray -NoNewline
-            Write-Host $_.SOMPath -ForegroundColor Cyan
-        }
-        If ($gPLinks) {
-            # Parse out the domain name, translate it to the destination domain name.
-            # Create a distinguished name path from the SOMPath
-            # wingtiptoys.local/Testing/SubTest
+            Write-Host "    [>] SOMPath" -ForegroundColor DarkGray -NoNewline
+            #Write-Host $_.SOMPath -ForegroundColor Cyan
 
-            <#
-            ForEach ($gPLink in $gPLinks)
+            $SplitSOMPath = $_.SOMPath -split '/'
+            [array]::Reverse($SplitSOMPath)
+
+            $ou = @()
+
+            For ($i=0;$i -lt $SplitSOMPath.Length;$i++)
             {
+                #Write-Host $i $SplitSOMPath[$i] ($SplitSOMPath.Length - 1) -ForegroundColor Red
+                $index = ($SplitSOMPath.Length - 1)
+                #Write-Host ((0 -le $index) -and ($i -eq 0))
+                #Write-Host (($i -eq 0) -and ($index -gt 0) -and ($i -lt 1))
+                switch ($i) {
 
-                Write-host " [>] GPO: " -ForegroundColor DarkGray -NoNewline
-                #Write-host "$($gPLink.GPODisplayName)" -ForegroundColor White -NoNewline
-                #Write-Host $gPLink.SOMPath -ForegroundColor Red
-
-                $SplitSOMPath = $gPLink.SOMPath -split '/'
-                #Write-host $SplitSOMPath -ForegroundColor Red
-                [array]::Reverse($SplitSOMPath)
-
-                $ou = @()
-
-                For ($i=0;$i -lt $SplitSOMPath.Length;$i++)
-                {
-                    #Write-Host $i $SplitSOMPath[$i] ($SplitSOMPath.Length - 1) -ForegroundColor Red
-                    $index = ($SplitSOMPath.Length - 1)
-                    #Write-Host ((0 -le $index) -and ($i -eq 0))
-                    #Write-Host (($i -eq 0) -and ($index -gt 0) -and ($i -lt 1))
-                    switch ($i) {
-
-                        {(($i -eq 0) -and ($index -gt 0) -and ($i -lt 1))} {
-                            $ou += "OU=" + $SplitSOMPath[$i]
-                            break
-                        }
-                        {(($i  -ge 1) -and ($i -lt $index))} {
-
-                            $ou += ",OU=" + $SplitSOMPath[$i]
-                            break
-                        }
-                        {(($i -ne 0) -and ($i -eq $index))} {
-
-                            $ou += ",DC=" + $SplitSOMPath[$i].Split(".")[0] + ",DC=" + $SplitSOMPath[$i].Split(".")[1]
-                            break
-                        }
-                        {(($i -eq 0) -and ($i -eq $index))} {
-
-                            $ou += "DC=" + $SplitSOMPath[$i].Split(".")[0] + ",DC=" + $SplitSOMPath[$i].Split(".")[1]
-                            break
-                        }
-                        Default {
-                            "Something else happened"
-                        }
+                    {(($i -eq 0) -and ($index -gt 0) -and ($i -lt 1))} {
+                        $ou += "OU=" + $SplitSOMPath[$i]
+                        break
                     }
+                    {(($i  -ge 1) -and ($i -lt $index))} {
 
-
-                }
-                $finalOU = @($OU -join "")
-
-                # Swap the source and destination domain names
-                ForEach ($d in $MigDomains) {
-                    $DomainName = $finalOU.Replace($d.Source, $d.Destination)
-                    $newSOMName = ($gPLink.SOMName).Replace($d.Source, $d.Destination)
-                }
-                Write-Host $newSOMName -ForegroundColor White -NoNewline
-
-                #Write-Host $DomainName -ForegroundColor Red
-
-                # Add the DN path as a property on the object
-
-                <#
-                Add-Member -InputObject $gPLink -MemberType NoteProperty -Name gPLinkDN -Value $DomainName
-
-
-                #.gPLink.
-                #SOMName     SOMPath                           Enabled NoOverride gPLinkDN
-                #-------     -------                           ------- ---------- --------
-                #SubTest     wingtiptoys.local/Testing/SubTest true    false      OU=SubTest,OU=Testing,DC=cohovineyard,DC=com
-                #wingtiptoys wingtiptoys.local                 false   false      DC=cohovineyard,DC=com
-
-
-
-                $SOMPath = $null
-                #$ErrorActionPreference = 'SilentlyContinue'
-                Try{
-                    $SOMPath = Get-ADObject -Server $DestServer -Identity $gPLink.gPLinkDN -Properties gPLink
-                    If($SOMPath){
-                        Write-host " gPLink location " -ForegroundColor DarkGray -NoNewline
-                        Write-host $($gPLink.gPLinkDN) -ForegroundColor White -NoNewline
-                        # It is possible that the policy is already linked to the destination path.
-                        try {
-
-                            New-GPLink -Domain $DestDomain -Server $DestServer `
-                                -Name $GPMBackup.GPODisplayName `
-                                -Target $gPLink.gPLinkDN `
-                                -LinkEnabled $(If ($gPLink.Enabled -eq 'true') {'Yes'} Else {'No'}) `
-                                -Enforced $(If ($gPLink.NoOverride -eq 'true') {'Yes'} Else {'No'}) `
-                                -Order $(If ($SOMPath.gPLink.Length -gt 1) {$SOMPath.gPLink.Split(']').Length} Else {1}) `
-                                -ErrorAction Stop | Out-Null
-                            # We calculated the order by counting how many gPLinks already exist.
-                            # This ensures that it is always linked last in the order.
-                            Write-Host " created!"
-                        }
-                        catch {
-                            If($_.Exception.ToString().Contains("already linked")){
-                                Write-Host " already exists. Skipping!" -ForegroundColor DarkGreen
-                            }
-                            Else{
-
-                                Write-host $_.Exception -ForegroundColor Yellow
-                            }
-
-
-                        }
-
+                        $ou += ",OU=" + $SplitSOMPath[$i]
+                        break
                     }
-                    Else{
+                    {(($i -ne 0) -and ($i -eq $index))} {
 
+                        $ou += ",DC=" + $SplitSOMPath[$i].Split(".")[0] + ",DC=" + $SplitSOMPath[$i].Split(".")[1]
+                        break
                     }
+                    {(($i -eq 0) -and ($i -eq $index))} {
 
-                }
-                Catch {
-                    If($_.Exception.ToString().Contains("Directory object not found")){
-                        Write-Host "`r`n      [-] " -ForegroundColor Red -NoNewline
-                        Write-host "There is an issue with the specified path. Check that the OU exists. " -ForegroundColor DarkYellow -NoNewline
-                        Write-Host $_.TargetObject -ForegroundColor White
+                        $ou += "DC=" + $SplitSOMPath[$i].Split(".")[0] + ",DC=" + $SplitSOMPath[$i].Split(".")[1]
+                        break
                     }
-                    Else{
-                        Write-Host $_.Exception
-
+                    Default {
+                        "Something else happened"
                     }
                 }
 
 
-            } # End ForEach gPLink
-            #>
+            }
+            $finalOU = @($OU -join "")
 
-        }
-        Else {
-            "No gPLinks for GPO: $($GPMBackup.GPODisplayName)."
-        } # End If gPLinks exist
+            ForEach ($d in $MigDomains) {
+                $DomainName = $finalOU.Replace($d.Source, $d.Destination)
+                $newSOMName = ($_.SOMName).Replace($d.Source, $d.Destination)
+            }
+
+            Add-Member -InputObject $_ -MemberType NoteProperty -Name gPLinkDN -Value $DomainName
+            $SOMPath = $null
+            Try{
+                $SOMPath = Get-ADObject -Server $DestServer -Identity $_.gPLinkDN -Properties gPLink
+                If($SOMPath){
+                    Write-host " gPLink location " -ForegroundColor DarkGray -NoNewline
+                    Write-host $($_.gPLinkDN) -ForegroundColor White -NoNewline
+                    # It is possible that the policy is already linked to the destination path.
+                    try {
+
+                        New-GPLink -Domain $DestDomain -Server $DestServer `
+                            -Name $GPMBackup.GPODisplayName `
+                            -Target $_.gPLinkDN `
+                            -LinkEnabled $(If ($_.Enabled -eq 'true') {'Yes'} Else {'No'}) `
+                            -Enforced $(If ($_.NoOverride -eq 'true') {'Yes'} Else {'No'}) `
+                            -Order $(If ($SOMPath.gPLink.Length -gt 1) {$SOMPath.gPLink.Split(']').Length} Else {1}) `
+                            -ErrorAction Stop | Out-Null
+                        # We calculated the order by counting how many gPLinks already exist.
+                        # This ensures that it is always linked last in the order.
+                        Write-Host " created!"
+                    }
+                    catch {
+                        If($_.Exception.ToString().Contains("already linked")){
+                            Write-Host " already exists. Skipping!" -ForegroundColor DarkGreen
+                        }
+                        Else{
+
+                            Write-host $_.Exception -ForegroundColor Yellow
+                        }
+
+
+                    }
+
+                }
+                Else{
+
+                }
+
+            }
+            Catch {
+                If($_.Exception.ToString().Contains("Directory object not found")){
+                    Write-Host "`r`n      [-] " -ForegroundColor Red -NoNewline
+                    Write-host "There is an issue with the specified path. Check that the OU exists. " -ForegroundColor DarkYellow -NoNewline
+                    Write-Host $_.TargetObject -ForegroundColor White
+                }
+                Else{
+                    Write-Host $_.Exception
+
+                }
+            }
+        } # End SOMPathLoop
+
         $n++
     } # End Foreach GPMBackup
 

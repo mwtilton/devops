@@ -42,7 +42,7 @@ Function Start-GPOImport {
 
     # Validate the migration table
     # No output is good.
-    <#
+
     Write-host "Validate the migration table" -ForegroundColor Yellow
     Test-GPOMigrationTable -Path $MigTablePath
 
@@ -59,7 +59,7 @@ Function Start-GPOImport {
     # Import all from backup
     # This will fail for any policies that are missing migration table accounts in the destination domain.
     Invoke-ImportGPO -DestDomain $DestDomain -DestServer $DestServer -BackupPath $BackupPath -MigTablePath $MigTablePath -CopyACL
-
+    <#
     Write-host "Importing WMI filters" -ForegroundColor Yellow
     # Import WMIFilters
     $impWMI = Import-WMIFilter -DestServer $DestServer -Path $BackupPath
@@ -82,7 +82,7 @@ Function Start-GPOImport {
     # The migration table CSV is used to remap the domain name portion of the OU distinguished name paths.
     Write-host "Importing GPLinks" -ForegroundColor Yellow
     Import-GPLink -DestDomain $DestDomain -DestServer $DestServer -BackupPath $BackupPath -MigTableCSVPath $MigTableCSVPath
-
+    #>
 } # End Function
 
 #Start Subsection 1
@@ -495,7 +495,7 @@ Function Import-GPLink {
     #Write-Host "Domain: "$DestDomain "server: "$DestServer.Split(".")[1] -ForegroundColor Black -BackgroundColor Yellow
 
     $n = 1
-    Write-Host $BackupList.Count -ForegroundColor Cyan
+
     ForEach ($GPMBackup in $BackupList)
     {
 
@@ -726,16 +726,18 @@ Function Import-GPPermission {
                         'GlobalGroup'     {$ADObject = Get-ADGroup -Identity $MigID.DestinationName -Server $MigID.DestinationDomain; break}
                         'LocalGroup'      {$ADObject = Get-ADGroup -Identity $MigID.DestinationName -Server $MigID.DestinationDomain; break}
                         'UniversalGroup'  {$ADObject = Get-ADGroup -Identity $MigID.DestinationName -Server "$($MigID.DestinationDomain):3268"; break}
+                        'Free Text or SID' {"found free text"}
                         Default           {$ADObject = $null; break}
                     }
+
                 }
                 Catch {
                     # AD object not found. Warning written below.
+                    $_ | fl * -force
+                    $_.InvocationInfo.BoundParameters | fl * -force
+                    $_.Exception
                 }
-
-                # If we found the object, then attempt to set the permission.
-                If ($ADObject) {
-
+                Try{
                     Write-Host "        [+] ADObject found for " -ForegroundColor DarkGreen -NoNewline
                     Write-host $($ADObject.Name) -ForegroundColor White -NoNewline
                     Write-Host " Writing permission." -ForegroundColor DarkGreen
@@ -752,26 +754,26 @@ Function Import-GPPermission {
 
                     # Commit the ACL
                     Set-Acl -Path "AD:\$($GPO.Path)" -AclObject $acl
-
                 }
-                Else {
-                    # Else, Log failure to find security principal
+                Catch {
                     Write-Host "        [-] ADObject not found. ACE not set for: " -ForegroundColor Red
                     Write-Host "            [>]" -ForegroundColor DarkGray -NoNewline
                     Write-host $($ACE.IDName) -ForegroundColor White
                     Write-Host "            [>]" -ForegroundColor DarkGray -NoNewline
                     Write-Host  $Name -ForegroundColor White
+                    $_ | fl * -force
+                    $_.InvocationInfo.BoundParameters | fl * -force
+                    $_.Exception
                 }
 
             }
             Else {
             # Else, attempt to set without migration table translation (ie. CREATOR OWNER, etc.)
 
-                Write-host "        [=] Setting ACE without migration table translation: " -ForegroundColor Yellow
-                Write-host "         [>]" -ForegroundColor DarkGray -NoNewline
-                Write-host ""$($ACE.IDName) -ForegroundColor White
-                Write-host "         [>]" -ForegroundColor DarkGray -NoNewline
-                Write-host ""$Name -ForegroundColor White
+                #Write-host "        [=] Setting ACE without migration table translation: " -ForegroundColor Yellow
+                #Write-host "       [>] $Name" -ForegroundColor DarkGray -NoNewline
+                #Write-host ""$($ACE.IDName) -ForegroundColor White
+
 
                 $sid = $null
                 Try {
@@ -780,22 +782,32 @@ Function Import-GPPermission {
                 Catch {
                     Write-Warning "Error.  Cannot set: '$($ACE.IDName)' on '$Name'"
                 }
+                Try {
+                    If ($sid) {
 
-                If ($sid) {
+                        # Same effect as using Get-ACL "AD:\..."
+                        $acl = $GPO | Select-Object -ExpandProperty Path | Get-ADObject -Properties NTSecurityDescriptor | Select-Object -ExpandProperty NTSecurityDescriptor
 
-                    # Same effect as using Get-ACL "AD:\..."
-                    $acl = $GPO | Select-Object -ExpandProperty Path | Get-ADObject -Properties NTSecurityDescriptor | Select-Object -ExpandProperty NTSecurityDescriptor
+                        $ObjectType = [GUID]$($ACE.ObjectType)
+                        $InheritedObjectType = [GUID]$($ACE.InheritedObjectType)
+                        $ace = New-Object System.DirectoryServices.ActiveDirectoryAccessRule `
+                            $sid, $ACE.ActiveDirectoryRights, $ACE.AccessControlType, $ObjectType, `
+                            $ACE.InheritanceType, $InheritedObjectType
+                        $acl.AddAccessRule($ace)
 
-                    $ObjectType = [GUID]$($ACE.ObjectType)
-                    $InheritedObjectType = [GUID]$($ACE.InheritedObjectType)
-                    $ace = New-Object System.DirectoryServices.ActiveDirectoryAccessRule `
-                        $sid, $ACE.ActiveDirectoryRights, $ACE.AccessControlType, $ObjectType, `
-                        $ACE.InheritanceType, $InheritedObjectType
-                    $acl.AddAccessRule($ace)
+                        # Commit the ACL
+                        Set-Acl -Path "AD:\$($GPO.Path)" -AclObject $acl
+                    }
+                    Else{
 
-                    # Commit the ACL
-                    Set-Acl -Path "AD:\$($GPO.Path)" -AclObject $acl
+                    }
                 }
+                Catch {
+                    $_ | fl * -force
+                    $_.InvocationInfo.BoundParameters | fl * -force
+                    $_.Exception
+                }
+
 
             }
 

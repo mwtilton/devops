@@ -496,9 +496,9 @@ Function Import-GPLink {
 
     $n = 0
     ForEach ($GPMBackup in $BackupList) {
-        Write-host $n -NoNewline
-        Write-host " [>] Backup GPO Displayname: " -ForegroundColor DarkGray -NoNewline
-        Write-host "$($GPMBackup.GPODisplayName)" -ForegroundColor White -NoNewline
+
+
+        #Write-host "$($GPMBackup.GPODisplayName)" -ForegroundColor White -NoNewline
 
         <#
         ID             : {2DA3E56D-061C-4CB7-95D8-DCA4D023ACF5}
@@ -522,8 +522,10 @@ Function Import-GPLink {
             # wingtiptoys.local/Testing/SubTest
             #$gPLinks | ft
             ForEach ($gPLink in $gPLinks) {
-                Write-Host $gPLink.SOMPath -ForegroundColor Red
-
+                Write-host $n -NoNewline
+                Write-host " [>] GPO: " -ForegroundColor DarkGray -NoNewline
+                #Write-Host $gPLink.SOMPath -ForegroundColor Red
+                Write-Host $gPLink.SOMName -ForegroundColor White -NoNewline
                 $SplitSOMPath = $gPLink.SOMPath -split '/'
                 #Write-host $SplitSOMPath -ForegroundColor Red
                 [array]::Reverse($SplitSOMPath)
@@ -593,9 +595,9 @@ Function Import-GPLink {
                 # but the Get-ADObject does not seem to obey the -ErrorAction parameter
                 # at least with PS v2 on 2008 R2.
                 $SOMPath = $null
-                $ErrorActionPreference = 'SilentlyContinue'
+                #$ErrorActionPreference = 'SilentlyContinue'
                 $SOMPath = Get-ADObject -Server $DestServer -Identity $gPLink.gPLinkDN -Properties gPLink
-                $ErrorActionPreference = 'Continue'
+                #$ErrorActionPreference = 'Continue'
 
                 # Only attempt to link the policy if the destination path exists.
                 If ($SOMPath) {
@@ -630,13 +632,13 @@ Function Import-GPLink {
                 Else {
                     Write-Host "gPLink path does not exist: "$($gPLink.gPLinkDN).replace($SplitSOMPath[0], $DestServer.Split(".")[1])
                 } # End if SOMPath exists
-
+                $n++
             } # End ForEach gPLink
         }
         Else {
             "No gPLinks for GPO: $($GPMBackup.GPODisplayName)."
         } # End If gPLinks exist
-        $n++
+
     }
 
 } #End Function

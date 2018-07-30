@@ -73,14 +73,7 @@ function Get-FilesFolders {
 
 }
 
-Function Invoke-FileShares {
-    [CmdletBinding()]
-    param (
-        [parameter(Mandatory=$true)][string]$Path
-    )
-}
-
-Function Import-FileShares {
+Function Get-FileShares {
     Param (
         [Parameter(Mandatory=$true)]
         [String]
@@ -88,11 +81,7 @@ Function Import-FileShares {
         [Parameter(Mandatory=$true)]
         [ValidateScript({Test-Path $_})]
         [String]
-        $BackupPath, # Path of the GPO GUID Folder under the main Backup Folder
-        [Parameter(Mandatory=$true)]
-        [ValidateScript({Test-Path $_})]
-        [String]
-        $MigTableCSVPath # Path for migration table source for automatic migtable generation
+        $BackupPath # Path of the GPO GUID Folder under the main Backup Folder
     )
     $gpm = New-Object -ComObject GPMgmt.GPM
     $Constants = $gpm.getConstants()
@@ -100,17 +89,8 @@ Function Import-FileShares {
     $GPMSearchCriteria = $gpm.CreateSearchCriteria()
     $BackupList = $GPMBackupDir.SearchBackups($GPMSearchCriteria)
 
-    $MigTableCSV = Import-CSV $MigTableCSVPath
-    $MigDomains  = $MigTableCSV | Where-Object {$_.Type -eq "Domain"}
-    #Testing for new domain names
-    #Write-Host "Domain: "$DestDomain "server: "$DestServer.Split(".")[1] -ForegroundColor Black -BackgroundColor Yellow
-
-    $n = 1
-
     ForEach ($GPMBackup in $BackupList)
     {
-        Write-host " [>] GPO: " -ForegroundColor DarkGray -NoNewline
-        Write-host "$($GPMBackup.GPODisplayName)`r`n" -ForegroundColor White -NoNewline
         [xml]$GPReport = Get-Content (Join-Path -Path $GPMBackup.BackupDir -ChildPath "$($GPMBackup.ID)\gpreport.xml")
 
         $gPLinks = $null
@@ -123,13 +103,48 @@ Function Import-FileShares {
     }
     get-WmiObject -class Win32_Share -computer $DestServer | select name, path | ft
 }
+Function New-FileShares {
+    Param (
+        [Parameter(Mandatory=$true)]
+        [String]
+        $DestServer,
+        [Parameter(Mandatory=$true)]
+        [ValidateScript({Test-Path $_})]
+        [String]
+        $csv # Path of the GPO GUID Folder under the main Backup Folder
+    )
+    $importCSV = Import-csv $csv | ? {$_.path -ne ""}
+    $importcsv | Foreach-object {
+        Write-host $_.path -ForegroundColor red
+        Try{
+            New-item -Path $_.path -ItemType Directory -ErrorAction Stop | Out-null
+        }
+        Catch{
+            If($_.exception.tostring().contains("already exists")){
+
+            }
+            elseif($_.exception.tostring().contains("A drive with the name")){
+                Write-host "  [-]" -fore red -NoNewline
+                Write-host "This is probably trying to create a new folder to the drive letter " -ForegroundColor DarkYellow -nonewline
+                Write-host $_.targetobject -foregroundcolor White -nonewline
+                Write-host " and this is not possible since it is a drive letter and not a valid folder location. This can be ignored but may need to be reviewed." -ForegroundColor DarkYellow
+
+            }
+            else {
+                Write-Host $_.exception
+            }
+        }
+
+    }
+}
 
 Function Export-FileShares {
     [CmdletBinding()]
     param (
-        [parameter(Mandatory=$true)][string]$Path
+        [parameter(Mandatory=$true)][string]$Path,
+        [parameter(Mandatory=$true)][string]$DestServer
     )
-    return 1
+    get-WmiObject -class Win32_Share -computer $DestServer | select name, path | Export-Csv "$path\Exported-FileShares.csv" -NoTypeInformation -Force
 }
 
 Function Set-SharesACL {

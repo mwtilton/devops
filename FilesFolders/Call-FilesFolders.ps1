@@ -19,15 +19,15 @@ Import-Module $moduleFolder -Force
 $Path        = $PWD  # Current folder specified in Set-Location above
 $BackupPath  = "$env:USERPROFILE\Desktop\WorkingFolder\GPO Backup 2018-07-30-08-23-59\"
 New-Item -ItemType Directory $BackupPath -ea SilentlyContinue
+New-Item -ItemType Directory "$env:USERPROFILE\Desktop\WorkingFolder" -ea SilentlyContinue
 
 ###############################################################################
 # IMPORT PROCESS
 ###############################################################################
 $DestDomain  = $env:USERDNSDOMAIN
 $DestServer  = "fileserver01"
-$MigTableCSVPath = "$env:USERPROFILE\Desktop\WorkingFolder\Import.csv"
+$CSVPath = "$env:USERPROFILE\Desktop\WorkingFolder\Exported-FileShares.csv"
 
-Import-FileShares `
+New-FileShares `
     -DestServer $DestServer `
-    -BackupPath $BackupPath `
-    -MigTableCSVPath $MigTableCSVPath
+    -csv $CSVPath

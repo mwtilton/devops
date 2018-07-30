@@ -84,9 +84,6 @@ Function Import-FileShares {
     Param (
         [Parameter(Mandatory=$true)]
         [String]
-        $DestDomain,
-        [Parameter(Mandatory=$true)]
-        [String]
         $DestServer,
         [Parameter(Mandatory=$true)]
         [ValidateScript({Test-Path $_})]
@@ -117,14 +114,14 @@ Function Import-FileShares {
         [xml]$GPReport = Get-Content (Join-Path -Path $GPMBackup.BackupDir -ChildPath "$($GPMBackup.ID)\gpreport.xml")
 
         $gPLinks = $null
-        $gPLinks = $GPReport.GPO.User.ExtensionData.Extension.DriveMapSettings.Drive.Properties | Select-Object label, path, letter, action | ? {$_.path -ne $null -or $_.path -eq ""} | Sort-Object label
+        $gPLinks = $GPReport.GPO.User.ExtensionData.Extension.DriveMapSettings.Drive.Properties | Select-Object label, path, letter, action | ? {($_.path -ne "")} | Sort-Object label
         $gpLinks | Foreach-Object {
             #Write-host ($_) -match "path\=\`""
             $_
-            Test-Path $_.path
+            #Test-Path $_.path
         }
     }
-    #get-WmiObject -class Win32_Share -computer $Computer | select *
+    get-WmiObject -class Win32_Share -computer $DestServer | select name, path | ft
 }
 
 Function Export-FileShares {

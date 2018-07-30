@@ -143,31 +143,22 @@ Function New-FileShares {
     }
 }
 
-Function Set-SharesACL {
+Function Export-SharesACL {
     [CmdletBinding()]
     param (
-        [parameter(Mandatory=$true)][string]$Path,
-        [parameter(Mandatory=$true)][string]$outputfile
+        [parameter(Mandatory=$true)][string]$csv,
+        [parameter(Mandatory=$true)][string]$path
     )
-    if ($ComputerName -eq '.'){
-        $Path = $Folder
-    }
 
-    else {
-        $Path = "\\$ComputerName\$Folder"
-    }
+    $importCSV = Import-CSV $csv
+    $importCSV | Foreach-object {
+        $Output = @()
+        $Output += get-acl $_.path
+        $Output += GCI $Path | ?{$_.PSIsContainer} | Get-ACL
 
-    $Output = @()
-    $Output += get-acl $Path
-    $Output += GCI $Path | ?{$_.PSIsContainer} | Get-ACL
 
-    if ($OutputFile){
-        $Output | sort PSParentPath| Select-Object @{Name="Path";Expression={$_.PSPath.Substring($_.PSPath.IndexOf(":")+2) }},@{Name="Type";Expression={$_.GetType()}},Owner -ExpandProperty Access | Export-CSV $OutputFile -NoType
     }
-
-    else{
-        $Output | sort PSParentPath| Select-Object @{Name="Path";Expression={$_.PSPath.Substring($_.PSPath.IndexOf(":")+2) }},@{Name="Type";Expression={$_.GetType()}},Owner -ExpandProperty Access | FT -Auto
-    }
+    $Output | sort PSParentPath| Select-Object @{Name="Path";Expression={$_.PSPath.Substring($_.PSPath.IndexOf(":")+2) }},@{Name="Type";Expression={$_.GetType()}},Owner -ExpandProperty Access | Export-Csv "$path\Exported-FileSharesACL.csv" -NoTypeInformation -Force
 }
 Function Export-FileShares {
     [CmdletBinding()]
@@ -178,15 +169,3 @@ Function Export-FileShares {
     get-WmiObject -class Win32_Share -computer $DestServer | select name, path | Export-Csv "$path\Exported-FileShares.csv" -NoTypeInformation -Force
 }
 
-
-Function Export-SharesACL {
-    [CmdletBinding()]
-    param (
-        [parameter(Mandatory=$true)][string]$DestServer
-    )
-    get-WmiObject -class Win32_Share -computer $DestServer | select name, path
-    $getShares = get-WmiObject -class Win32_Share -computer $DestServer | select name, path
-    $getshares | Foreach-object {
-        Get-acl $_.path | Export-Csv "$path\Exported-FileSharesACL.csv" -NoTypeInformation -Force -Append
-    }
-}

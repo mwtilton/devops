@@ -72,7 +72,11 @@ function Get-FilesFolders {
     }
 
 }
-
+##########################################################################################
+#
+# Getting/Creating Share Folders
+#
+##########################################################################################
 Function Get-FileShares {
     Param (
         [Parameter(Mandatory=$true)]
@@ -142,7 +146,11 @@ Function New-FileShares {
 
     }
 }
-
+##########################################################################################
+#
+# Exporting Shares
+#
+##########################################################################################
 Function Export-SharesACL {
     [CmdletBinding()]
     param (
@@ -152,13 +160,33 @@ Function Export-SharesACL {
 
     $importCSV = Import-CSV $csv
     $importCSV | Foreach-object {
-        $Output = @()
-        $Output += get-acl $_.path
-        $Output += GCI $Path | ?{$_.PSIsContainer} | Get-ACL
+        Try{
+            $Output = @()
+            $Output += get-acl $_.path
+            $Output += GCI $Path | ?{$_.PSIsContainer} | Get-ACL
+            $Output | sort PSParentPath| Select-Object @{Name="Path";Expression={$_.PSPath.Substring($_.PSPath.IndexOf(":")+2) }},@{Name="Type";Expression={$_.GetType()}},Owner -ExpandProperty Access | Export-Csv "$path\Exported-FileSharesACL.csv" -NoTypeInformation -Force -append
 
+        }
+        Catch{
+            If($_.exception.ToString().contains("The argument is null")){
+                Write-host "  [-]" -fore red -NoNewline
+                Write-host "This is probably due to an invalid or empty string" -ForegroundColor DarkYellow -nonewline
+                Write-host $_.targetobject -foregroundcolor White
+
+            }
+            elseif($_.exception.ToString().contains("drive with the name")){
+                Write-host "  [-]" -fore red -NoNewline
+                Write-host "This is probably trying to access the drive letter " -ForegroundColor DarkYellow -nonewline
+                Write-host $_.targetobject -foregroundcolor White -nonewline
+                Write-host " and this is not possible since it is a drive letter and not a valid folder location. This can be ignored but may need to be reviewed." -ForegroundColor DarkYellow
+            }
+            Else{
+
+            }
+        }
 
     }
-    $Output | sort PSParentPath| Select-Object @{Name="Path";Expression={$_.PSPath.Substring($_.PSPath.IndexOf(":")+2) }},@{Name="Type";Expression={$_.GetType()}},Owner -ExpandProperty Access | Export-Csv "$path\Exported-FileSharesACL.csv" -NoTypeInformation -Force
+
 }
 Function Export-FileShares {
     [CmdletBinding()]
@@ -169,3 +197,56 @@ Function Export-FileShares {
     get-WmiObject -class Win32_Share -computer $DestServer | select name, path | Export-Csv "$path\Exported-FileShares.csv" -NoTypeInformation -Force
 }
 
+##########################################################################################
+#
+# Importing Shares
+#
+##########################################################################################
+
+Function Import-SharesACL {
+    [CmdletBinding()]
+    param (
+        [parameter(Mandatory=$true)][string]$csv
+    )
+
+    $importCSV = Import-CSV $csv
+    $importCSV | Foreach-object {
+        $_
+        Try{
+            Resolve-Path $_.path -erroraction stop | Out-null
+        }
+        Catch{
+            Write-host "RP error" -foregrouncolor Red
+            $_ | fl * -force
+            $_.InvocationInfo.BoundParameters | fl * -force
+            $_.Exception
+        }
+        Try{
+            $Ar = New-Object System.Security.AccessControl.FileSystemAccessRule(
+                $_.Owner, ` #username <#Not really sure what this one is...#>
+                $_.FileSystemRights, ` #modify, full control
+                $_.InheritanceFlags, ` # ContainerInherit, Objectinherit
+                $_.PropagationFlags,` #None, InheritOnly
+                $_.AccessControl` #Allow, Deny
+            )
+            $Acl.SetAccessRule($Ar)
+        }
+        Catch{
+            Write-host "New-Object error" -foregrouncolor Red
+            $_ | fl * -force
+            $_.InvocationInfo.BoundParameters | fl * -force
+            $_.Exception
+        }
+        Try{
+            Set-ACL -path $_.path -AclObject $Acl -ErrorAction Stop
+        }
+        Catch{
+            Write-host "Set acl error" -ForegroundColor Red
+            $_ | fl * -force
+            $_.InvocationInfo.BoundParameters | fl * -force
+            $_.Exception
+        }
+
+    }
+
+}

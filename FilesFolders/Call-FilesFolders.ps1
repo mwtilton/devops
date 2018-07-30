@@ -26,16 +26,20 @@ New-Item -ItemType Directory "$env:USERPROFILE\Desktop\WorkingFolder" -ea Silent
 ###############################################################################
 $DestDomain  = $env:USERDNSDOMAIN
 $DestServer  = "fileserver01"
-$sharefolderCSVPath = "$env:USERPROFILE\Desktop\WorkingFolder\Exported-FileShares.csv"
-#$shareACLCSVPath = "$env:USERPROFILE\Desktop\WorkingFolder\Exported-FileSharesACL.csv"
+#$sharefolderCSVPath = "$env:USERPROFILE\Desktop\WorkingFolder\Exported-FileShares.csv"
+$shareACLCSVPath = "$env:USERPROFILE\Desktop\WorkingFolder\Exported-FileSharesACL.csv"
 <#
-=====================================
+====================================================
 [+] Importing Functions
+Get-FileShares `
+    -DestServer `
+    -BackupPath `
+
 New-FileShares `
     -DestServer $DestServer `
     -csv $CSVPath
 
-=============================================
+====================================================
 [+] Exporting Functions
 Export-FileShares `
     -destserver $DestServer `
@@ -43,11 +47,13 @@ Export-FileShares `
 Export-SharesACL `
     -csv $sharefolderCSVPath `
     -Path $env:USERPROFILE\Desktop\WorkingFolder
+====================================================
+[+] Importing
 
-
-
+Import-SharesACL `
+    -csv $shareACLCSVPath `
 
 #>
-Export-SharesACL `
-    -csv $sharefolderCSVPath `
-    -Path $env:USERPROFILE\Desktop\WorkingFolder
+
+Import-SharesACL `
+    -csv $shareACLCSVPath `

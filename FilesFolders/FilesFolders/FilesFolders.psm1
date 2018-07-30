@@ -113,8 +113,13 @@ Function New-FileShares {
         [String]
         $csv # Path of the GPO GUID Folder under the main Backup Folder
     )
+
     $importCSV = Import-csv $csv | ? {$_.path -ne ""}
     $importcsv | Foreach-object {
+        Write-host "  [>]" -foregroundcolor DarkGray
+        Write-host "Testing Server Shares" -foregroundcolor DarkGray
+
+
         Write-host $_.path -ForegroundColor red
         Try{
             New-item -Path $_.path -ItemType Directory -ErrorAction Stop | Out-null
@@ -138,16 +143,12 @@ Function New-FileShares {
     }
 }
 
-Function Export-FileShares {
+Function Set-SharesACL {
     [CmdletBinding()]
     param (
         [parameter(Mandatory=$true)][string]$Path,
-        [parameter(Mandatory=$true)][string]$DestServer
+        [parameter(Mandatory=$true)][string]$outputfile
     )
-    get-WmiObject -class Win32_Share -computer $DestServer | select name, path | Export-Csv "$path\Exported-FileShares.csv" -NoTypeInformation -Force
-}
-
-Function Set-SharesACL {
     if ($ComputerName -eq '.'){
         $Path = $Folder
     }
@@ -166,5 +167,26 @@ Function Set-SharesACL {
 
     else{
         $Output | sort PSParentPath| Select-Object @{Name="Path";Expression={$_.PSPath.Substring($_.PSPath.IndexOf(":")+2) }},@{Name="Type";Expression={$_.GetType()}},Owner -ExpandProperty Access | FT -Auto
+    }
+}
+Function Export-FileShares {
+    [CmdletBinding()]
+    param (
+        [parameter(Mandatory=$true)][string]$Path,
+        [parameter(Mandatory=$true)][string]$DestServer
+    )
+    get-WmiObject -class Win32_Share -computer $DestServer | select name, path | Export-Csv "$path\Exported-FileShares.csv" -NoTypeInformation -Force
+}
+
+
+Function Export-SharesACL {
+    [CmdletBinding()]
+    param (
+        [parameter(Mandatory=$true)][string]$DestServer
+    )
+    get-WmiObject -class Win32_Share -computer $DestServer | select name, path
+    $getShares = get-WmiObject -class Win32_Share -computer $DestServer | select name, path
+    $getshares | Foreach-object {
+        Get-acl $_.path | Export-Csv "$path\Exported-FileSharesACL.csv" -NoTypeInformation -Force -Append
     }
 }

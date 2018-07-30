@@ -74,14 +74,64 @@ function Get-FilesFolders {
 }
 
 Function Invoke-FileShares {
-
+    [CmdletBinding()]
+    param (
+        [parameter(Mandatory=$true)][string]$Path
+    )
 }
 
 Function Import-FileShares {
+    Param (
+        [Parameter(Mandatory=$true)]
+        [String]
+        $DestDomain,
+        [Parameter(Mandatory=$true)]
+        [String]
+        $DestServer,
+        [Parameter(Mandatory=$true)]
+        [ValidateScript({Test-Path $_})]
+        [String]
+        $BackupPath, # Path of the GPO GUID Folder under the main Backup Folder
+        [Parameter(Mandatory=$true)]
+        [ValidateScript({Test-Path $_})]
+        [String]
+        $MigTableCSVPath # Path for migration table source for automatic migtable generation
+    )
+    $gpm = New-Object -ComObject GPMgmt.GPM
+    $Constants = $gpm.getConstants()
+    $GPMBackupDir = $gpm.GetBackupDir($BackupPath)
+    $GPMSearchCriteria = $gpm.CreateSearchCriteria()
+    $BackupList = $GPMBackupDir.SearchBackups($GPMSearchCriteria)
 
+    $MigTableCSV = Import-CSV $MigTableCSVPath
+    $MigDomains  = $MigTableCSV | Where-Object {$_.Type -eq "Domain"}
+    #Testing for new domain names
+    #Write-Host "Domain: "$DestDomain "server: "$DestServer.Split(".")[1] -ForegroundColor Black -BackgroundColor Yellow
+
+    $n = 1
+
+    ForEach ($GPMBackup in $BackupList)
+    {
+        Write-host " [>] GPO: " -ForegroundColor DarkGray -NoNewline
+        Write-host "$($GPMBackup.GPODisplayName)`r`n" -ForegroundColor White -NoNewline
+        [xml]$GPReport = Get-Content (Join-Path -Path $GPMBackup.BackupDir -ChildPath "$($GPMBackup.ID)\gpreport.xml")
+
+        $gPLinks = $null
+        $gPLinks = $GPReport.GPO.User.ExtensionData.Extension.DriveMapSettings.Drive.Properties | Select-Object label, path, letter, action | ? {$_.path -ne $null -or $_.path -eq ""} | Sort-Object label
+        $gpLinks | Foreach-Object {
+            #Write-host ($_) -match "path\=\`""
+            $_
+            Test-Path $_.path
+        }
+    }
+    #get-WmiObject -class Win32_Share -computer $Computer | select *
 }
 
 Function Export-FileShares {
+    [CmdletBinding()]
+    param (
+        [parameter(Mandatory=$true)][string]$Path
+    )
     return 1
 }
 

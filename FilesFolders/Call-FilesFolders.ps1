@@ -7,10 +7,10 @@ Notes:
 #Import-Module "$env:WORKINGFOLDER\DevOps\FilesFolders\FilesFolders\FilesFolders.psm1" -Force -Verbose
 #Invoke-Pester $moduleFolder -CodeCoverage $moduleFolder\FilesFolders\FilesFolders.psm1
 
-$moduleFolder = "C:\Users\mwtilton\Desktop\FilesFolders\FilesFolders"
+$moduleFolder = "$env:USERPROFILE\Desktop\FilesFolders\FilesFolders"
 
-Import-Module GroupPolicy
-Import-Module ActiveDirectory
+#Import-Module GroupPolicy
+#Import-Module ActiveDirectory
 Import-Module $moduleFolder -Force
 
 
@@ -26,8 +26,28 @@ New-Item -ItemType Directory "$env:USERPROFILE\Desktop\WorkingFolder" -ea Silent
 ###############################################################################
 $DestDomain  = $env:USERDNSDOMAIN
 $DestServer  = "fileserver01"
-$CSVPath = "$env:USERPROFILE\Desktop\WorkingFolder\Exported-FileShares.csv"
-
+$sharefolderCSVPath = "$env:USERPROFILE\Desktop\WorkingFolder\Exported-FileShares.csv"
+#$shareACLCSVPath = "$env:USERPROFILE\Desktop\WorkingFolder\Exported-FileSharesACL.csv"
+<#
+=====================================
+[+] Importing Functions
 New-FileShares `
     -DestServer $DestServer `
     -csv $CSVPath
+
+=============================================
+[+] Exporting Functions
+Export-FileShares `
+    -destserver $DestServer `
+    -path $env:USERPROFILE\Desktop\WorkingFolder
+Export-SharesACL `
+    -csv $sharefolderCSVPath `
+    -Path $env:USERPROFILE\Desktop\WorkingFolder
+
+
+
+
+#>
+Export-SharesACL `
+    -csv $sharefolderCSVPath `
+    -Path $env:USERPROFILE\Desktop\WorkingFolder

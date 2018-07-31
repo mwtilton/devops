@@ -206,12 +206,15 @@ Function Export-FileShares {
 Function Import-SharesACL {
     [CmdletBinding()]
     param (
-        [parameter(Mandatory=$true)][string]$csv
+        [parameter(Mandatory=$true)][string]$csv,
+        [parameter(Mandatory=$true)][string]$MigTableCSVPath
     )
+    $MigTableCSV = Import-CSV $MigTableCSVPath
+    $MigDomains  = $MigTableCSV | Where-Object {$_.Type -eq "Domain"}
 
-    $importCSV = Import-CSV $csv
+    $importCSV = Import-CSV $csv | ? {$_.path -notlike "*c:\*"}
     $importCSV | Foreach-object {
-        $_
+
         Try{
             Resolve-Path $_.path -erroraction stop | Out-null
         }
@@ -221,21 +224,51 @@ Function Import-SharesACL {
             $_.InvocationInfo.BoundParameters | fl * -force
             $_.Exception
         }
+
+        ForEach ($d in $MigDomains) {
+            $UserName = ($_.IdentityReference).Replace($d.Source, $d.Destination)
+        }
         Try{
-            $Ar = New-Object System.Security.AccessControl.FileSystemAccessRule(
-                $_.Owner, ` #username <#Not really sure what this one is...#>
-                $_.FileSystemRights, ` #modify, full control
-                $_.InheritanceFlags, ` # ContainerInherit, Objectinherit
-                $_.PropagationFlags,` #None, InheritOnly
-                $_.AccessControl` #Allow, Deny
-            )
-            $Acl.SetAccessRule($Ar)
+            $Acl = Get-Acl $_.path
         }
         Catch{
-            Write-host "New-Object error" -foregrouncolor Red
+            Write-host "Get-Acl error" -foregroundcolor Red
             $_ | fl * -force
             $_.InvocationInfo.BoundParameters | fl * -force
             $_.Exception
+        }
+        Try{
+            $value = 268435456
+            If($_.FileSystemRights -eq $value){
+                $newFullControl = ($_.FileSystemRights).Replace("$value","FullControl")
+            }
+            Else{
+                $newFullControl = $_.FileSystemRights
+            }
+
+            Write-host "Identity --- "$newFullControl
+            Write-host @($UserName, $newFullControl, "$($_.InheritanceFlags)", "$($_.PropagationFlags)", "$($_.AccessControl)") -ForegroundColor Cyan
+            #$Ar = New-Object System.Security.AccessControl.FileSystemAccessRule($username, "$($_.FileSystemRights)","$($_.InheritanceFlags)", "$($_.PropagationFlags)", "$($_.AccessControlType)")
+
+
+            $Ar = New-Object System.Security.AccessControl.FileSystemAccessRule($username, $_.FileSystemRights,$_.InheritanceFlags, $_.PropagationFlags, $_.AccessControlType)
+            $Acl.SetAccessRule($Ar)
+        }
+        Catch{
+            If($_.Exception.ToString().contains("Some or all identity")){
+                Write-host "  [-]" -fore red -NoNewline
+                Write-host "This is probably due to the invalid username " -ForegroundColor DarkYellow -nonewline
+                Write-host $username -ForegroundColor White -NoNewline
+                Write-host " which does not exist on the domain." -ForegroundColor DarkYellow
+                Write-host "It looks like an individual user account and should not be applied to a folder permission" -ForegroundColor DarkYellow
+            }
+            Else{
+                Write-host "New-Object error" -foregroundcolor Red
+                $_ | fl * -force
+                $_.InvocationInfo.BoundParameters | fl * -force
+                $_.Exception
+            }
+
         }
         Try{
             Set-ACL -path $_.path -AclObject $Acl -ErrorAction Stop

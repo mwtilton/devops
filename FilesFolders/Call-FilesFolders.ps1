@@ -28,6 +28,7 @@ $DestDomain  = $env:USERDNSDOMAIN
 $DestServer  = "fileserver01"
 #$sharefolderCSVPath = "$env:USERPROFILE\Desktop\WorkingFolder\Exported-FileShares.csv"
 $shareACLCSVPath = "$env:USERPROFILE\Desktop\WorkingFolder\Exported-FileSharesACL.csv"
+$MigTableCSVPath = "$env:USERPROFILE\Desktop\WorkingFolder\Import.csv"
 <#
 ====================================================
 [+] Importing Functions
@@ -57,3 +58,4 @@ Import-SharesACL `
 
 Import-SharesACL `
     -csv $shareACLCSVPath `
+    -MigTableCSVPath $MigTableCSVPath

@@ -238,6 +238,7 @@ Function Import-SharesACL {
 
         Try{
             $Acl = Get-Acl $_.path
+            #$acl.Access
             Write-host "    [+] " -NoNewline
             Write-host "Acl " -ForegroundColor DarkGreen -NoNewline
             Write-host $newFullControl -ForegroundColor White -NoNewline
@@ -296,6 +297,19 @@ Function Import-SharesACL {
             $_.InvocationInfo.BoundParameters | fl * -force
             $_.Exception
         }
+        <#
+        Try{
+            Write-host "    [>] Checking" -ForegroundColor DarkGray -NoNewline
+            $finalACL = Get-Acl $_.path
+            $finalACL.Access
+        }
+        Catch{
+            Write-host "Get acl error" -ForegroundColor Red
+            $_ | fl * -force
+            $_.InvocationInfo.BoundParameters | fl * -force
+            $_.Exception
+        }
+        #>
 
     }
 

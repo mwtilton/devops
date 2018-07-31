@@ -26,7 +26,7 @@ New-Item -ItemType Directory "$env:USERPROFILE\Desktop\WorkingFolder" -ea Silent
 ###############################################################################
 $DestDomain  = $env:USERDNSDOMAIN
 $DestServer  = "fileserver01"
-#$sharefolderCSVPath = "$env:USERPROFILE\Desktop\WorkingFolder\Exported-FileShares.csv"
+$sharefolderCSVPath = "$env:USERPROFILE\Desktop\WorkingFolder\Exported-FileShares.csv"
 $shareACLCSVPath = "$env:USERPROFILE\Desktop\WorkingFolder\Exported-FileSharesACL.csv"
 $MigTableCSVPath = "$env:USERPROFILE\Desktop\WorkingFolder\Import.csv"
 <#
@@ -53,9 +53,10 @@ Export-SharesACL `
 
 Import-SharesACL `
     -csv $shareACLCSVPath `
+    -MigTableCSVPath $MigTableCSVPath
 
 #>
 
-Import-SharesACL `
-    -csv $shareACLCSVPath `
-    -MigTableCSVPath $MigTableCSVPath
+New-FileShares `
+    -DestServer $DestServer `
+    -csv $sharefolderCSVPath

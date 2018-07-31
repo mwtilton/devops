@@ -122,7 +122,7 @@ Function New-FileShares {
     $importcsv | Foreach-object {
         Write-host "  [>]" -foregroundcolor DarkGray
         Write-host "Testing Server Shares" -foregroundcolor DarkGray
-
+        $_
 
         Write-host $_.path -ForegroundColor red
         Try{
@@ -142,6 +142,15 @@ Function New-FileShares {
             else {
                 Write-Host $_.exception
             }
+        }
+        Try{
+            New-SmbShare –Name $_.Name -Path $_.Path –Description $_.Description
+        }
+        Catch{
+            Write-host "Fileshare creation error" -foregrouncolor Red
+            $_ | fl * -force
+            $_.InvocationInfo.BoundParameters | fl * -force
+            $_.Exception
         }
 
     }
@@ -194,7 +203,7 @@ Function Export-FileShares {
         [parameter(Mandatory=$true)][string]$Path,
         [parameter(Mandatory=$true)][string]$DestServer
     )
-    get-WmiObject -class Win32_Share -computer $DestServer | select name, path | Export-Csv "$path\Exported-FileShares.csv" -NoTypeInformation -Force
+    get-WmiObject -class Win32_Share -computer $DestServer | select name, path, Description | Export-Csv "$path\Exported-FileShares.csv" -NoTypeInformation -Force
 }
 
 ##########################################################################################

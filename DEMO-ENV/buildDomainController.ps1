@@ -165,10 +165,12 @@ configuration buildDomainController
             Count = 60
         }
 
-        xDisk FVolume {
+        xDisk DVolume {
             DiskNumber = 2
             DriveLetter = 'D'
             FSLabel = 'Data'
+            Size = 60000
+            FSFormat = NTFS
         }
     }
 }

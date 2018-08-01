@@ -1,17 +1,9 @@
-<# Notes:
+<#
 
-Author - Greg Shields
-
-Goal - Prepare the server by connecting to the gallery,
-installing the package provider, and installing the modules
-required by the configuration.  Note that the modules to be installed
-are versioned to protect against future breaking changes.
+Notes:
+The modules to be installed are versioned to protect against future breaking changes.
 
 This script must be run before configureServer.ps1.
-
-Disclaimer - This example code is provided without copyright and AS IS.  
-It is free for you to use and modify.
-
 #>
 
 Get-PackageSource -Name PSGallery | Set-PackageSource -Trusted -Force -ForceBootstrap

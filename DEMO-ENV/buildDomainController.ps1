@@ -9,10 +9,10 @@ defines which configurations you're interested in managing.
 
 configuration buildDomainController
 {
-    Import-DscResource -ModuleName xComputerManagement -ModuleVersion 3.2.0.0
-    Import-DscResource -ModuleName xNetworking -ModuleVersion 5.4.0.0
-    Import-DscResource -ModuleName xDnsServer -ModuleVersion 1.9.0.0
-    Import-DscResource -ModuleName xActiveDirectory -ModuleVersion 2.16.0.0
+    Import-DscResource -ModuleName xComputerManagement -ModuleVersion "3.2.0.0"
+    Import-DscResource -ModuleName xNetworking -ModuleVersion "5.4.0.0"
+    Import-DscResource -ModuleName xDnsServer -ModuleVersion "1.9.0.0"
+    Import-DscResource -ModuleName xActiveDirectory -ModuleVersion "2.16.0.0"
 
     Node localhost
     {
@@ -21,7 +21,7 @@ configuration buildDomainController
             ConfigurationMode = "ApplyOnly"
             RebootNodeIfNeeded = $true
         }
-  
+
         xIPAddress NewIPAddress {
             IPAddress = $node.IPAddressCIDR
             InterfaceAlias = $node.InterfaceAlias
@@ -93,22 +93,22 @@ configuration buildDomainController
             Name = "AD-Domain-Services"
             DependsOn = "[xDnsServerPrimaryZone]addForwardZoneCompanyPri"
         }
-                 
-        WindowsFeature ADDSTools {             
-             Ensure = "Present"             
-             Name = "RSAT-ADDS"             
-        }            
-           
+
+        WindowsFeature ADDSTools {
+             Ensure = "Present"
+             Name = "RSAT-ADDS"
+        }
+
         xADDomain FirstDC {
             DomainName = $node.DomainName
             DomainAdministratorCredential = $domainCred
             SafemodeAdministratorPassword = $domainCred
             DatabasePath = $node.DCDatabasePath
             LogPath = $node.DCLogPath
-            SysvolPath = $node.SysvolPath 
+            SysvolPath = $node.SysvolPath
             DependsOn = "[WindowsFeature]ADDSInstall"
         }
-
+        <#
         xADUser myaccount {
             DomainName = $node.DomainName
             Path = "CN=Users,$($node.DomainDN)"
@@ -122,48 +122,7 @@ configuration buildDomainController
             PasswordNeverExpires = $true
             DependsOn = "[xADDomain]FirstDC"
         }
-
-        xADUser gshields {
-            DomainName = $node.DomainName
-            Path = "CN=Users,$($node.DomainDN)"
-            UserName = "gshields"
-            GivenName = "Greg"
-            Surname = "Shields"
-            DisplayName = "Greg Shields"
-            Enabled = $true
-            Password = $Cred
-            DomainAdministratorCredential = $Cred
-            PasswordNeverExpires = $true
-            DependsOn = "[xADDomain]FirstDC"
-        }
-
-        xADUser djones {
-            DomainName = $node.DomainName
-            Path = "CN=Users,$($node.DomainDN)"
-            UserName = "djones"
-            GivenName = "Dan"
-            Surname = "Jones"
-            DisplayName = "Dan Jones"
-            Enabled = $true
-            Password = $Cred
-            DomainAdministratorCredential = $Cred
-            PasswordNeverExpires = $true
-            DependsOn = "[xADDomain]FirstDC"
-        }
-
-        xADUser jhelmick {
-            DomainName = $node.DomainName
-            Path = "CN=Users,$($node.DomainDN)"
-            UserName = "jhelmick"
-            GivenName = "Jane"
-            Surname = "Helmick"
-            DisplayName = "Jane Helmick"
-            Enabled = $true
-            Password = $Cred
-            DomainAdministratorCredential = $Cred
-            PasswordNeverExpires = $true
-            DependsOn = "[xADDomain]FirstDC"
-        }
+        #>
 
         xADGroup IT {
             GroupName = "IT"
@@ -207,13 +166,13 @@ configuration buildDomainController
 Specify values for the configurations you're interested in managing.
 See in the configuration above how variables are used to reference values listed here.
 #>
-            
+
 $ConfigData = @{
     AllNodes = @(
         @{
             Nodename = "localhost"
             ThisComputerName = "DC01"
-            IPAddressCIDR = "192.168.1.6/24"
+            IPAddressCIDR = "192.168.1.5/24"
             GatewayAddress = "192.168.1.1"
             DNSAddress = "127.0.0.1"
             InterfaceAlias = "Ethernet0"

@@ -213,7 +213,7 @@ Function New-FileShares {
 
             }
             elseif($_.exception.tostring().contains("A drive with the name")){
-                Write-host "`r`n  [-]" -fore red -NoNewline
+                Write-host "`r`n    [-]" -fore red -NoNewline
                 Write-host "This is probably trying to create a new folder to the drive letter " -ForegroundColor DarkYellow -nonewline
                 Write-host $_.targetobject -foregroundcolor White -nonewline
                 Write-host " and this is not possible since it is a drive letter and not a valid folder location. This can be ignored but may need to be reviewed." -ForegroundColor DarkYellow
@@ -234,14 +234,12 @@ Function New-FileShares {
                 Write-Host " has already been shared. Skipped!"
             }
             elseif($_.exception.tostring().contains("directory does not exist")){
-                Write-host "`r`n  [-]" -fore red -NoNewline
-                Write-host "This is probably trying to create a new share to " -ForegroundColor DarkYellow -nonewline
-                Write-host $_.Path
-                Write-host " and this is not possible since the target folder does not exist." -ForegroundColor DarkYellow
+                Write-host "`r    [-]" -fore red -NoNewline
+                Write-host "This is probably trying to create a new share and this is not possible since the target folder does not exist, is an empty string or a null value." -ForegroundColor DarkYellow
 
             }
             else{
-                Write-host "Fileshare creation error" -ForegroundColor Red
+                Write-host "`rFileshare creation error" -ForegroundColor Red
                 $_ | fl * -force
                 $_.InvocationInfo.BoundParameters | fl * -force
                 $_.Exception

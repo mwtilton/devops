@@ -13,3 +13,14 @@
 \n"\\olddomain.local\","\\newdomain.local\","UNC"
 \n"\\olddomain\","\\newdomain\","UNC"
 '''
+#Export Process
+##On Template Domain
+Run Call-DCExport.ps1
+Run Call-FilesFoldersExport.ps1
+Run Call-GPOExport.ps1
+
+#Import Process
+##On Import Domain
+Run Call-DCImport.ps1
+Run Call-FilesFoldersImport.ps1
+Run Call-GPOImport.ps1

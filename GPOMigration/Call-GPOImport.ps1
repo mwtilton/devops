@@ -16,9 +16,9 @@ Import-Module ActiveDirectory
 Import-Module $env:USERPROFILE\Desktop\GPOMigration\GPOMigration -Force
 
 # This path must be absolute, not relative
-$date = (get-date).ToString("mmddyyyy")
+#$date = (get-date).ToString("mmddyyyy")
 $Path        = $PWD  # Current folder specified in Set-Location above
-$BackupPath  = ""
+$BackupPath  = "$env:USERPROFILE\Desktop\WorkingFolder\GPOBackup-DemoCloud"
 New-Item -ItemType Directory $BackupPath -ea SilentlyContinue
 
 ###############################################################################

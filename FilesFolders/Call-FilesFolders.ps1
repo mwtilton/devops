@@ -17,7 +17,7 @@ Import-Module $moduleFolder -Force
 # This path must be absolute, not relative
 #$date = (get-date).ToString("mmddyyyy")
 $Path        = $PWD  # Current folder specified in Set-Location above
-$BackupPath  = "$env:USERPROFILE\Desktop\WorkingFolder\GPO Backup 2018-07-30-08-23-59\"
+$BackupPath  = "$env:USERPROFILE\Desktop\WorkingFolder\GPOBackup-DemoCloud\"
 New-Item -ItemType Directory $BackupPath -ea SilentlyContinue
 New-Item -ItemType Directory "$env:USERPROFILE\Desktop\WorkingFolder" -ea SilentlyContinue
 
@@ -31,14 +31,14 @@ $shareACLCSVPath = "$env:USERPROFILE\Desktop\WorkingFolder\Exported-FileSharesAC
 $MigTableCSVPath = "$env:USERPROFILE\Desktop\WorkingFolder\Import.csv"
 <#
 ====================================================
-[+] Importing Functions
+[+] Creating/Getting Functions
 Get-FileShares `
-    -DestServer `
-    -BackupPath `
+    -DestServer $DestServer `
+    -BackupPath $BackupPath
 
 New-FileShares `
     -DestServer $DestServer `
-    -csv $CSVPath
+    -csv $sharefolderCSVPath
 
 ====================================================
 [+] Exporting Functions
@@ -56,7 +56,6 @@ Import-SharesACL `
     -MigTableCSVPath $MigTableCSVPath
 
 #>
-
-New-FileShares `
+Get-FileShares `
     -DestServer $DestServer `
-    -csv $sharefolderCSVPath
+    -BackupPath $BackupPath

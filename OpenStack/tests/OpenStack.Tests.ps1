@@ -91,11 +91,12 @@ Describe "Unit testing for OpenStack" -Tags 'Unit'{
             }
         }#End Context
         Context "Hitting the API" {
-            It "invoke the restsss" {
-                $_.values | ForEach-Object {
-                    Invoke-RestMethod -Uri $_ -Method GET
-                } | Should throw
+            $OpenStackinfo | ForEach-Object {
+
             }
+
+
+
         }
     } #End Inmodule scope
 

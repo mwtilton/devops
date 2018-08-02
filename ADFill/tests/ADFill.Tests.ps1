@@ -1,6 +1,10 @@
 Import-Module $env:WORKINGFOLDER\Devops\ADFill\ADFill -Force -ErrorAction Stop
 
 Describe "DCImport Unit Tests" -Tags "UNIT" {
+    $testPath = "$testdrive\testfile.psm1","$testdrive\testfile.psm1"
+    $testPath | ForEach-Object {
+        Set-Content $testPath -value "my test text."
+    }
     InModuleScope ADFill {
 
         Context "Mocking getting the Organizational Units" {
@@ -26,9 +30,16 @@ Describe "DCImport Unit Tests" -Tags "UNIT" {
             }
         }
         Context "Moving Modules Unit testing" {
-            Mock Get-ChildItem {return "$env:USERPROFILE\Desktop\ADFill\ADFill\ADFill.psm1"} -Verifiable
-            Mock Get-ChildItem {return "$env:USERPROFILE\Desktop\ADFill\ADFill\ADFill.psd1"} -Verifiable
-            $result = Move-Modules -path "$env:USERPROFILE\Desktop"
+            $testPath = "$testdrive\testfile.psm1","$testdrive\testfile.psm1"
+            $testPath | ForEach-Object {
+                Mock Get-ChildItem {return @{FullName = $_.FullName}}
+                Mock ForEach-Object -MockWith {}
+                Mock Get-Content {return "my test text."} -ParameterFilter {$path -eq $_.FullName}
+                Mock Out-File {return $true} -ParameterFilter { $path -eq $_.FullName -and $destination -eq "$testdrive\Module\testfile.psm1"}
+            }
+
+            $result = Move-Modules -path $testdrive
+
             It "Calls the gci 1 time" {
                 $Params = @{
                     CommandName = 'Get-ChildItem'
@@ -37,24 +48,40 @@ Describe "DCImport Unit Tests" -Tags "UNIT" {
                 }
                 Assert-MockCalled @Params
             }
-            It "Looks in the users desktop" {
-                $result | Should belike "*.ps*1"
+            It "Files should be psm or psd files" {
+                $result | ForEach-Object{
+                    $result.FullName | Should belike "*.ps*1"
+                }
+            }
+            It "file should exist" {
+                $result | ForEach-Object {
+                    $_.Name | Should not be $null
+                    $_.FullName | Should Exist
+                }
             }
             It "has the program module folder" {
                 ($env:PSModulePath).Split(";")[1] | Should belike "c:\Program*"
             }
-
-        }
-        Context "Copy's the module to the users module folder" {
-            Mock Copy-Item {return $true} -ParameterFilter { $path -eq "$testdrive\testfile.psm1" -and $destination -eq "$testdrive\Module\testfile.psm1"}
-            It "calls copy-item" {
+            It "returns something" {
+                $result | Should -not -BeNullOrEmpty
+            }
+            It "calls get-content" {
                 $Params = @{
-                    CommandName = 'Copy-Item'
-                    Times = 1
+                    CommandName = 'Get-Content'
+                    Times = 2
                     Exactly = $true
                 }
                 Assert-MockCalled @Params
             }
+            It "calls out-file" {
+                $Params = @{
+                    CommandName = 'Out-File'
+                    Times = 2
+                    Exactly = $true
+                }
+                Assert-MockCalled @Params
+            }
+
         }
 
     }

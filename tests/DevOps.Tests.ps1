@@ -1,6 +1,6 @@
 Get-Module DevOps | Remove-Module -Force
 Import-Module $env:WORKINGFOLDER\DevOps\DevOps -Force -ErrorAction Stop
-
+$here = Split-Path -Parent $MyInvocation.MyCommand.Path
 Describe "Unit testing for DevOps" -Tags 'U1'{
 
     InModuleScope DevOps {
@@ -23,8 +23,31 @@ Describe "Unit testing for DevOps" -Tags 'U1'{
                 "$($here)\start-pester.ps1" | Should be $true
             }
             It "has a call DevOps file" {
-                "$($here)\start-pester.ps1" | Should be $true
+                "$($here)\Call-DevOps.ps1" | Should be $true
             }
+            It "has function folder" {
+                "$($here)\Functions" | Should Exist
+            }
+        }
+        Context "finds the functions" {
+            $functionsFolder = $env:WORKINGFOLDER + "\DevOps\Functions"
+            It "PS Script root is in Devops\" {
+                $PSScriptRoot | Should Exist
+            }
+            It "can go to the functions folder" {
+                $functionsFolder | Should Exist
+            }
+            It "should have the DevOps\Functions in the directory name" {
+                $functionsFolder | Should BeLike "*\vsCode\DevOps\Functions*"
+            }
+            $functions = Get-ChildItem $functionsFolder -Filter "*.ps1"
+            $functions | ForEach-Object {
+                It "found $($_.name)" {
+                    "$here\Functions\$($_.name)" | Should Exist
+                }
+
+            }
+
         }
 
     }

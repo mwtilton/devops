@@ -26,12 +26,12 @@ Describe "Unit testing for DevOps" -Tags 'U1'{
                 "$($here)\Call-DevOps.ps1" | Should be $true
             }
             It "has function folder" {
-                "$($here)\Functions" | Should Exist
+                "$($here)\Functions" | Should be $true
             }
         }
         Context "finds the functions" {
             $functionsFolder = $env:WORKINGFOLDER + "\DevOps\Functions"
-            It "PS Script root is in Devops\" {
+            It "PS Script root exists" {
                 $PSScriptRoot | Should Exist
             }
             It "can go to the functions folder" {
@@ -40,10 +40,13 @@ Describe "Unit testing for DevOps" -Tags 'U1'{
             It "should have the DevOps\Functions in the directory name" {
                 $functionsFolder | Should BeLike "*\vsCode\DevOps\Functions*"
             }
+        }
+        Context "finds the functions" {
+            $functionsFolder = $env:WORKINGFOLDER + "\DevOps\Functions"
             $functions = Get-ChildItem $functionsFolder -Filter "*.ps1"
             $functions | ForEach-Object {
                 It "found $($_.name)" {
-                    "$here\Functions\$($_.name)" | Should Exist
+                    "$here\Functions\$($_.name)" | Should Be $true
                 }
 
             }
@@ -53,7 +56,30 @@ Describe "Unit testing for DevOps" -Tags 'U1'{
     }
 
 }
+Describe "Unit testing for DevOps" -Tags 'A1'{
 
+    InModuleScope DevOps {
+        Context "finds the functions" {
+            $functionsFolder = $env:WORKINGFOLDER + "\DevOps\Functions"
+            $functions = Get-ChildItem $functionsFolder -Filter "*.ps1"
+            $functions | ForEach-Object {
+                Context "importing $($_.name)" {
+                    It "found $($_.name)" {
+                        "$here\Functions\$($_.name)" | Should Be $true
+                    }
+                    It "should have a function in it" {
+                        $_.FullName | Should -FileContentMatchMultiline "Function"
+                    }
+                }
+
+
+            }
+
+        }
+
+    }
+
+}
 
 Describe "Unit testing for OpenStack" -Tags 'Unit'{
 

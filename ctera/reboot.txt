@@ -1,1 +1,0 @@
-<obj><att id="type"><val>user-defined</val></att><att id="name"><val>reboot</val></att></obj>

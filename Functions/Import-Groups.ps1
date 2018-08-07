@@ -1,6 +1,6 @@
 
 Function Import-Groups {
-
+    [CmdletBinding()]
     Param (
         [Parameter(Mandatory=$true,HelpMessage="Must be FQDN.")]
         [ValidateScript({$_ -like "*.*"})]

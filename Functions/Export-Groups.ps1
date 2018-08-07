@@ -1,4 +1,5 @@
 Function Export-Groups {
+    [CmdletBinding()]
     Param (
         [Parameter(Mandatory=$true)]
         [ValidateScript({Test-Path $_})]

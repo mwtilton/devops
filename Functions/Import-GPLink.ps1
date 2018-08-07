@@ -1,4 +1,5 @@
 Function Import-GPLink {
+    [CmdletBinding()]
     Param (
         [Parameter(Mandatory=$true)]
         [String]

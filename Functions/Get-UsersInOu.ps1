@@ -1,5 +1,6 @@
 
 Function Get-UsersInOu{
+    [CmdletBinding()]
     Param (
         [Parameter(Mandatory=$true)]
         [String]

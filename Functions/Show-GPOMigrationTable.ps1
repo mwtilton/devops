@@ -1,4 +1,5 @@
 Function Show-GPOMigrationTable {
+    [CmdletBinding()]
     Param (
         [Parameter(Mandatory=$true)]
         [ValidateScript({Test-Path $_})]

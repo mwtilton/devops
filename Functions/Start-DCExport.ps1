@@ -1,4 +1,5 @@
 Function Start-DCExport {
+    [CmdletBinding()]
     Param (
         [Parameter(Mandatory=$false)]
         [String]

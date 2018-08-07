@@ -1,4 +1,5 @@
 Function Move-Modules {
+    [CmdletBinding()]
     Param (
         [Parameter(Mandatory=$true)]
         [ValidateScript({Test-Path $_})]

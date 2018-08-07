@@ -1,4 +1,5 @@
 Function New-FileShares {
+    [CmdletBinding()]
     Param (
         [Parameter(Mandatory=$true)]
         [String]

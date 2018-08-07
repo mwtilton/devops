@@ -1,4 +1,5 @@
 function Get-FilesFolders {
+    [CmdletBinding()]
     Param(
         [Parameter(Mandatory=$false)]
         [String]

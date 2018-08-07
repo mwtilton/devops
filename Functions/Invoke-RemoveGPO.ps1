@@ -1,5 +1,6 @@
 
 Function Invoke-RemoveGPO {
+    [CmdletBinding()]
     Param (
         [Parameter(Mandatory=$true)]
         [String]

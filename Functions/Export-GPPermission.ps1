@@ -1,4 +1,5 @@
 function Export-GPPermission {
+    [CmdletBinding()]
     Param(
         [Parameter(Mandatory=$true,
             ParameterSetName="All")]

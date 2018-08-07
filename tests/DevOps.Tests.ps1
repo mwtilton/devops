@@ -67,8 +67,20 @@ Describe "Unit testing for DevOps" -Tags 'A1'{
                     It "found $($_.name)" {
                         "$here\Functions\$($_.name)" | Should Be $true
                     }
+                    It "should exist" {
+                        $_.FullName | Should Exist
+                    }
                     It "should have a function in it" {
                         $_.FullName | Should -FileContentMatchMultiline "Function"
+                    }
+                    It "should have some params" {
+                        $_.FullName | Should -FileContentMatchMultiline "Param"
+                    }
+                    It "should have cmdletbinding" {
+                        $_.FullName | Should -FileContentMatchMultiline "cmdletbinding"
+                    }
+                    It "dot sourcing does not throw when importing it" {
+                        {. $_.FullName} | Should Not throw
                     }
                 }
 

@@ -1,5 +1,8 @@
 Function Enable-ADSystemOnlyChange {
-    Param ([switch]$Disable)
+    [CmdletBinding()]
+    Param (
+        [switch]$Disable
+    )
 
     Write-Warning 'This command must run locally on the domain controller where the
     GPOs will be imported. You only need to execute this function if WMI filter

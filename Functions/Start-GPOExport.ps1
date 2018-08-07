@@ -1,4 +1,5 @@
 Function Start-GPOExport {
+    [CmdletBinding()]
     Param (
         [Parameter(Mandatory=$true)]
         [String]

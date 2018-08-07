@@ -1,5 +1,6 @@
 
 Function Export-OUs {
+    [CmdletBinding()]
     Param (
         [Parameter(Mandatory=$true)]
         [ValidateScript({Test-Path $_})]

@@ -14,7 +14,10 @@ Function Set-OpenRC {
 .LINK
    http://openstack.naturalis.nl
 #>
+    [CmdletBinding()]
+    Param(
 
+    )
 
     If ($args.count -lt 1) {
         Write "Please provide an OpenRC file as argument."

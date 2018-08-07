@@ -1,5 +1,6 @@
 
 Function Set-UsersPassword {
+    [CmdletBinding()]
     Param (
         [Parameter(Mandatory=$true)]
         [String]

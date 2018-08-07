@@ -1,4 +1,5 @@
 function Invoke-BackupGPO {
+    [CmdletBinding()]
     Param(
         [Parameter(Mandatory=$true,
             ParameterSetName="All")]

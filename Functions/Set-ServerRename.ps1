@@ -1,5 +1,8 @@
 Function Set-ServerRename{
+    [CmdletBinding()]
+    Param(
 
+    )
     $name = Read-Host "New Server Name"
     Rename-Computer -NewName "$name"
     $Domain = Read-Host "Enter in new Domain Name: "

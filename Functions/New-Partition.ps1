@@ -1,4 +1,5 @@
 Function New-Partition {
+    [CmdletBinding()]
     Param (
         [Parameter(Mandatory=$true)]
         [String]
@@ -14,7 +15,7 @@ Function New-Partition {
     $DiskID=$LISTDISK[-1].substring(7,5)
     $DiskID=$LISTDISK[-1].substring(7,5).trim()
     $SIZE=$LISTDISK[-1].substring(25,9)
-    $SIZE=$LISTDISK[-1].substring(25,9).replace(“ “,””)
+    $SIZE=$LISTDISK[-1].substring(25,9).replace(" ","")
     NEW-ITEM -Name detail.txt -ItemType file -force | OUT-NULL
 
     ADD-CONTENT -Path detail.txt "SELECT DISK $DISKID"

@@ -1,4 +1,8 @@
 function Get-OpenFiles {
+    [CmdletBinding()]
+    Param(
+
+    )
     #openfiles /query /s fileserver01 /u matthewt | findstr /i /c:"LG-PST-BACKUPS"
 
     openfiles /query /s $args[0] /fo csv /V | Out-File -Force C:\temp\openfiles.csv

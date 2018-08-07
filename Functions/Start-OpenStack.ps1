@@ -1,4 +1,5 @@
 Function Start-OpenStack {
+    [CmdletBinding()]
     Param (
         [Parameter(Mandatory=$true)]
         [String]

@@ -1,4 +1,8 @@
 Function Get-UserVHDFile {
+    [CmdletBinding()]
+    PAram(
+
+    )
     $users = get-aduser -filter *
     $vhds = gci \\fileserver01\users | ? {$_.name -match '\d{10}'}
 

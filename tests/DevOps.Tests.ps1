@@ -101,6 +101,14 @@ Describe "Unit Testing for Call file" -Tags "CALL" {
             "$($here)\Call-DevOps.ps1" | Should be $true
         }
     }
+    Context "Testing folder locations" {
+        It "imports the DevOps module" {
+            "$($here)\Call-DevOps.ps1" | Should -FileContentMatchMultiline "Import-Module `"$env:USERPROFILE\DevOps\DevOps`" -Force"
+        }
+        It "has the working folder set to Desktop\Workingfolder" {
+
+        }
+    }
 }
 
 Describe "Unit testing for OpenStack" -Tags 'Unit'{

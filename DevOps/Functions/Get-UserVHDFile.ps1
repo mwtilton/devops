@@ -4,7 +4,7 @@ Function Get-UserVHDFile {
 
     )
     $users = get-aduser -filter *
-    $vhds = gci \\fileserver01\users | ? {$_.name -match '\d{10}'}
+    $vhds = gci \\fileserver01\users$ | ? {$_.name -match '\d{10}'}
 
     $UPDList = Foreach ($VHD in $VHDs)
     {

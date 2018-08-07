@@ -110,4 +110,3 @@ Function Set-OpenRC {
     }
 
 }
-Set-OpenRC C:\Users\matthewtilton\Documents\Tilt-openrc.txt

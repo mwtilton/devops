@@ -19,7 +19,8 @@ configuration configureServer
 {
     Import-DscResource -ModuleName xComputerManagement -ModuleVersion 3.2.0.0
     Import-DscResource -ModuleName xNetworking -ModuleVersion 5.4.0.0
-    
+    Import-DSCResource -ModuleName xStorage
+
     Node localhost
     {
         LocalConfigurationManager {
@@ -27,7 +28,7 @@ configuration configureServer
             ConfigurationMode = "ApplyOnly"
             RebootNodeIfNeeded = $true
         }
-  
+
         xIPAddress NewIPAddress {
             IPAddress = $node.IPAddressCIDR
             InterfaceAlias = $node.InterfaceAlias
@@ -68,7 +69,7 @@ configuration configureServer
 Specify values for the configurations you're interested in managing.
 See in the configuration above how variables are used to reference values listed here.
 #>
-            
+
 $ConfigData = @{
     AllNodes = @(
         @{

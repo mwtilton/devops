@@ -56,6 +56,3 @@ Import-SharesACL `
     -MigTableCSVPath $MigTableCSVPath
 
 #>
-Get-FileShares `
-    -DestServer $DestServer `
-    -BackupPath $BackupPath

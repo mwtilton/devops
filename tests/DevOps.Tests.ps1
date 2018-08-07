@@ -62,7 +62,7 @@ Describe "Unit testing for DevOps" -Tags 'A1'{
 
     InModuleScope DevOps {
         Context "finds the functions" {
-            $functionsFolder = $env:WORKINGFOLDER + "\DevOps\Functions"
+            $functionsFolder = $env:WORKINGFOLDER + "\DevOps\DevOps\Functions"
             $functions = Get-ChildItem $functionsFolder -Filter "*.ps1"
             $functions | ForEach-Object {
                 Context "importing $($_.name)" {

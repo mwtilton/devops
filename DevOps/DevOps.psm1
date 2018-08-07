@@ -3,13 +3,16 @@ $PSDefaultParameterValues=@{'Write-host:BackGroundColor'='Black';'Write-host:For
 . "$PSScriptRoot\DevOps.Machine.Ps1"
 ############################################################################
 #Import related functions
-
-<#
 $functions = Get-ChildItem $PSScriptRoot\Functions -Filter "*.ps1"
 $functions | ForEach-Object {
-    . $PSScriptRoot\Functions\$_.name
+    Write-Host $_.Name
+    . $PSScriptRoot\Functions\$($_.name)
 }
-Export-ModuleMember "Start-*"
+Export-ModuleMember *
+
+
+<#
+
 
 
 . $PSScriptRoot\function-Get-PodcastData.ps1

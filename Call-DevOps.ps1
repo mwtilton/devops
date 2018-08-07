@@ -3,11 +3,34 @@
 # Main
 #
 ##############################################################################
-$workingfolder ="$env:WORKINGFOLDER\WorkingFolder"
-New-Item -ItemType Directory $workingfolder -ea SilentlyContinue
+#Paths
+$BackupPath  = "$env:USERPROFILE\Desktop\WorkingFolder\GPOBackup-DemoCloud\"
+$workingfolder ="$env:USERPROFILE\Desktop\WorkingFolder"
 
+#Folders
+New-Item -ItemType Directory $workingfolder -ea SilentlyContinue
+#Set-Location $workingfolder
+
+#Modules
 #Import-Module DevOps -Force
-Import-Module "$env:WORKINGFOLDER\DevOps\DevOps" -Force
+#Import-Module GroupPolicy -Force
+#Import-Module ActiveDirectory -Force
+#Import-Module "$env:USERPROFILE\Desktop\DevOps\DevOps" -Force
+
+#working
+
+<#
+    #Get Stuff
+    Get-FileShares -DestServer FileServer01 -BackupPath $BackupPath
+    Get-FilesFolders -path $env:USERPROFILE\Desktop
+    Get-OpenFiles -DestServer FileServer01 #-search data
+#>
+
+#testing
+
+
+
+
 
 <#
 #Import-Module "$env:WORKINGFOLDER\DevOps\FilesFolders\FilesFolders\FilesFolders.psm1" -Force

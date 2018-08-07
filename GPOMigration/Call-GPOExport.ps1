@@ -15,8 +15,8 @@ Modify the following to your needs:
  destination domain and server
  the GPO DisplayName Where criteria to target your policies for migration
 ##############################################################################>
-New-Item -ItemType Directory $env:USERPROFILE\Desktop\GPOMigrationWorkingFolder -ea SilentlyContinue
-Set-Location $env:USERPROFILE\Desktop\GPOMigrationWorkingFolder
+New-Item -ItemType Directory $env:USERPROFILE\Desktop\WorkingFolder -ea SilentlyContinue
+Set-Location $env:USERPROFILE\Desktop\WorkingFolder
 
 Import-Module GroupPolicy
 Import-Module ActiveDirectory
@@ -29,13 +29,12 @@ $SrceServer  = "$env:COMPUTERNAME.$env:USERDNSDOMAIN"
 
 $DisplayName = Get-GPO -All -Domain $SrceDomain -Server $SrceServer | Select-Object -ExpandProperty DisplayName
 
-
 Start-GPOExport `
     -SrceDomain $SrceDomain `
     -SrceServer $SrceServer `
     -DisplayName $DisplayName `
     -Path $Path
-    
+
 ###############################################################################
 # END
 ###############################################################################

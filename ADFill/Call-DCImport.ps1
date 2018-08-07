@@ -3,13 +3,13 @@ NOTE:
     Must have exported all necessary items from Original Domain
 
 ##############################################################################>
-$ActiveDirectory = "$env:USERPROFILE\Desktop\ActiveDirectory\ActiveDirectory"
-$ActiveDirectoryWorkingDirectory = "$ActiveDirectory\WorkingFolder"
+$ADFill = "$env:USERPROFILE\Desktop\ADFill\ADFill"
+$ActiveDirectoryWorkingDirectory = "$env:USERPROFILE\Desktop\WorkingFolder"
 New-Item -ItemType Directory $ActiveDirectoryWorkingDirectory -ea SilentlyContinue
 Set-Location $ActiveDirectoryWorkingDirectory
 
 Import-Module ActiveDirectory
-Import-Module $ActiveDirectory -Force
+Import-Module $ADFill -Force
 
 # This path must be absolute, not relative
 $Path        = $PWD  # Current folder specified in Set-Location above

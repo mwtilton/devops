@@ -441,3 +441,31 @@ Function IsAdmin {
     $principal.IsInRole($admin)
 
 }
+
+Function Move-Modules {
+    Param (
+        [Parameter(Mandatory=$true)]
+        [ValidateScript({Test-Path $_})]
+        [String]
+        $Path
+
+    )
+    $modulePath = ($env:PSmodulePath).split(";")[1]
+    $getModules = Get-ChildItem -path $path -recurse | ? {$_.extension -like "*.ps*1"}
+    $getmodules | Foreach-Object {
+        $newFileLocation = $modulepath + $_.Name
+        (Get-content $_.fullname) | Out-file $newFileLocation -encoding default
+    }
+    return $getmodules
+}
+Function Get-UserVHDFile {
+    $users = get-aduser -filter *
+    $vhds = gci \\fileserver01\users | ? {$_.name -match '\d{10}'}
+
+    $UPDList = Foreach ($VHD in $VHDs)
+    {
+        New-Object -Typename PSObject | Add-Member -MemberType NoteProperty -Name Username -Value (($Users | ? {$_.SID -eq ($VHD.name -replace "uvhd-","" -replace ".vhdx","")}).UserPrincipalName) -Passthru | Add-Member -Membertype NoteProperty -Name "VHD File" -Value $VHD.Name -PassThru
+    }
+
+    $UPDList | ? {$_.Username} | Sort Username | FT
+}

@@ -159,6 +159,19 @@ configuration buildDomainController
             MembersToInclude = "gshields", "myaccount"
             DependsOn = "[xADDomain]FirstDC"
         }
+        xWaitforDisk Disk2 {
+            DiskNumber = 2
+            RetryIntervalSec = 60
+            Count = 60
+        }
+
+        xDisk DVolume {
+            DiskNumber = 2
+            DriveLetter = 'D'
+            FSLabel = 'Data'
+            Size = 60000
+            FSFormat = NTFS
+        }
     }
 }
 

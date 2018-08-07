@@ -4,7 +4,7 @@ NOTE:
 
 ##############################################################################>
 $ADFill = "$env:USERPROFILE\Desktop\ADFill\ADFill"
-$ActiveDirectoryWorkingDirectory = "$env:USERPROFILE\Desktop\ADFill\WorkingFolder"
+$ActiveDirectoryWorkingDirectory = "$env:USERPROFILE\Desktop\WorkingFolder"
 New-Item -ItemType Directory $ActiveDirectoryWorkingDirectory -ea SilentlyContinue
 Set-Location $ActiveDirectoryWorkingDirectory
 

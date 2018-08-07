@@ -469,3 +469,43 @@ Function Get-UserVHDFile {
 
     $UPDList | ? {$_.Username} | Sort Username | FT
 }
+
+Function Get-UsersInOu{
+    Param (
+        [Parameter(Mandatory=$true)]
+        [String]
+        $ou
+
+    )
+    $users = Get-ADUser -SearchBase "OU=$($OU),dc=$($OU),dc=Local" -Filter * | select name, samaccountname, distinguishedname
+    return $users
+}
+
+Function Set-UsersPassword {
+    Param (
+        [Parameter(Mandatory=$true)]
+        [String]
+        $ou
+
+    )
+    $NewPassword = (Read-Host "Provide New Password" -AsSecureString)
+    $users = Get-UsersInOu -ou $ou
+    $users | Foreach-object {
+        Set-ADAccountPassword -Identity $_.samaccountname -Reset -NewPassword $NewPassword
+    }
+
+}
+
+Function Reset-PWAtLogon{
+    Param (
+        [Parameter(Mandatory=$true)]
+        [String]
+        $ou
+
+    )
+    $users = Get-UsersInOu -ou $ou
+    $users | Foreach-object {
+
+        Set-ADuser -identity $_.samaccountname -changepasswordatlogon $true
+    }
+}

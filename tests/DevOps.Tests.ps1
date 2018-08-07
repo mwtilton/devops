@@ -1,5 +1,7 @@
 Get-Module DevOps | Remove-Module -Force
 Import-Module $env:WORKINGFOLDER\DevOps\DevOps -Force -ErrorAction Stop
+Import-Module $env:WORKINGFOLDER\DevOps\Call-DevOps.ps1 -Force -ErrorAction Stop
+
 $here = Split-Path -Parent $MyInvocation.MyCommand.Path
 Describe "Unit testing for DevOps" -Tags 'U1'{
 
@@ -91,6 +93,14 @@ Describe "Unit testing for DevOps" -Tags 'A1'{
 
     }
 
+}
+
+Describe "Unit Testing for Call file" -Tags "CALL" {
+    Context "Testing if call file exists" {
+        It "does exist" {
+            "$($here)\Call-DevOps.ps1" | Should be $true
+        }
+    }
 }
 
 Describe "Unit testing for OpenStack" -Tags 'Unit'{

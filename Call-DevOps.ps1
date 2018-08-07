@@ -1,23 +1,16 @@
-<##############################################################################
-Setup
-
-Notes:
-
-
-##############################################################################>
-$workingfolder ="$env:WORKINGFOLDER\DevOps\DevOps-WorkingFolder"
+##############################################################################
+#
+# Main
+#
+##############################################################################
+$workingfolder ="$env:WORKINGFOLDER\WorkingFolder"
 New-Item -ItemType Directory $workingfolder -ea SilentlyContinue
-Set-Location $workingfolder
 
+#Import-Module DevOps -Force
 Import-Module "$env:WORKINGFOLDER\DevOps\DevOps" -Force
 
-<##############################################################################
-Setup
-
-Notes:
-
-##############################################################################>
-#Import-Module "$env:WORKINGFOLDER\DevOps\FilesFolders\FilesFolders\FilesFolders.psm1" -Force -Verbose
+<#
+#Import-Module "$env:WORKINGFOLDER\DevOps\FilesFolders\FilesFolders\FilesFolders.psm1" -Force
 #Invoke-Pester $moduleFolder -CodeCoverage $moduleFolder\FilesFolders\FilesFolders.psm1
 
 $moduleFolder = "$env:USERPROFILE\Desktop\FilesFolders\FilesFolders"
@@ -42,7 +35,7 @@ $DestServer  = "fileserver01"
 $sharefolderCSVPath = "$env:USERPROFILE\Desktop\WorkingFolder\Exported-FileShares.csv"
 $shareACLCSVPath = "$env:USERPROFILE\Desktop\WorkingFolder\Exported-FileSharesACL.csv"
 $MigTableCSVPath = "$env:USERPROFILE\Desktop\WorkingFolder\Import.csv"
-<#
+
 ====================================================
 [+] Creating/Getting Functions
 Get-FileShares `
@@ -68,7 +61,7 @@ Import-SharesACL `
     -csv $shareACLCSVPath `
     -MigTableCSVPath $MigTableCSVPath
 
-#>
+
 
 New-FileShares `
     -DestServer $DestServer `
@@ -80,11 +73,8 @@ Import-SharesACL `
 
 
 
-<##############################################################################
-Setup
-
-Notes:
-##############################################################################>
+##############################################################################
+##############################################################################
 #$workingfolder ="$env:WORKINGFOLDER\DevOps\OpenStack\OpenStack-WorkingFolder"
 #New-Item -ItemType Directory $workingfolder -ea SilentlyContinue
 #Set-Location $workingfolder
@@ -97,23 +87,8 @@ $path = "$env:USERPROFILE\Documents\Tilt_ZeroStack_v3rc.txt"
 Set-OpenRC $Path
 
 
-<##############################################################################
-Setup
+##############################################################################
 
-Your working folder path should include a copy of this script, and a copy of
-the GPOMigration.psm1 module file.
-
-This example assumes that a backup will run under a source credential and server,
-and the import will run under a destination credential and server.  Between these
-two operations you will need to copy your working folder from one environment to
-the other.
-
-Modify the following to your needs:
- working folder path
- source domain and server
- destination domain and server
- the GPO DisplayName Where criteria to target your policies for migration
-##############################################################################>
 New-Item -ItemType Directory $env:USERPROFILE\Desktop\WorkingFolder -ea SilentlyContinue
 Set-Location $env:USERPROFILE\Desktop\WorkingFolder
 
@@ -139,7 +114,7 @@ Start-GPOExport `
 ###############################################################################
 
 
-<##############################################################################
+##############################################################################
 
 MigrationTableCSV file setup:
 
@@ -148,7 +123,7 @@ Source,Destination,Type
 "OldDomainNETBIOSName","NewDomainNETBIOSName","Domain"
 "\\foo\server","\\baz\server","UNC"
 
-##############################################################################>
+##############################################################################
 New-Item -ItemType Directory $env:USERPROFILE\Desktop\WorkingFolder -ea SilentlyContinue
 Set-Location $env:USERPROFILE\Desktop\WorkingFolder
 
@@ -178,10 +153,10 @@ Start-GPOImport `
     -CopyACL
 
 
-    <##############################################################################
-Setup
-
-##############################################################################>
+##############################################################################
+#Setup
+#
+##############################################################################
 $ADFill = "$env:USERPROFILE\Desktop\ADFill\ADFill"
 $ActiveDirectoryWorkingDirectory = "$env:USERPROFILE\Desktop\ADFill\WorkingFolder"
 New-Item -ItemType Directory $ActiveDirectoryWorkingDirectory -ea SilentlyContinue
@@ -204,11 +179,11 @@ Start-DCExport `
 # END
 ###############################################################################
 
-<##############################################################################
-NOTE:
-    Must have exported all necessary items from Original Domain
-
-##############################################################################>
+##############################################################################
+#NOTE:
+#    Must have exported all necessary items from Original Domain
+#
+##############################################################################
 $ADFill = "$env:USERPROFILE\Desktop\ADFill\ADFill"
 $ActiveDirectoryWorkingDirectory = "$env:USERPROFILE\Desktop\WorkingFolder"
 New-Item -ItemType Directory $ActiveDirectoryWorkingDirectory -ea SilentlyContinue
@@ -231,3 +206,4 @@ Start-DCImport `
     -DestServer $DestServer `
     -CSVPath $CSVPath `
     -Path $Path
+#>

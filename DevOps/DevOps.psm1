@@ -5,7 +5,7 @@ $PSDefaultParameterValues=@{'Write-host:BackGroundColor'='Black';'Write-host:For
 #Import related functions
 $functions = Get-ChildItem $PSScriptRoot\Functions -Filter "*.ps1"
 $functions | ForEach-Object {
-    Write-Host $_.Name
+    #Write-Host $_.Name
     . $PSScriptRoot\Functions\$($_.name)
 }
 Export-ModuleMember *

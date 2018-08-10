@@ -117,30 +117,25 @@ Describe "Unit Testing for Call file" -Tags "UNIT","CALL"{
 
 
     Context "Sets up the DevOps process" {
-        $TestDriveDesktop = "TestDrive:\Desktop"
-        $TestDriveWorkingFolder = "TestDrive:\Desktop\WorkingFolder"
 
         Setup -Dir "Desktop"
         Setup -Dir "Desktop\WorkingFolder"
 
-        Mock New-Item -ParameterFilter {$path -eq "Desktop", $itemtype -eq "Directoy" }
-        Mock New-Item -ParameterFilter {$path -eq $TestDriveWorkingFolder, $itemtype -eq "Directoy" }
+        Mock New-Item -ParameterFilter {$path -eq "TestDrive:\Desktop", $itemtype -eq "Directoy" }
+        Mock New-Item -ParameterFilter {$path -eq "TestDrive:\Desktop\WorkingFolder", $itemtype -eq "Directoy" }
 
-        Mock Import-Csv -ParameterFilter {$path -eq "$TestDrive\Desktop\WorkingFolder\Import.csv"}
+        Mock Import-Csv -ParameterFilter {$path -eq "TestDrive:\Desktop\WorkingFolder\Import.csv"}
 
-        $desktop = New-Item -Path $TestDriveDesktop
-        $workingfolder = New-Item -Path $TestDriveWorkingFolder
-
-        $importCSV = "$TestDriveWorkingFolder\Import.csv"
+        $importCSV = "TestDrive:\Desktop\WorkingFolder\Import.csv"
 
         It "has a testdrive folder" {
             "TestDrive:\" | Should Exist
         }
         It "test desktop folder should exist" {
-            $Desktop | Should Exist
+            "TestDrive:\Desktop" | Should Exist
         }
         It "Creates the testdrive working folder on the desktop"{
-            $WorkingFolder | Should Exist
+            "TestDrive:\Desktop\WorkingFolder" | Should Exist
         }
         It "imports the csv file without throwing" {
             { Import-Csv $importCSV } | Should Not throw

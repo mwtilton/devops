@@ -120,6 +120,7 @@ Describe "Unit Testing for Call file" -Tags "UNIT","CALL"{
 
         Setup -Dir "Desktop"
         Setup -Dir "Desktop\WorkingFolder"
+        Setup -Dir "Desktop\WorkingFolder\GPOBackup"
 
         Mock New-Item -ParameterFilter {$path -eq "TestDrive:\Desktop", $itemtype -eq "Directoy" }
         Mock New-Item -ParameterFilter {$path -eq "TestDrive:\Desktop\WorkingFolder", $itemtype -eq "Directoy" }
@@ -140,6 +141,9 @@ Describe "Unit Testing for Call file" -Tags "UNIT","CALL"{
         It "imports the csv file without throwing" {
             { Import-Csv $importCSV } | Should Not throw
         }
+        It "has the backup GPO folder" {
+            "TestDrive:\Desktop\WorkingFolder\GPOBackup"
+        }
     }
     Context "Start Something" {
         $start = "Start-DCImport","Start-DCExport","Start-GPOExport","Start-DCImport","Start-OpenStack"
@@ -148,7 +152,12 @@ Describe "Unit Testing for Call file" -Tags "UNIT","CALL"{
                 "$env:WORKINGFOLDER\DevOps\Call-DevOps.ps1" | Should FileContentMatch ([regex]::Escape($($_)))
             }
         }
-
+        $parameters = "DestServer","GPOBackuppath","MigTableCSV","DestDomain","Importcsv"
+        $parameters | ForEach-Object {
+            It "has the $_ parameter" {
+                "$env:WORKINGFOLDER\DevOps\Call-DevOps.ps1" | Should FileContentMatch ([regex]::Escape($($_)))
+            }
+        }
     }
     Context "Import Machine Files" {
 

@@ -10,11 +10,18 @@ Function Invoke-DevOps {
     $SrceServer  = "$env:COMPUTERNAME.$env:USERDNSDOMAIN"
     $path = "$env:USERPROFILE\Desktop\WorkingFolder"
     $BackupPath  = "$env:USERPROFILE\Desktop\WorkingFolder\GPOBackup\"
-    #$DisplayName = Get-GPO -All -Domain $SrceDomain -Server $SrceServer | Select-Object -ExpandProperty DisplayName
-    $DisplayName = "Testing"
+
+    $CSVPath = "$path\Import.csv"
+    $DestinationDomain = $env:USERDNSDOMAIN
+    $DestinationServer  = "$env:COMPUTERNAME.$env:USERDNSDOMAIN"
+
+    #Gets the displayname for all the GPO's on the domain
+    $DisplayName = Get-GPO -All -Domain $SrceDomain -Server $SrceServer | Select-Object DisplayName
+
     #Exports
     Start-DCExport -Path $path
     Start-GPOExport -SrceDomain $SrceDomain -SrceServer $SrceServer -DisplayName $DisplayName -Path $Path
+    Start-DCImport -Path $Path -DestDomain $DestinationDomain -DestServer $DestinationServer -CSVPath $CSVPath
 }
 
 <#

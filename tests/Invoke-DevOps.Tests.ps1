@@ -75,26 +75,37 @@ Describe "Unit Tests for Invoke-DevOps" -Tags "UNIT" {
     }#End Machine File Context
 }
 
-Describe "Acceptance tests for Invoke-DevOps" -Tags "Acceptance" {
+Describe "Unit testing Start functions for Invoke-DevOps" -Tags "Unit" {
     $parent = (get-item $PSScriptRoot).parent.FullName
     Context "Testing the Start functions parameters" {
         $WorkingFolderPath = "$env:USERPROFILE\Desktop\WorkingFolder"
 
         $SourceDomain  = "democloud.local"
         $SourceServer  = "dc01.democloud.local"
-        $GPODisplayName = "Accounting","HR"
+        $GPODisplayName = "Accounting"
+
+        $DestinationDomain = "democloud.local"
+        $DestinationDomain = "dc01.democloud.local"
+        Setup -Dir "Desktop\WorkingFolder"
+        Setup -File "Desktop\WorkingFolder\Import.csv" "Source,Domain"
+
+        Mock Get-GPO {return $GPODisplayName } #-ParameterFilter { $All -eq $true, $Domain -eq $SourceDomain, $Server -eq $SourceServer}
 
         #Exports
         Mock Start-DCExport {} -ParameterFilter { $path -eq $WorkingFolderPath }
-        Mock Start-GPOExport {} -ParameterFilter { $path -eq $WorkingFolderPath, $SrceDomain -eq $SourceDomain, $SrceServer -eq $SourceServer, $DisplayName -eq $GPODisplayName }
-        #Mock Get-GPO { $GPODisplayName } -ParameterFilter { $All -eq $true, $Domain -eq $SourceDomain, $Server -eq $SourceServer}
+        Mock Start-GPOExport {} #-ParameterFilter { $path -eq $WorkingFolderPath, $SrceDomain -eq $SourceDomain, $SrceServer -eq $SourceServer, $DisplayName -eq $GPODisplayName }
+
+        #Imports
+        Mock Start-DCImport {} #-ParameterFilter { $path -eq $WorkingFolderPath, $DestDomain -eq $DestinationDomain } #-Path $Path -DestDomain $DestDomain -DestServer $DestServer -CSVPath $CSVPath
 
         $result = Invoke-DevOps -Job Import
-
+        It "should have an import csv" {
+            "TestDrive:\Desktop\WorkingFolder\Import.csv" | Should Exist
+        }
         It "does not throw when invoked" {
             { $result } | Should Not throw
         }
-        $functions = "Start-DCExport","Start-GPOExport"
+        $functions = "Get-GPO","Start-DCExport","Start-GPOExport","Start-DCImport"
         $functions | ForEach-Object {
 
             It "the $_ gets called" {

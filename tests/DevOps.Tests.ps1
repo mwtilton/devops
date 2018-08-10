@@ -5,7 +5,7 @@ Import-Module $parent\DevOps -Force -ErrorAction Stop
 Import-Module $parent\DevOps\DevOps.Machine.ps1 -Force -ErrorAction Stop
 Import-Module $parent\Call-DevOps.ps1 -Force -ErrorAction Stop
 
-Describe "Unit testing for DevOps Module" -Tags 'UNIT'{
+Describe "Unit testing for DevOps Module" -Tags 'WF'{
 
     InModuleScope DevOps {
         $parent = (get-item $PSScriptRoot).parent.FullName
@@ -78,34 +78,33 @@ Describe "Unit testing for DevOps Module" -Tags 'UNIT'{
                 "$($here)\Functions" | Should be $true
             }
         }
-        Context "Testing if call file exists" {
-            It "does return true, whatever that means" {
-                "$parent\Call-DevOps.ps1" | Should be $true
-            }
-            It "does exist apparently" {
-                "$parent\Call-DevOps.ps1" | Should Exist
-            }
-            It "not going to work without the env: Working folder" {
-                {. "$($parent)\Call-DevOps.ps1" } | Should throw
-            }
-        }
-        Context "Testing folder locations" {
-            It "imports the DevOps module" {
-                "$env:WORKINGFOLDER\DevOps\Call-DevOps.ps1" | Should FileContentMatch ([regex]::Escape("Import-Module `"`$env:USERPROFILE\Desktop\DevOps\DevOps`" -Force"))
-            }
-            It "has the working folder set to Desktop\Workingfolder" {
-                "$env:WORKINGFOLDER\DevOps\Call-DevOps.ps1" | Should FileContentMatch ([regex]::Escape("`$env:USERPROFILE\Desktop\WorkingFolder"))
-            }
-            It "does not contain any special env:" {
-                "$env:WORKINGFOLDER\DevOps\Call-DevOps.ps1" | Should FileContentMatch ([regex]::Escape("`$env:WORKINGFOLDER"))
-            }
-        }
+
     }
 }
 
 
 Describe "Unit Testing for Call file" -Tags "UNIT","CALL"{
+    $parent = (get-item $PSScriptRoot).parent.FullName
+    Context "Testing if call file exists" {
+        It "does return true, whatever that means" {
+            "$parent\Call-DevOps.ps1" | Should be $true
+        }
+        It "does exist apparently" {
+            "$parent\Call-DevOps.ps1" | Should Exist
+        }
+        It "not going to work without the env: Working folder" {
+            {. "$($parent)\Call-DevOps.ps1" } | Should Not throw
+        }
+    }
+    Context "Testing Contents of the call file" {
+        It "imports the DevOps module" {
+            "$parent\Call-DevOps.ps1" | Should FileContentMatch ([regex]::Escape("Import-Module `"`$env:USERPROFILE\Desktop\DevOps\DevOps`" -Force"))
+        }
+        It "has the working folder set to Desktop\Workingfolder" {
+            "$parent\Call-DevOps.ps1" | Should FileContentMatch ([regex]::Escape("`$env:USERPROFILE\Desktop\WorkingFolder"))
+        }
 
+    }
     Context "Sets up the DevOps process" {
 
         Setup -Dir "Desktop"

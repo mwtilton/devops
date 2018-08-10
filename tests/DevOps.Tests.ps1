@@ -145,7 +145,8 @@ Describe "Unit Testing for Call file" -Tags "UNIT","CALL"{
             "TestDrive:\Desktop\WorkingFolder\GPOBackup"
         }
     }
-    Context "Start Something" {
+
+    Context "Wrappers, Paramters, Variables" {
         $start = "Start-DCImport","Start-DCExport","Start-GPOExport","Start-DCImport","Start-OpenStack"
         $start | ForEach-Object {
             It "has the $_ wrapper" {
@@ -156,6 +157,21 @@ Describe "Unit Testing for Call file" -Tags "UNIT","CALL"{
         $parameters | ForEach-Object {
             It "has the $_ parameter" {
                 "$env:WORKINGFOLDER\DevOps\Call-DevOps.ps1" | Should FileContentMatch ([regex]::Escape($($_)))
+            }
+        }
+        $variables = "SrceDomain","SrceServer","BackupPath"
+        $variables | ForEach-Object {
+            It "has the $_ variable" {
+                "$env:WORKINGFOLDER\DevOps\Call-DevOps.ps1" | Should FileContentMatch ([regex]::Escape($($_)))
+            }
+        }
+    }
+    Context "Import CSV Headers" {
+        $CSV = Import-Csv "TestDrive:\Desktop\WorkingFolder\Import.csv" | Select *
+        $headers = "Source"
+        $headers | ForEach-Object {
+            It "has the $_ header" {
+                $csv.$($_) | Should
             }
         }
     }
@@ -186,7 +202,7 @@ Describe "Unit Testing for Call file" -Tags "UNIT","CALL"{
             It "gets the $_ module" {
                 {Get-Module $_ -ErrorAction Stop}| Should Not throw
             }
-            It "has the $_ module" {
+            It "$_ module does not throw on import" {
                 { Import-Module $_ -Force -ErrorAction Stop } | Should Not throw
             }
         }

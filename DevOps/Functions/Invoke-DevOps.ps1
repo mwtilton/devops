@@ -5,7 +5,7 @@ Function Invoke-DevOps {
         [String]
         $job # Base path where backup folder will be created
     )
-    Write-Host $job
+    #Write-Host $job
     $SrceDomain  = $env:USERDNSDOMAIN
     $SrceServer  = "$env:COMPUTERNAME.$env:USERDNSDOMAIN"
     $path = "$env:USERPROFILE\Desktop\WorkingFolder"
@@ -21,7 +21,10 @@ Function Invoke-DevOps {
     #Exports
     Start-DCExport -Path $path
     Start-GPOExport -SrceDomain $SrceDomain -SrceServer $SrceServer -DisplayName $DisplayName -Path $Path
+
+    #Imports
     Start-DCImport -Path $Path -DestDomain $DestinationDomain -DestServer $DestinationServer -CSVPath $CSVPath
+    Start-GPOImport -DestDomain $DestinationDomain -DestServer $DestinationServer -BackupPath $BackupPath -MigTableCSVPath $MigTableCSVPath -CopyACL
 }
 
 <#

@@ -1,12 +1,6 @@
 Function Start-DCExport {
     [CmdletBinding()]
     Param (
-        [Parameter(Mandatory=$false)]
-        [String]
-        $SrceDomain,
-        [Parameter(Mandatory=$false)]
-        [String]
-        $SrceServer,
         [Parameter(Mandatory=$true)]
         [ValidateScript({Test-Path $_})]
         [String]

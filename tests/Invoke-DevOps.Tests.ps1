@@ -87,6 +87,7 @@ Describe "Unit testing Start functions for Invoke-DevOps" -Tags "Unit" {
         $DestinationDomain = "democloud.local"
         $DestinationDomain = "dc01.democloud.local"
         Setup -Dir "Desktop\WorkingFolder"
+        Setup -Dir "Desktop\WorkingFolder\GPOBackup"
         Setup -File "Desktop\WorkingFolder\Import.csv" "Source,Domain"
 
         Mock Get-GPO {return $GPODisplayName } #-ParameterFilter { $All -eq $true, $Domain -eq $SourceDomain, $Server -eq $SourceServer}
@@ -97,6 +98,7 @@ Describe "Unit testing Start functions for Invoke-DevOps" -Tags "Unit" {
 
         #Imports
         Mock Start-DCImport {} #-ParameterFilter { $path -eq $WorkingFolderPath, $DestDomain -eq $DestinationDomain } #-Path $Path -DestDomain $DestDomain -DestServer $DestServer -CSVPath $CSVPath
+        Mock Start-GPOImport {}
 
         $result = Invoke-DevOps -Job Import
         It "should have an import csv" {
@@ -105,7 +107,7 @@ Describe "Unit testing Start functions for Invoke-DevOps" -Tags "Unit" {
         It "does not throw when invoked" {
             { $result } | Should Not throw
         }
-        $functions = "Get-GPO","Start-DCExport","Start-GPOExport","Start-DCImport"
+        $functions = "Get-GPO","Start-DCExport","Start-DCImport","Start-GPOExport","Start-GPOImport"
         $functions | ForEach-Object {
 
             It "the $_ gets called" {

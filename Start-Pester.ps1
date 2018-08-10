@@ -1,2 +1,3 @@
-$projectFolder = "$env:WORKINGFOLDER\DevOps"
-Invoke-Pester $projectFolder\Tests\*DevOps* -CodeCoverage $projectFolder\DevOps\DevOps.psm1 -tags "Call"
+$parent = (get-item $PSScriptRoot).FullName
+$select = "*DevOps*"
+Invoke-Pester "$parent\Tests\$select" -CodeCoverage $parent\DevOps\Functions\$select -tags "UNIT"

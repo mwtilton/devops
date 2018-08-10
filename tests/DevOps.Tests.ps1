@@ -1,15 +1,16 @@
 Get-Module DevOps | Remove-Module -Force
-Import-Module $env:WORKINGFOLDER\DevOps\DevOps -Force -ErrorAction Stop
-Import-Module $env:WORKINGFOLDER\DevOps\DevOps\DevOps.Machine.ps1 -Force -ErrorAction Stop
-Import-Module $env:WORKINGFOLDER\DevOps\Call-DevOps.ps1 -Force -ErrorAction Stop
 
-$here = Split-Path -Parent $MyInvocation.MyCommand.Path
+$parent = (get-item $PSScriptRoot).parent.FullName
+Import-Module $parent\DevOps -Force -ErrorAction Stop
+Import-Module $parent\DevOps\DevOps.Machine.ps1 -Force -ErrorAction Stop
+Import-Module $parent\Call-DevOps.ps1 -Force -ErrorAction Stop
+
 Describe "Unit testing for DevOps Module" -Tags 'WF'{
 
     InModuleScope DevOps {
 
         Context "finds the functions" {
-            $functionsFolder = $env:WORKINGFOLDER + "\DevOps\DevOps\Functions"
+            $functionsFolder = "$parent\DevOps\Functions"
             It "PS Script root exists" {
                 $PSScriptRoot | Should Exist
             }
@@ -115,7 +116,6 @@ Describe "Unit testing for DevOps Module" -Tags 'WF'{
 
 Describe "Unit Testing for Call file" -Tags "UNIT","CALL"{
 
-
     Context "Sets up the DevOps process" {
 
         Setup -Dir "Desktop"
@@ -143,7 +143,7 @@ Describe "Unit Testing for Call file" -Tags "UNIT","CALL"{
     $modules | ForEach-Object{
         Context "Imports the $_ module" {
             It "gets the $_ module" {
-                {Get-Module $_ -ErrorAction Stop}| Should Not throw
+                { Get-Module $_ -ErrorAction Stop }| Should Not throw
             }
             It "$_ module does not throw on import" {
                 { Import-Module $_ -Force -ErrorAction Stop } | Should Not throw

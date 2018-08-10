@@ -37,13 +37,12 @@ Describe "Invoke-DevOps" -Tags "UNIT" {
             Get-Content "TestDrive:\Desktop\WorkingFolder\Import.csv" | Should Be "Source,Domain"
         }
         It "can import the file without throwing" {
-            { Import-Csv "TestDrive:\Desktop\WorkingFolder\Import.csv" -ErrorAction Stop } | Should Not throw
+            { Import-Csv $importCSV -ErrorAction Stop } | Should Not throw
+        }
+        It "the csv file exists" {
+            $importCSV | Should Exist
         }
         $headers = "Source,Domain"
-        It "has: $headers for headers" {
-            #$csv = Import-Csv $importCSV
-            # | Should Be $true
-        }
     }
     Context "Import Machine Files" {
 

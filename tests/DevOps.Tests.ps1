@@ -125,10 +125,6 @@ Describe "Unit Testing for Call file" -Tags "UNIT","CALL"{
         Mock New-Item -ParameterFilter {$path -eq "TestDrive:\Desktop", $itemtype -eq "Directoy" }
         Mock New-Item -ParameterFilter {$path -eq "TestDrive:\Desktop\WorkingFolder", $itemtype -eq "Directoy" }
 
-        Mock Import-Csv -ParameterFilter {$path -eq "TestDrive:\Desktop\WorkingFolder\Import.csv"}
-
-        $importCSV = "TestDrive:\Desktop\WorkingFolder\Import.csv"
-
         It "has a testdrive folder" {
             "TestDrive:\" | Should Exist
         }
@@ -137,9 +133,6 @@ Describe "Unit Testing for Call file" -Tags "UNIT","CALL"{
         }
         It "Creates the testdrive working folder on the desktop"{
             "TestDrive:\Desktop\WorkingFolder" | Should Exist
-        }
-        It "imports the csv file without throwing" {
-            { Import-Csv $importCSV } | Should Not throw
         }
         It "has the backup GPO folder" {
             "TestDrive:\Desktop\WorkingFolder\GPOBackup"
@@ -167,12 +160,23 @@ Describe "Unit Testing for Call file" -Tags "UNIT","CALL"{
         }
     }
     Context "Import CSV Headers" {
-        $CSV = Import-Csv "TestDrive:\Desktop\WorkingFolder\Import.csv" | Select *
-        $headers = "Source"
-        $headers | ForEach-Object {
-            It "has the $_ header" {
-                $csv.$($_) | Should
-            }
+        Setup -Dir "Desktop\WorkingFolder"
+        Setup -File "Desktop\WorkingFolder\Import.csv" "Source,Domain"
+
+        It "has an import csv file" {
+            "TestDrive:\Desktop\WorkingFolder\Import.csv" | Should Exist
+        }
+        It "has contents" {
+            Get-Content "TestDrive:\Desktop\WorkingFolder\Import.csv" | Should Be "Source,Domain"
+        }
+        It "can import the file" {
+            { Import-Csv "TestDrive:\Desktop\WorkingFolder\Import.csv" -ErrorAction Stop } | Should Not throw
+        }
+
+        $headers = "Source,Domain"
+        It "has: $headers for headers" {
+            $csv = Import-Csv "TestDrive:\Desktop\WorkingFolder\Import.csv"
+            $csv | Should Be $headers
         }
     }
     Context "Import Machine Files" {

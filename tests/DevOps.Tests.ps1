@@ -103,6 +103,9 @@ Describe "Unit Testing for Call file" -Tags "UNIT","CALL"{
         It "has the working folder set to Desktop\Workingfolder" {
             "$parent\Call-DevOps.ps1" | Should FileContentMatch ([regex]::Escape("`$env:USERPROFILE\Desktop\WorkingFolder"))
         }
+        It "has the Invoke-DevOps function" {
+            "$parent\Call-DevOps.ps1" | Should FileContentMatch ([regex]::Escape("Invoke-DevOps"))
+        }
 
     }
     Context "Sets up the DevOps process" {

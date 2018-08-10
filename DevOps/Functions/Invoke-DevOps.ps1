@@ -2,10 +2,12 @@ Function Invoke-DevOps {
     [CmdletBinding()]
     Param(
         [Parameter(Mandatory=$true)]
-        [ValidateScript({Test-Path $_})]
         [String]
-        $Path # Base path where backup folder will be created
+        $job # Base path where backup folder will be created
     )
+    Write-Host $job
+    $path = "$env:USERPROFILE\Desktop\WorkingFolder"
+    Start-DCExport -Path $path
 }
 
 <#

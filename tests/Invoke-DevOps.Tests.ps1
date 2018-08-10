@@ -2,33 +2,34 @@ $parent = (get-item $PSScriptRoot).parent.FullName
 Import-Module $parent\DevOps\DevOps.Machine.ps1 -Force -ErrorAction Stop
 Import-Module "$parent\DevOps\Functions\Invoke-DevOps.ps1" -Force -ErrorAction Stop
 
-Describe "Invoke-DevOps" -Tags "UNIT" {
-    Context "Wrappers, Parameters, Variables, Invoker" {
-        $start = "Start-DCImport","Start-DCExport","Start-GPOExport","Start-DCImport","Start-OpenStack"
+Describe "Unit Tests for Invoke-DevOps" -Tags "UNIT" {
+    $parent = (get-item $PSScriptRoot).parent.FullName
+    Context "Wrappers, Parameters, Variables" {
+        $start = "Start-DCImport","Start-DCExport","Start-GPOExport","Start-DCImport"
         $start | ForEach-Object {
             It "has the $_ wrapper" {
-                "$env:WORKINGFOLDER\DevOps\Call-DevOps.ps1" | Should FileContentMatch ([regex]::Escape($($_)))
+                "$parent\DevOps\Functions\Invoke-DevOps.ps1" | Should FileContentMatch ([regex]::Escape($($_)))
             }
         }
         $parameters = "DestServer","GPOBackuppath","MigTableCSV","DestDomain","Importcsv"
         $parameters | ForEach-Object {
             It "has the $_ parameter" {
-                "$env:WORKINGFOLDER\DevOps\Call-DevOps.ps1" | Should FileContentMatch ([regex]::Escape($($_)))
+                "$parent\DevOps\Functions\Invoke-DevOps.ps1" | Should FileContentMatch ([regex]::Escape($($_)))
             }
         }
         $variables = "SrceDomain","SrceServer","BackupPath"
         $variables | ForEach-Object {
             It "has the $_ variable" {
-                "$env:WORKINGFOLDER\DevOps\Call-DevOps.ps1" | Should FileContentMatch ([regex]::Escape($($_)))
+                "$parent\DevOps\Functions\Invoke-DevOps.ps1" | Should FileContentMatch ([regex]::Escape($($_)))
             }
         }
-        It "Invokes the DevOps Process" {
-            "$env:WORKINGFOLDER\DevOps\Call-DevOps.ps1" | Should FileContentMatch ([regex]::Escape("Invoke-DevOps"))
-        }
+
     }
-    Context "Import CSV Headers" {
+    Context "Mocking Import CSV Headers" {
         Setup -Dir "Desktop\WorkingFolder"
         $importCSV = Setup -File "Desktop\WorkingFolder\Import.csv" "Source,Domain" -PassThru
+
+        Mock Import-Csv {"Source,Domain"} -ParameterFilter {$path -eq $importCSV }
 
         It "has an import csv file" {
             "TestDrive:\Desktop\WorkingFolder\Import.csv" | Should Exist
@@ -42,7 +43,14 @@ Describe "Invoke-DevOps" -Tags "UNIT" {
         It "the csv file exists" {
             $importCSV | Should Exist
         }
+        It "should not be null or empty" {
+            Import-Csv $importCSV | Should Not BeNullOrEmpty
+        }
         $headers = "Source,Domain"
+        It "imports the csv file" {
+            Import-Csv $importCSV | Should Be $headers
+        }
+
     }
     Context "Import Machine Files" {
 
@@ -64,4 +72,27 @@ Describe "Invoke-DevOps" -Tags "UNIT" {
 
         }
     }#End Machine File Context
+}
+
+Describe "Acceptance tests for Invoke-DevOps" -Tags "Acceptance" {
+    $parent = (get-item $PSScriptRoot).parent.FullName
+    Context "Testing the Start functions parameters" {
+        Mock Start-DCExport {} -ParameterFilter {$path -eq $parent}
+
+        $result = Invoke-DevOps -Job Import
+        It "does not throw when invoked" {
+            { $result } | Should Not throw
+        }
+        $functions = "Start-DCExport"
+        $functions | ForEach-Object {
+
+            It "has the start option" {
+                Assert-MockCalled -CommandName $_ -Exactly 1
+            }
+            It "does not throw" {
+
+            }
+        }
+
+    }
 }

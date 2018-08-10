@@ -6,8 +6,15 @@ Function Invoke-DevOps {
         $job # Base path where backup folder will be created
     )
     Write-Host $job
+    $SrceDomain  = $env:USERDNSDOMAIN
+    $SrceServer  = "$env:COMPUTERNAME.$env:USERDNSDOMAIN"
     $path = "$env:USERPROFILE\Desktop\WorkingFolder"
+    $BackupPath  = "$env:USERPROFILE\Desktop\WorkingFolder\GPOBackup\"
+    #$DisplayName = Get-GPO -All -Domain $SrceDomain -Server $SrceServer | Select-Object -ExpandProperty DisplayName
+    $DisplayName = "Testing"
+    #Exports
     Start-DCExport -Path $path
+    Start-GPOExport -SrceDomain $SrceDomain -SrceServer $SrceServer -DisplayName $DisplayName -Path $Path
 }
 
 <#

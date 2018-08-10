@@ -1,6 +1,7 @@
 $parent = (get-item $PSScriptRoot).parent.FullName
 Import-Module $parent\DevOps\DevOps.Machine.ps1 -Force -ErrorAction Stop
 Import-Module "$parent\DevOps\Functions\Invoke-DevOps.ps1" -Force -ErrorAction Stop
+Import-Module "$parent\DevOps\DevOps.psm1" -Force -ErrorAction Stop
 
 Describe "Unit Tests for Invoke-DevOps" -Tags "UNIT" {
     $parent = (get-item $PSScriptRoot).parent.FullName
@@ -77,21 +78,29 @@ Describe "Unit Tests for Invoke-DevOps" -Tags "UNIT" {
 Describe "Acceptance tests for Invoke-DevOps" -Tags "Acceptance" {
     $parent = (get-item $PSScriptRoot).parent.FullName
     Context "Testing the Start functions parameters" {
-        Mock Start-DCExport {} -ParameterFilter {$path -eq $parent}
+        $WorkingFolderPath = "$env:USERPROFILE\Desktop\WorkingFolder"
+
+        $SourceDomain  = "democloud.local"
+        $SourceServer  = "dc01.democloud.local"
+        $GPODisplayName = "Accounting","HR"
+
+        #Exports
+        Mock Start-DCExport {} -ParameterFilter { $path -eq $WorkingFolderPath }
+        Mock Start-GPOExport {} -ParameterFilter { $path -eq $WorkingFolderPath, $SrceDomain -eq $SourceDomain, $SrceServer -eq $SourceServer, $DisplayName -eq $GPODisplayName }
+        #Mock Get-GPO { $GPODisplayName } -ParameterFilter { $All -eq $true, $Domain -eq $SourceDomain, $Server -eq $SourceServer}
 
         $result = Invoke-DevOps -Job Import
+
         It "does not throw when invoked" {
             { $result } | Should Not throw
         }
-        $functions = "Start-DCExport"
+        $functions = "Start-DCExport","Start-GPOExport"
         $functions | ForEach-Object {
 
-            It "has the start option" {
+            It "the $_ gets called" {
                 Assert-MockCalled -CommandName $_ -Exactly 1
             }
-            It "does not throw" {
 
-            }
         }
 
     }

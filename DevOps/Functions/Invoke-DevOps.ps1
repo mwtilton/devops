@@ -1,5 +1,11 @@
 Function Invoke-DevOps {
-
+    [CmdletBinding()]
+    Param(
+        [Parameter(Mandatory=$true)]
+        [ValidateScript({Test-Path $_})]
+        [String]
+        $Path # Base path where backup folder will be created
+    )
 }
 
 <#

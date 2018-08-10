@@ -5,11 +5,11 @@ Import-Module $parent\DevOps -Force -ErrorAction Stop
 Import-Module $parent\DevOps\DevOps.Machine.ps1 -Force -ErrorAction Stop
 Import-Module $parent\Call-DevOps.ps1 -Force -ErrorAction Stop
 
-Describe "Unit testing for DevOps Module" -Tags 'WF'{
+Describe "Unit testing for DevOps Module" -Tags 'UNIT'{
 
     InModuleScope DevOps {
-
-        Context "finds the functions" {
+        $parent = (get-item $PSScriptRoot).parent.FullName
+        Context "Functions folder Main Testing" {
             $functionsFolder = "$parent\DevOps\Functions"
             It "PS Script root exists" {
                 $PSScriptRoot | Should Exist
@@ -21,24 +21,14 @@ Describe "Unit testing for DevOps Module" -Tags 'WF'{
                 $functionsFolder | Should BeLike "*\DevOps\Functions*"
             }
         }
-        Context "finds the functions" {
-            $functionsFolder = $env:WORKINGFOLDER + "\DevOps\DevOps\Functions"
-            $functions = Get-ChildItem $functionsFolder -Filter "*.ps1"
-            $functions | ForEach-Object {
-                It "found $($_.name)" {
-                    "$here\Functions\$($_.name)" | Should Be $true
-                }
 
-            }
-
-        }
-        Context "finds the functions" {
-            $functionsFolder = $env:WORKINGFOLDER + "\DevOps\DevOps\Functions"
+        Context "Finds individual details about each functions" {
+            $functionsFolder = "$parent\DevOps\Functions"
             $functions = Get-ChildItem $functionsFolder -Filter "*.ps1"
             $functions | ForEach-Object {
                 Context "importing $($_.name)" {
                     It "found $($_.name)" {
-                        "$here\Functions\$($_.name)" | Should Be $true
+                        "$parent\DevOps\Functions\$($_.name)" | Should Be $true
                     }
                     It "should exist" {
                         $_.FullName | Should Exist
@@ -90,13 +80,13 @@ Describe "Unit testing for DevOps Module" -Tags 'WF'{
         }
         Context "Testing if call file exists" {
             It "does return true, whatever that means" {
-                "$env:WORKINGFOLDER\DevOps\Call-DevOps.ps1" | Should be $true
+                "$parent\Call-DevOps.ps1" | Should be $true
             }
             It "does exist apparently" {
-                "$env:WORKINGFOLDER\DevOps\Call-DevOps.ps1" | Should Exist
+                "$parent\Call-DevOps.ps1" | Should Exist
             }
             It "not going to work without the env: Working folder" {
-                {. "$($here)\Call-DevOps.ps1" } | Should throw
+                {. "$($parent)\Call-DevOps.ps1" } | Should throw
             }
         }
         Context "Testing folder locations" {

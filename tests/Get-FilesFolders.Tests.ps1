@@ -1,6 +1,6 @@
 Import-Module "$env:WORKINGFOLDER\DevOps\DevOps\Functions\Get-FilesFolders.ps1" -Force -ErrorAction Stop
 
-Describe "Get-FilesFolders" {
+Describe "Get-FilesFolders" -Tags "UNIT" {
     Context "finds files" {
         $gff = Get-FilesFolders
         It "GCI on the c:\" {
@@ -11,12 +11,6 @@ Describe "Get-FilesFolders" {
             {$gff} | Should Not throw
         }
 
-    }
-    Context "Finds the fileshares" {
-        Mock Get-FileShare -MockWith {}
-        It "returns shares" {
-            Should not be $null
-        }
     }
     Context "Get-Acl Unit Tests" {
         Mock Get-Acl -MockWith {"c:\"}
@@ -32,9 +26,5 @@ Describe "Get-FilesFolders" {
         }
 
     }
-    Context "Creates New Shares" {
-        It "New path exists" {
 
-        }
-    }
 }

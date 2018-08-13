@@ -40,13 +40,16 @@ Describe "Unit Testing for Enable-ADSystemOnlyChange" -tags "UNIT" {
 
         Mock Read-Host {return "y"}
 
-        Enable-ADSystemOnlyChange
+        Enable-ADSystemOnlyChange -disable
 
         It "sets the item property" {
             Assert-MockCalled -CommandName Set-ItemProperty -Exactly 1
         }
         It "shouldn't make a new-item reg edit" {
             Assert-MockCalled -CommandName New-Item -Exactly 0
+        }
+        It "shouldn't try and make a new-item property either" {
+            Assert-MockCalled -CommandName New-ItemProperty -Exactly 0
         }
         It "get the service" {
             Assert-MockCalled -CommandName Get-Service -Exactly 1
@@ -67,10 +70,10 @@ Describe "Unit Testing for Enable-ADSystemOnlyChange" -tags "UNIT" {
         Mock Read-Host {return "y"}
 
         Enable-ADSystemOnlyChange
-        It "sets the item property" {
+        It "creates the new-item" {
             Assert-MockCalled -CommandName New-Item -Exactly 1
         }
-        It "shouldn't make a new-item reg edit" {
+        It "should make a new-itemproperty reg edit" {
             Assert-MockCalled -CommandName New-ItemProperty -Exactly 1
         }
         It "get the service" {
@@ -84,26 +87,3 @@ Describe "Unit Testing for Enable-ADSystemOnlyChange" -tags "UNIT" {
         }
     }
 }
-
-<#
-
-     Else {
-        # Set the registry value
-        $valueData = 1
-        if ($Disable) {
-            $valueData = 0
-        }
-
-        $key = Get-Item HKLM:\System\CurrentControlSet\Services\NTDS\Parameters -ErrorAction SilentlyContinue
-        New-Item HKLM:\System\CurrentControlSet\Services\NTDS\Parameters -ItemType RegistryKey | Out-Null
-        $kval = Get-ItemProperty HKLM:\System\CurrentControlSet\Services\NTDS\Parameters -Name "Allow System Only Change" -ErrorAction SilentlyContinue
-        New-ItemProperty HKLM:\System\CurrentControlSet\Services\NTDS\Parameters -Name "Allow System Only Change" -Value $valueData -PropertyType DWORD | Out-Null
-        Set-ItemProperty HKLM:\System\CurrentControlSet\Services\NTDS\Parameters -Name "Allow System Only Change" -Value $valueData | Out-Null
-        If (Get-Service NTDS -ErrorAction SilentlyContinue) {
-            Write-Warning "You must restart the Directory Service to coninue..."
-            Restart-Service NTDS -Confirm:$true
-            Write-Warning "You must reboot the server to coninue..."
-            Restart-Computer localhost -Confirm:$true
-
-
-#>

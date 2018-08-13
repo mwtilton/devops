@@ -165,7 +165,23 @@ Describe "Unit testing Start functions for Invoke-DevOps" -Tags "Unit" {
 
                 }
                 Default {
-                    It "" {
+                    $functions = @(
+                        "Get-GPO",`
+                        "Start-DCExport",`
+                        "Start-DCImport",`
+                        "Start-GPOExport",`
+                        "Start-GPOImport",`
+                        "Get-FilesFolders",`
+                        "Get-FileShares",`
+                        "Get-OpenFiles",`
+                        "Get-UsersInOU",`
+                        "Get-UserVHDFile"
+                    )
+                    $functions | ForEach-Object {
+
+                        It "the $_ function does not get called in the default block" {
+                            Assert-MockCalled -CommandName $_ -Exactly 0
+                        }
 
                     }
                 }

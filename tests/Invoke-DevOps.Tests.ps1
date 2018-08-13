@@ -5,20 +5,24 @@ Import-Module "$parent\DevOps\DevOps.psm1" -Force -ErrorAction Stop
 
 Describe "Unit Tests for Invoke-DevOps" -Tags "UNIT" {
     $parent = (get-item $PSScriptRoot).parent.FullName
-    Context "Wrappers, Parameters, Variables" {
+    Context "Wrappers" {
         $start = "Start-DCImport","Start-DCExport","Start-GPOExport","Start-DCImport"
         $start | ForEach-Object {
             It "has the $_ wrapper" {
                 "$parent\DevOps\Functions\Invoke-DevOps.ps1" | Should FileContentMatch ([regex]::Escape($($_)))
             }
         }
-        $parameters = "DestServer","GPOTemplate","CSVPath","DestDomain","Importcsv"
+    }
+    Context "Parameters" {
+        $parameters = "-DestServer","-GPOFolder","-CSVPath","-DestDomain","-BackupPath","-MigTableCSVPath","-CopyACL"
         $parameters | ForEach-Object {
             It "has the $_ parameter" {
                 "$parent\DevOps\Functions\Invoke-DevOps.ps1" | Should FileContentMatch ([regex]::Escape($($_)))
             }
         }
-        $variables = "SrceDomain","SrceServer","BackupPath"
+    }
+    Context "Variables" {
+        $variables = "`$SrceDomain","`$SrceServer","`$BackupPath","`$CSVPath","`$DestinationDomain","`$DestinationServer","`$company"
         $variables | ForEach-Object {
             It "has the $_ variable" {
                 "$parent\DevOps\Functions\Invoke-DevOps.ps1" | Should FileContentMatch ([regex]::Escape($($_)))
@@ -26,6 +30,7 @@ Describe "Unit Tests for Invoke-DevOps" -Tags "UNIT" {
         }
 
     }
+
     Context "Mocking Import CSV Headers" {
         Setup -Dir "Desktop\WorkingFolder"
         $importCSV = Setup -File "Desktop\WorkingFolder\Import.csv" "Source,Domain" -PassThru
@@ -100,6 +105,13 @@ Describe "Unit testing Start functions for Invoke-DevOps" -Tags "Unit" {
         Mock Start-DCImport {} #-ParameterFilter { $path -eq $WorkingFolderPath, $DestDomain -eq $DestinationDomain } #-Path $Path -DestDomain $DestDomain -DestServer $DestServer -CSVPath $CSVPath
         Mock Start-GPOImport {} #-ParameterFilter {$CSVpath -eq "TestDrive:\Desktop\WorkingFolder\Import.csv"}
 
+        #gets
+        Mock Get-FilesFolders {}
+        Mock Get-FileShares {}
+        Mock Get-OpenFiles {}
+        Mock Get-UsersInOU {}
+        Mock Get-UserVHDFile {}
+
         $result = Invoke-DevOps -Job Import
         It "should have an import csv" {
             "TestDrive:\Desktop\WorkingFolder\Import.csv" | Should Exist
@@ -107,7 +119,18 @@ Describe "Unit testing Start functions for Invoke-DevOps" -Tags "Unit" {
         It "does not throw when invoked" {
             { $result } | Should Not throw
         }
-        $functions = "Get-GPO","Start-DCExport","Start-DCImport","Start-GPOExport","Start-GPOImport"
+        $functions = @(
+            "Get-GPO",`
+            "Start-DCExport",`
+            "Start-DCImport",`
+            "Start-GPOExport",`
+            "Start-GPOImport",`
+            "Get-FilesFolders",`
+            "Get-FileShares",`
+            "Get-OpenFiles",`
+            "Get-UsersInOU",`
+            "Get-UserVHDFile"
+        )
         $functions | ForEach-Object {
 
             It "the $_ function gets called" {

@@ -2,7 +2,6 @@ Get-Module DevOps | Remove-Module -Force
 
 $parent = (get-item $PSScriptRoot).parent.FullName
 Import-Module $parent\DevOps -Force -ErrorAction Stop
-Import-Module $parent\DevOps\DevOps.Machine.ps1 -Force -ErrorAction Stop
 Import-Module $parent\Call-DevOps.ps1 -Force -ErrorAction Stop
 
 Describe "Unit testing for DevOps Module" -Tags 'WF'{
@@ -92,7 +91,7 @@ Describe "Unit Testing for Call file" -Tags "UNIT","CALL"{
         It "does exist apparently" {
             "$parent\Call-DevOps.ps1" | Should Exist
         }
-        It "not going to work without the env: Working folder" {
+        It "call file should not throw with dot sourcing" {
             {. "$($parent)\Call-DevOps.ps1" } | Should Not throw
         }
     }
@@ -137,7 +136,7 @@ Describe "Unit Testing for Call file" -Tags "UNIT","CALL"{
             It "gets the $_ module" {
                 { Get-Module $_ -ErrorAction Stop }| Should Not throw
             }
-            It "$_ module does not throw on import" {
+            It "$_ module does not throw on import" -Skip {
                 { Import-Module $_ -Force -ErrorAction Stop } | Should Not throw
             }
         }

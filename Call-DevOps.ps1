@@ -4,7 +4,7 @@
 #
 ##############################################################################
 #Paths
-$BackupPath  = "$env:USERPROFILE\Desktop\WorkingFolder\GPOBackup-DemoCloud\"
+$BackupPath  = "$env:USERPROFILE\Desktop\WorkingFolder\GPOBackup\"
 $workingfolder ="$env:USERPROFILE\Desktop\WorkingFolder"
 
 #Folders

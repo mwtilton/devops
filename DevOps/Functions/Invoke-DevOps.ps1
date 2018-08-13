@@ -24,7 +24,7 @@ Function Invoke-DevOps {
 
     #Imports
     Start-DCImport -Path $Path -DestDomain $DestinationDomain -DestServer $DestinationServer -CSVPath $CSVPath
-    Start-GPOImport -DestDomain $DestinationDomain -DestServer $DestinationServer -BackupPath $BackupPath -MigTableCSVPath $MigTableCSVPath -CopyACL
+    Start-GPOImport -Path $Path -DestDomain $DestinationDomain -DestServer $DestinationServer -BackupPath $BackupPath -MigTableCSVPath $CSVPath -CopyACL
 }
 
 <#

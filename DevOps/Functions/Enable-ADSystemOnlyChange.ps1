@@ -4,6 +4,7 @@ Function Enable-ADSystemOnlyChange {
         [switch]$Disable
     )
 
+
     Write-Warning 'This command must run locally on the domain controller where the
     GPOs will be imported. You only need to execute this function if WMI filter
     creation via script has failed. If you continue, the process will finish with

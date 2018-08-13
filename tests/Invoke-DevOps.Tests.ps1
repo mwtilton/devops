@@ -119,7 +119,7 @@ Describe "Unit testing Start functions for Invoke-DevOps" -Tags "Unit" {
             { $result } | Should Not throw
         }
 
-        $jobs = "import","Export","get"
+        $jobs = "Import","Export","Get","other"
         $jobs | ForEach-Object {
             $result = Invoke-DevOps -Job $_
 
@@ -127,42 +127,41 @@ Describe "Unit testing Start functions for Invoke-DevOps" -Tags "Unit" {
                 "Import" {
 
                     It "Start-DCImport is called in $_" {
-                        Assert-MockCalled -CommandName Start-DCImport -Exactly 1
+                        Assert-MockCalled -CommandName Start-DCImport -Exactly 1 -Scope It
                     }
                     It "Start-GPOImport is called in $_" {
-                        Assert-MockCalled -CommandName Start-GPOImport -Exactly 1
+                        Assert-MockCalled -CommandName Start-GPOImport -Exactly 1  -Scope It
                     }
 
                 }
                 "Export"{
                     It "Get-GPO is called in $_" {
-                        Assert-MockCalled -CommandName Get-GPO -Exactly 1
+                        Assert-MockCalled -CommandName Get-GPO -Exactly 1 -Scope It
                     }
                     It "Start-DCExport is called in $_" {
-                        Assert-MockCalled -CommandName Start-DCExport -Exactly 1
+                        Assert-MockCalled -CommandName Start-DCExport -Exactly 1 -Scope It
                     }
                     It "Start-GPOExport is called in $_" {
-                        Assert-MockCalled -CommandName Start-GPOExport -Exactly 1
+                        Assert-MockCalled -CommandName Start-GPOExport -Exactly 1 -Scope It
                     }
 
                 }
                 "Get"{
                     It "Get-FilesFolders is called in $_" {
-                        Assert-MockCalled -CommandName Get-FilesFolders -Exactly 1
+                        Assert-MockCalled -CommandName Get-FilesFolders -Exactly 1 -Scope It
                     }
                     It "Get-FileShares is called in $_" {
-                        Assert-MockCalled -CommandName Get-FileShares -Exactly 1
+                        Assert-MockCalled -CommandName Get-FileShares -Exactly 1 -Scope It
                     }
                     It "Get-OpenFiles is called in $_" {
-                        Assert-MockCalled -CommandName Get-OpenFiles -Exactly 1
+                        Assert-MockCalled -CommandName Get-OpenFiles -Exactly 1 -Scope It
                     }
                     It "Get-UsersInOU is called in $_" {
-                        Assert-MockCalled -CommandName Get-UsersInOU -Exactly 1
+                        Assert-MockCalled -CommandName Get-UsersInOU -Exactly 1 -Scope It
                     }
                     It "Get-UserVHDFile is called in $_" {
-                        Assert-MockCalled -CommandName Get-UserVHDFile -Exactly 1
+                        Assert-MockCalled -CommandName Get-UserVHDFile -Exactly 1 -Scope It
                     }
-
                 }
                 Default {
                     $functions = @(
@@ -178,11 +177,9 @@ Describe "Unit testing Start functions for Invoke-DevOps" -Tags "Unit" {
                         "Get-UserVHDFile"
                     )
                     $functions | ForEach-Object {
-
                         It "the $_ function does not get called in the default block" {
-                            Assert-MockCalled -CommandName $_ -Exactly 0
+                            Assert-MockCalled -CommandName $_ -Exactly 0 -Scope It
                         }
-
                     }
                 }
             }

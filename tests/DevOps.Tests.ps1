@@ -82,7 +82,7 @@ Describe "Unit testing for DevOps Module" -Tags 'WF'{
 }
 
 
-Describe "Unit Testing for Call file" -Tags "UNIT","CALL"{
+Describe "Unit Testing for Call file" -Tags "CALL"{
     $parent = (get-item $PSScriptRoot).parent.FullName
     Context "Testing if call file exists" {
         It "does return true, whatever that means" {

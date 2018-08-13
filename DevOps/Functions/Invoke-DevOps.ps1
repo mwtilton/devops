@@ -3,7 +3,7 @@ Function Invoke-DevOps {
     Param(
         [Parameter(Mandatory=$true)]
         [String]
-        $job # Base path where backup folder will be created
+        $job # Job you are looking to run
     )
     #Write-Host $job
     $SrceDomain  = $env:USERDNSDOMAIN
@@ -15,16 +15,43 @@ Function Invoke-DevOps {
     $DestinationDomain = $env:USERDNSDOMAIN
     $DestinationServer  = "$env:COMPUTERNAME.$env:USERDNSDOMAIN"
 
+    $company = "democloud"
     #Gets the displayname for all the GPO's on the domain
-    $DisplayName = Get-GPO -All -Domain $SrceDomain -Server $SrceServer | Select-Object DisplayName
 
-    #Exports
-    Start-DCExport -Path $path
-    Start-GPOExport -SrceDomain $SrceDomain -SrceServer $SrceServer -DisplayName $DisplayName -Path $Path
+    #Start-DCImport -Path $Path -DestDomain $DestinationDomain -DestServer $DestinationServer -CSVPath $CSVPath
 
-    #Imports
-    Start-DCImport -Path $Path -DestDomain $DestinationDomain -DestServer $DestinationServer -CSVPath $CSVPath
-    Start-GPOImport -Path $Path -DestDomain $DestinationDomain -DestServer $DestinationServer -BackupPath $BackupPath -MigTableCSVPath $CSVPath -CopyACL
+    Switch($job){
+        "Import"{
+            #Imports
+            Start-DCImport -Path $Path -DestDomain $DestinationDomain -DestServer $DestinationServer -CSVPath $CSVPath
+            Start-GPOImport -Path $Path -DestDomain $DestinationDomain -DestServer $DestinationServer -BackupPath $BackupPath -MigTableCSVPath $CSVPath -CopyACL
+
+        }
+        "Export"{
+            $DisplayName = Get-GPO -All -Domain $SrceDomain -Server $SrceServer | Select-Object DisplayName
+            #Exports
+            Start-DCExport -Path $path
+            Start-GPOExport -SrceDomain $SrceDomain -SrceServer $SrceServer -DisplayName $DisplayName -Path $Path
+
+        }
+        "Get"{
+            #Gets
+            Get-FilesFolders
+            Get-FileShares -DestServer FileServer01 -BackupPath $BackupPath
+            Get-OpenFiles -DestServer FileServer01 #-search data
+            Get-UsersInOU -ou $company
+            Get-UserVHDFile
+
+        }
+        default{
+            "Nothing was input."
+        }
+    }
+    #>
+
+
+
+
 }
 
 <#

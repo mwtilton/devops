@@ -11,7 +11,8 @@ Function Enable-ADSystemOnlyChange {
     either restarting the NTDS service or rebooting the server.'
     If ((Read-Host "Continue? (y/n)") -ne 'y') {
         Return
-    } Else {
+    }
+    Else {
         # Set the registry value
         $valueData = 1
         if ($Disable) {
@@ -26,7 +27,8 @@ Function Enable-ADSystemOnlyChange {
         $kval = Get-ItemProperty HKLM:\System\CurrentControlSet\Services\NTDS\Parameters -Name "Allow System Only Change" -ErrorAction SilentlyContinue
         if (!$kval) {
             New-ItemProperty HKLM:\System\CurrentControlSet\Services\NTDS\Parameters -Name "Allow System Only Change" -Value $valueData -PropertyType DWORD | Out-Null
-        } else {
+        }
+        else {
             Set-ItemProperty HKLM:\System\CurrentControlSet\Services\NTDS\Parameters -Name "Allow System Only Change" -Value $valueData | Out-Null
         }
 
@@ -34,7 +36,8 @@ Function Enable-ADSystemOnlyChange {
         If (Get-Service NTDS -ErrorAction SilentlyContinue) {
             Write-Warning "You must restart the Directory Service to coninue..."
             Restart-Service NTDS -Confirm:$true
-        } Else {
+        }
+        Else {
             Write-Warning "You must reboot the server to coninue..."
             Restart-Computer localhost -Confirm:$true
         }

@@ -1,11 +1,25 @@
 Import-Module "$env:WORKINGFOLDER\DevOps\DevOps\Functions\Enable-ADSystemOnlyChange.ps1" -Force -ErrorAction Stop
 
 Describe "Unit Testing for Enable-ADSystemOnlyChange" -tags "UNIT" {
-    Context "Opening" {
+    $mocks = @(
+        "Get-Item",`
+        "New-Item",`
+        "Get-ItemProperty",`
+        "New-ItemProperty",`
+        "Set-ItemProperty",`
+        "Get-Service",`
+        "Restart-Service",`
+        "Restart-Computer"
+    )
+    $mocks | ForEach-Object {
+        Mock $_ {}
+    }
+
+    Context "Asserting the Initial Read-host and write warnings are called" {
         $regPath =  "HKLM:\System\CurrentControlSet\Services\NTDS\Parameters"
 
         Mock Write-Warning {}
-        Mock Read-Host {}
+        Mock Read-Host {return "nope"}
 
         Enable-ADSystemOnlyChange
 
@@ -17,6 +31,56 @@ Describe "Unit Testing for Enable-ADSystemOnlyChange" -tags "UNIT" {
         }
         It "registry path is accessible"{
             $regPath | Should Exist
+        }
+    }
+    Context "Mocking true assertions" {
+        Mock Get-Item {return $true}
+        Mock Get-ItemProperty {return $true}
+        Mock Get-Service {return $true}
+
+        Mock Read-Host {return "y"}
+
+        Enable-ADSystemOnlyChange
+
+        It "sets the item property" {
+            Assert-MockCalled -CommandName Set-ItemProperty -Exactly 1
+        }
+        It "shouldn't make a new-item reg edit" {
+            Assert-MockCalled -CommandName New-Item -Exactly 0
+        }
+        It "get the service" {
+            Assert-MockCalled -CommandName Get-Service -Exactly 1
+        }
+        It "restarts the service" {
+            Assert-MockCalled -CommandName Restart-Service -Exactly 1
+        }
+        It "does not restart the computer" {
+            Assert-MockCalled -CommandName Restart-Computer -Exactly 0
+        }
+
+    }
+    Context "Mocking False assertions" {
+        Mock Get-Item {return $false}
+        Mock Get-ItemProperty {$false}
+        Mock Get-Service {return $false}
+
+        Mock Read-Host {return "y"}
+
+        Enable-ADSystemOnlyChange
+        It "sets the item property" {
+            Assert-MockCalled -CommandName New-Item -Exactly 1
+        }
+        It "shouldn't make a new-item reg edit" {
+            Assert-MockCalled -CommandName New-ItemProperty -Exactly 1
+        }
+        It "get the service" {
+            Assert-MockCalled -CommandName Get-Service -Exactly 1
+        }
+        It "does not restarts the service" {
+            Assert-MockCalled -CommandName Restart-Service -Exactly 0
+        }
+        It "restart the computer" {
+            Assert-MockCalled -CommandName Restart-Computer -Exactly 1
         }
     }
 }
@@ -31,24 +95,15 @@ Describe "Unit Testing for Enable-ADSystemOnlyChange" -tags "UNIT" {
         }
 
         $key = Get-Item HKLM:\System\CurrentControlSet\Services\NTDS\Parameters -ErrorAction SilentlyContinue
-        if (!$key) {
-            New-Item HKLM:\System\CurrentControlSet\Services\NTDS\Parameters -ItemType RegistryKey | Out-Null
-        }
-
+        New-Item HKLM:\System\CurrentControlSet\Services\NTDS\Parameters -ItemType RegistryKey | Out-Null
         $kval = Get-ItemProperty HKLM:\System\CurrentControlSet\Services\NTDS\Parameters -Name "Allow System Only Change" -ErrorAction SilentlyContinue
-        if (!$kval) {
-            New-ItemProperty HKLM:\System\CurrentControlSet\Services\NTDS\Parameters -Name "Allow System Only Change" -Value $valueData -PropertyType DWORD | Out-Null
-        } else {
-            Set-ItemProperty HKLM:\System\CurrentControlSet\Services\NTDS\Parameters -Name "Allow System Only Change" -Value $valueData | Out-Null
-        }
-
-        # Restart the NTDS service. Use a reboot on older OS where the service does not exist.
+        New-ItemProperty HKLM:\System\CurrentControlSet\Services\NTDS\Parameters -Name "Allow System Only Change" -Value $valueData -PropertyType DWORD | Out-Null
+        Set-ItemProperty HKLM:\System\CurrentControlSet\Services\NTDS\Parameters -Name "Allow System Only Change" -Value $valueData | Out-Null
         If (Get-Service NTDS -ErrorAction SilentlyContinue) {
             Write-Warning "You must restart the Directory Service to coninue..."
             Restart-Service NTDS -Confirm:$true
-        } Else {
             Write-Warning "You must reboot the server to coninue..."
             Restart-Computer localhost -Confirm:$true
-        }
+
 
 #>

@@ -140,7 +140,7 @@ Describe "Unit testing Start functions for Invoke-DevOps" -Tags "Unit" {
                                 Assert-MockCalled -CommandName Start-DCImport -Exactly 1 -Scope Context
                             }
                             It "Start-GPOImport is called in $_" {
-                                Assert-MockCalled -CommandName Start-GPOImport -Exactly 1  -Scope Context
+                                Assert-MockCalled -CommandName Start-GPOImport -Exactly 1 -Scope Context
                             }
 
                     }
@@ -189,8 +189,11 @@ Describe "Unit testing Start functions for Invoke-DevOps" -Tags "Unit" {
                             "Get-UserVHDFile"
                             )
                             $functions | ForEach-Object {
-                                It "the $_ function does not get called in the default block" {
+                                It "the $_ function does not get called in the default block scope:it" {
                                     Assert-MockCalled -CommandName $_ -Exactly 0 -Scope It
+                                }
+                                It "the $_ function does not get called in the default block scope:context" {
+                                    Assert-MockCalled -CommandName $_ -Exactly 0 -Scope Context
                                 }
                             }
 

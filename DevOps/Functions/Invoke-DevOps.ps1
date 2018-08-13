@@ -25,14 +25,14 @@ Function Invoke-DevOps {
             #Imports
             Start-DCImport -Path $Path -DestDomain $DestinationDomain -DestServer $DestinationServer -CSVPath $CSVPath
             Start-GPOImport -Path $Path -DestDomain $DestinationDomain -DestServer $DestinationServer -BackupPath $BackupPath -MigTableCSVPath $CSVPath -CopyACL
-
+            Break
         }
         "Export"{
             $DisplayName = Get-GPO -All -Domain $SrceDomain -Server $SrceServer | Select-Object DisplayName
             #Exports
             Start-DCExport -Path $path
             Start-GPOExport -SrceDomain $SrceDomain -SrceServer $SrceServer -DisplayName $DisplayName -Path $Path
-
+            Break
         }
         "Get"{
             #Gets
@@ -41,7 +41,7 @@ Function Invoke-DevOps {
             Get-OpenFiles -DestServer FileServer01 #-search data
             Get-UsersInOU -ou $company
             Get-UserVHDFile
-
+            Break
         }
         default{
             "Nothing was input."

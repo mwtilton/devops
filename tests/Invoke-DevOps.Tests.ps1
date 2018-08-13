@@ -112,32 +112,90 @@ Describe "Unit testing Start functions for Invoke-DevOps" -Tags "Unit" {
         Mock Get-UsersInOU {}
         Mock Get-UserVHDFile {}
 
-        $result = Invoke-DevOps -Job Import
         It "should have an import csv" {
             "TestDrive:\Desktop\WorkingFolder\Import.csv" | Should Exist
         }
         It "does not throw when invoked" {
             { $result } | Should Not throw
         }
-        $functions = @(
-            "Get-GPO",`
-            "Start-DCExport",`
-            "Start-DCImport",`
-            "Start-GPOExport",`
-            "Start-GPOImport",`
-            "Get-FilesFolders",`
-            "Get-FileShares",`
-            "Get-OpenFiles",`
-            "Get-UsersInOU",`
-            "Get-UserVHDFile"
-        )
-        $functions | ForEach-Object {
 
-            It "the $_ function gets called" {
-                Assert-MockCalled -CommandName $_ -Exactly 1
+        $jobs = "import","Export","get"
+        $jobs | ForEach-Object {
+            $result = Invoke-DevOps -Job $_
+
+            switch ($_) {
+                "Import" {
+
+                    It "Start-DCImport is called in $_" {
+                        Assert-MockCalled -CommandName Start-DCImport -Exactly 1
+                    }
+                    It "Start-GPOImport is called in $_" {
+                        Assert-MockCalled -CommandName Start-GPOImport -Exactly 1
+                    }
+
+                }
+                "Export"{
+                    It "Get-GPO is called in $_" {
+                        Assert-MockCalled -CommandName Get-GPO -Exactly 1
+                    }
+                    It "Start-DCExport is called in $_" {
+                        Assert-MockCalled -CommandName Start-DCExport -Exactly 1
+                    }
+                    It "Start-GPOExport is called in $_" {
+                        Assert-MockCalled -CommandName Start-GPOExport -Exactly 1
+                    }
+
+                }
+                "Get"{
+                    It "Get-FilesFolders is called in $_" {
+                        Assert-MockCalled -CommandName Get-FilesFolders -Exactly 1
+                    }
+                    It "Get-FileShares is called in $_" {
+                        Assert-MockCalled -CommandName Get-FileShares -Exactly 1
+                    }
+                    It "Get-OpenFiles is called in $_" {
+                        Assert-MockCalled -CommandName Get-OpenFiles -Exactly 1
+                    }
+                    It "Get-UsersInOU is called in $_" {
+                        Assert-MockCalled -CommandName Get-UsersInOU -Exactly 1
+                    }
+                    It "Get-UserVHDFile is called in $_" {
+                        Assert-MockCalled -CommandName Get-UserVHDFile -Exactly 1
+                    }
+
+                }
+                Default {
+                    It "" {
+
+                    }
+                }
             }
 
         }
 
+
+
+
+
+
+        <#
+
+$functions = @(
+                "",`
+                "",`
+                "",`
+                "",`
+                "Start-GPOImport",`
+
+            )
+
+            It "the $_ function gets called" {
+
+                Assert-MockCalled -CommandName $_ -Exactly 1
+            }
+
+
+        }
+        #>
     }
 }

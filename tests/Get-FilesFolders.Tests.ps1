@@ -13,7 +13,7 @@ Describe "Get-FilesFolders" -Tags "UNIT" {
 
     }
     Context "Get-Acl Unit Tests" {
-        Mock Get-Acl -MockWith {"c:\"}
+        Mock Get-Acl {}
         $acl = Get-Acl
         It "gets the acl and does not throw" {
             {$acl} | Should Not throw

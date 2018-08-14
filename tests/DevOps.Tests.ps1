@@ -126,7 +126,7 @@ Describe "Unit Testing for Call file" -Tags "CALL"{
             "TestDrive:\Desktop\WorkingFolder" | Should Exist
         }
         It "has the backup GPO folder" {
-            "TestDrive:\Desktop\WorkingFolder\GPOBackup"
+            "TestDrive:\Desktop\WorkingFolder\GPOBackup" | Should Exist
         }
     }
 

@@ -23,7 +23,6 @@ function Export-GPPermission {
     )
     $GPO_ACEs = @()
 
-
     If ($All) {
         $DisplayName = Get-GPO -Server $SrceServer -Domain $SrceDomain -All |
             Select-Object -ExpandProperty DisplayName

@@ -1,6 +1,6 @@
 Import-Module "$env:WORKINGFOLDER\DevOps\DevOps\Functions\Export-Ous.ps1" -Force -ErrorAction Stop
 
-Describe "Export-Ous" {
+Describe "Export-Ous" -Tags "UNIT" {
     $testPath = "$testdrive\testfile.psm1","$testdrive\testfile.psm1"
     $testPath | ForEach-Object {
         Set-Content $testPath -value "my test text."
@@ -8,11 +8,8 @@ Describe "Export-Ous" {
 
     Context "Mocking getting the Organizational Units" {
         Mock Get-ADOrganizationalUnit {return $true} -ParameterFilter {$filter -eq "Name -like 'OU=DEMOCLOUD,DC=DEMOCLOUD,DC=LOCAL'"}
-        It "should not be null" {
-            {Get-ADOrganizationalUnit -Filter }| Should not be $null
-        }
-        It "should not be empty" {
-            {Get-ADOrganizationalUnit -Filter}| Should not be ""
+        It "should not be null or empty" {
+            {Get-ADOrganizationalUnit -Filter }| Should Not BeNullOrEmpty
         }
         It "should not throw with wildcard" {
             {Get-ADOrganizationalUnit -Filter *}| Should not throw

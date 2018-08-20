@@ -5,7 +5,7 @@ Describe "Export-GPPermission" -Tags "UNIT" {
     Setup -Dir "Desktop\WorkingFolder"
 
     $paramargs = @{
-        DisplayName = "Accounting"
+        #DisplayName = "Accounting"
         SrceServer = "$env:COMPUTERNAME"
         SrceDomain = "$env:USERDNSDOMAIN"
         Path = "TestDrive:\Desktop\WorkingFolder"
@@ -15,7 +15,12 @@ Describe "Export-GPPermission" -Tags "UNIT" {
         $list = "Accounting","Admin"
 
         Mock Get-GPO {return $list}
-        Mock Get-ADObject -MockWith {}
+        Mock Get-ADObject {
+            $gpo = New-Object Microsoft.ActiveDirectory.Management.ADDomain Identity -Property @{
+                Identity = $GPO.Path
+                Properties = NTSecurityDescriptor
+            }
+        }
 
         It "should throw when no args are set" {
             { Export-GPPermission -ErrorAction Stop } | Should throw
@@ -23,7 +28,7 @@ Describe "Export-GPPermission" -Tags "UNIT" {
         It "throws specific exception for parameter binding exception" {
             { Export-GPPermission -ErrorAction Stop } | Should -Throw -ExceptionType ([System.Management.Automation.ParameterBindingException])
         }
-        It "thows specific exception for identity issue" {
+        It "should not throw for the paramargs" {
             { Export-GPPermission @paramargs -ErrorAction Stop } | Should -Not -Throw -ExceptionType ([System.Management.Automation.ParameterBindingException])
         }
     }

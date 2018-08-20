@@ -49,8 +49,5 @@ Describe "Export-FileShares" -Tags "UNIT" {
         It "should still append the csv" {
             Assert-MockCalled -CommandName Export-Csv -Exactly 1 -Scope Context
         }
-        It "should not be null" {
-            $error.Count | Should Be 0
-        }
     }
 }

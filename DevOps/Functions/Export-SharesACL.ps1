@@ -4,7 +4,7 @@ Function Export-SharesACL {
         [parameter(Mandatory=$true)][string]$csv,
         [parameter(Mandatory=$true)][string]$path
     )
-
+    #csv is the exported file shares from Export-FileShares
     $importCSV = Import-CSV $csv
     $importCSV | Foreach-object {
         Try{

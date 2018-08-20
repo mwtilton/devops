@@ -1,10 +1,8 @@
 Import-Module "$env:WORKINGFOLDER\DevOps\DevOps\Functions\Export-Ous.ps1" -Force -ErrorAction Stop
 
 Describe "Export-Ous" -Tags "UNIT" {
-    $testPath = "$testdrive\testfile.psm1","$testdrive\testfile.psm1"
-    $testPath | ForEach-Object {
-        Set-Content $testPath -value "my test text."
-    }
+    Setup -Dir "Desktop\WorkingFolder"
+
 
     Context "Mocking getting the Organizational Units" {
         Mock Get-ADOrganizationalUnit {return $true} -ParameterFilter {$filter -eq "Name -like 'OU=DEMOCLOUD,DC=DEMOCLOUD,DC=LOCAL'"}
@@ -19,10 +17,10 @@ Describe "Export-Ous" -Tags "UNIT" {
         }
     }
     Context "Throwing unit tests" {
-        Mock Mock Get-ADOrganizationalUnit {return $null} -ParameterFilter {$filter -eq "Name -like 'OU=DEMOCLOUD,DC=DEMOCLOUD,DC=LOCAL'"}
+        Mock Get-ADOrganizationalUnit {return $null}
+        Export-Ous
         It "will throw" {
-            $getOU = Get-ADOrganizationalUnit -Filter "Name -like 'OU=DEMOCLOUD,DC=DEMOCLOUD,DC=LOCAL'"
-            ($getOU -eq "OU=DEMOCLOUD,DC=DEMOCLOUD,DC=LOCAL") | Should Be $true
+
         }
     }
 }

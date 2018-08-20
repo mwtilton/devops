@@ -28,11 +28,11 @@ user_region = os.getenv('OS_REGION',None)
 if(auth_username == None or auth_password == None or auth_url == None or \
    project_name == None or user_region == None or user_domain_name == None or \
    project_domain_name == None or cacert == None):
-    print "Export the Zerostack RC file, or explicitly define authentication environment variables."
+    print ("Export the Zerostack RC file, or explicitly define authentication environment variables.")
     sys.exit(1)
 
 if(user_region == None):
-    print "Add user region variable OS_REGION to the Zerostack rc file and re-export, or export OS_REGION as an environment variable."
+    print ("Add user region variable OS_REGION to the Zerostack rc file and re-export, or export OS_REGION as an environment variable.")
     sys.exit(1)
 
 #get the region ID
@@ -53,10 +53,10 @@ try:
     admin_user_id = jtoken['token']['user']['id']
     token = trequest.headers.get('X-Subject-Token')
 except Exception as e:
-    print e
+    print (e)
     sys.exit(1)
 
-print "Looking for the default image"
+print ("Looking for the default image")
 image_id = None
 try:
     send_url = baseurl + '/glance/v2/images?visibility=public'
@@ -68,11 +68,11 @@ try:
         im.append({'count':count,'imagename':image['name'],'imageid':image['id']})
         count += 1
 except Exception as e:
-    print e
+    print (e)
     sys.exit(1)
 
 for i in im:
-    print "ID: %s   Name: %s"%(i['count'],i['imagename'])
+    print ("ID: %s   Name: %s"%(i['count'],i['imagename']))
 
 try:
     imid = raw_input('Enter the ID of the image to use: ')
@@ -81,31 +81,31 @@ try:
             image_id = i['imageid']
             break
 except Exception as e:
-    print e
+    print (e)
     sys.exit(1)
 
 
 #Create a new BU
 domain_id = None
-print "\n\nCreating business unit: %s"%(zsbuname)
+print ("\n\nCreating business unit: %s"%(zsbuname))
 try:
     send_url = auth_url + '/domains'
     data = '{"domain":{"name":"%s","description":"BU created on by %s.","ldapSet":false}}'%(zsbuname,auth_username)
     r = requests.post(send_url,verify = False,data = data,headers={"content-type":"application/json","X-Auth-Token":token})
     if(r.status_code == 409):
-        print "BU %s already exists."%(zsbuname)
+        print ("BU %s already exists."%(zsbuname))
         sys.exit(1)
     j = json.loads(r.text)
     #get the domain id
     domain_id = j['domain']['id']
 except Exception as e:
-    print e
+    print (e)
     sys.exit(1)
-print "%s business unit has been created, ID: %s.\n\n"%(zsbuname,domain_id)
+print ("%s business unit has been created, ID: %s.\n\n"%(zsbuname,domain_id))
 
 #get the roles and find the Admin role ID
 admin_id = None
-print "Gathering the available roles."
+print ("Gathering the available roles.")
 try:
     send_url = auth_url + '/roles'
     r = requests.get(send_url,verify = False,headers={"content-type":"application/json","X-Auth-Token":token})
@@ -114,13 +114,13 @@ try:
         if(role['name'] == 'admin'):
             admin_id = role['id']
 except Exception as e:
-    print e
+    print (e)
     sys.exit(1)
-print "Found the admin role ID: %s\n\n"%(admin_id)
+print ("Found the admin role ID: %s\n\n"%(admin_id))
 
 
 #Create a BU admin
-print "Creating the BU Admin account for %s."%(username)
+print ("Creating the BU Admin account for %s."%(username))
 user_id = None
 try:
     send_url = auth_url + '/users'
@@ -129,12 +129,12 @@ try:
     j = json.loads(r.text)
     user_id = j['user']['id']
 except Exception as e:
-    print e
+    print (e)
     sys.exit(1)
-print "Created BU Admin with ID: %s.\n\n"%(user_id)
+print ("Created BU Admin with ID: %s.\n\n"%(user_id))
 
 #createing the control project
-print "Creating the Devops BU %s control project."%(zsbuname)
+print ("Creating the Devops BU %s control project."%(zsbuname))
 project_id = None
 try:
     send_url = 'https://console.zerostack.com/v2/clusters/%s/projects'%(region_id)
@@ -147,22 +147,22 @@ try:
     j = json.loads(r.text)
     project_id = j['id']
 except Exception as e:
-    print e
+    print (e)
     sys.exit(1)
-print "Created devops control project with ID: %s\n\n"%(project_id)
+print ("Created devops control project with ID: %s\n\n"%(project_id))
 
 #add the admin
-print "Adding the admin account to the devops control project."
+print ("Adding the admin account to the devops control project.")
 try:
     send_url = auth_url + '/projects/%s/users/%s/roles/%s'%(project_id,user_id,admin_id)
     r = requests.put(send_url,verify = False,headers={"content-type":"application/json","X-Auth-Token":token})
 except Exception as e:
-    print e
+    print (e)
     sys.exit(1)
-print "Admin user added.\n\n"
+print ("Admin user added.\n\n")
 
 #add the basic security group
-print "Creating a basic Security group for %s BU."%(zsbuname)
+print ("Creating a basic Security group for %s BU."%(zsbuname))
 secgroup_id = None
 try:
     send_url = baseurl + '/neutron/v2.0/security-groups'
@@ -171,9 +171,9 @@ try:
     j = json.loads(r.text)
     secgroup_id = j['security_group']['id']
 except Exception as e:
-    print e
+    print (e)
     sys.exit(1)
-print "Created the basic security group with ID: %s.\n\n"%(j['security_group']['id'])
+print ("Created the basic security group with ID: %s.\n\n"%(j['security_group']['id']))
 
 #add the ports to the security group
 ports = [{'icmp':'null'},{'tcp':'22'},{'tcp':'80'},{'tcp':'443'}]
@@ -184,12 +184,12 @@ for port in ports:
         r = requests.post(send_url,verify = False,data = data,headers={"content-type":"application/json","X-Auth-Token":token})
         j = json.loads(r.text.encode('latin-1'))
     except Exception as e:
-        print e
+        print (e)
         sys.exit(1)
-    print "Created the basic security group rule, ID: %s.\n\n"%(j['security_group_rule']['id'])
+    print ("Created the basic security group rule, ID: %s.\n\n"%(j['security_group_rule']['id']))
 
 
-print "Creating a project scoped token for %s."%(username)
+print ("Creating a project scoped token for %s."%(username))
 project_token = None
 try:
     send_url = auth_url+"/auth/tokens"
@@ -197,13 +197,13 @@ try:
     r = requests.post(send_url,verify = False,data = data,headers={"content-type":"application/json","X-Auth-Token":token})
     project_token = r.headers.get('X-Subject-Token')
 except Exception as e:
-    print e
+    print (e)
     sys.exit(1)
-print "Created project token key: %s.\n\n"%(project_token)
+print ("Created project token key: %s.\n\n"%(project_token))
 
 
 #Build the defult sec key
-print "Creating default security keys, devops_keypair, for devops project in the %s BU."%(zsbuname)
+print ("Creating default security keys, devops_keypair, for devops project in the %s BU."%(zsbuname))
 devops_key = "%s_devops_keypair"%(zsbuname)
 try:
     send_url = baseurl+"/nova/v2/%s/os-keypairs"%(project_id)
@@ -211,15 +211,15 @@ try:
     r = requests.post(send_url,verify = False,data = data,headers={"content-type":"application/json","X-Auth-Token":project_token})
     keyinfo = json.loads(r.text.encode('latin-1'))
 except Exception as e:
-    print e
+    print (e)
     sys.exit(1)
-print "Created the security key devops_keypair.\n\n"
+print ("Created the security key devops_keypair.\n\n")
 
 time.sleep(2)
 keypair = keyinfo['keypair']
 
 #updateing the control project
-print "Updateing the Devops BU %s control project."%(zsbuname)
+print ("Updateing the Devops BU %s control project."%(zsbuname))
 try:
    send_url = 'https://console.zerostack.com/v2/clusters/%s/projects/%s'%(region_id,project_id)
    data = '{"description":"DevOps Control Project for %s devops BU.","domain_id":"%s","name":"DvOps Control","finite_duration":false,\
@@ -231,11 +231,11 @@ try:
    j = json.loads(r.text)
    project_id = j['id']
 except Exception as e:
-    print e
+    print (e)
     sys.exit(1)
-print "Updated devops control project with ID: %s\n\n"%(project_id)
+print ("Updated devops control project with ID: %s\n\n"%(project_id))
 
-print "Creating the devops network in DevOps project."
+print ("Creating the devops network in DevOps project.")
 network_id = None
 subnet_id = None
 try:
@@ -246,9 +246,9 @@ try:
     network_id = j['id']
     subnet_id = j['subnet_details'][0]['id']
 except Exception as e:
-    print e
+    print (e)
     sys.exit(1)
-print "Created the DevOps default network, ID: %s.\n\n"%(network_id)
+print ("Created the DevOps default network, ID: %s.\n\n"%(network_id))
 
 #list the available external networks
 ext_net_id = None
@@ -260,12 +260,12 @@ try:
         if(net['provider:physical_network'] == 'external' and net['router:external'] == True and net['shared'] == True):
             ext_net_id = net['id']
 except Exception as e:
-    print e
+    print (e)
     sys.exit(1)
-print "Found external network with id: %s."%(ext_net_id)
+print ("Found external network with id: %s."%(ext_net_id))
 
 #add the basic security group
-print "Creating a router for DevOps network."
+print ("Creating a router for DevOps network.")
 router_id = None
 try:
     send_url = baseurl + '/neutron/v2.0/routers'
@@ -274,63 +274,63 @@ try:
     j = json.loads(r.text)
     router_id = j['router']['id']
 except Exception as e:
-    print e
+    print (e)
     sys.exit(1)
-print "Created the the default router.\n\n"
+print ("Created the the default router.\n\n")
 
 #add the router interface to the network subnet
-print "Adding interface to router interface"
+print ("Adding interface to router interface")
 try:
     send_url = baseurl + '/neutron/v2.0/routers/%s/add_router_interface'%(router_id)
     data = '{"subnet_id":"%s"}'%(subnet_id)
     r = requests.put(send_url,verify = False,data = data,headers={"content-type":"application/json","X-Auth-Token":project_token})
     j = json.loads(r.text)
 except Exception as e:
-    print e
+    print (e)
     sys.exit(1)
-print "Added network interface to the router, interface ID: %s\n\n"%(j['id'])
+print ("Added network interface to the router, interface ID: %s\n\n"%(j['id']))
 
 #add router gateway interface
-print "Adding gateway interface to router."
+print ("Adding gateway interface to router.")
 try:
     send_url = baseurl + '/neutron/v2.0/routers/%s'%(router_id)
     data = '{"router":{"name":"DevOpsNet-Router","external_gateway_info":{"network_id":"%s"},"admin_state_up":true}}'%(ext_net_id)
     r = requests.put(send_url,verify = False,data = data,headers={"content-type":"application/json","X-Auth-Token":project_token})
     j = json.loads(r.text)
 except Exception as e:
-    print e
+    print (e)
     sys.exit(1)
-print "Added the gateway interface to the router, ID: %s, External IP: %s.\n\n"%(j['router']['id'],j['router']['external_gateway_info']['external_fixed_ips'][0]['ip_address'])
+print ("Added the gateway interface to the router, ID: %s, External IP: %s.\n\n"%(j['router']['id'],j['router']['external_gateway_info']['external_fixed_ips'][0]['ip_address']))
 
 
-print "Updateing the network."
+print ("Updateing the network.")
 try:
     send_url = 'https://console.zerostack.com/v2/clusters/%s/networks/%s'%(region_id,network_id)
     data = '{"name":"DevOps-network","router:external":false,"admin_state_up":true,"subnets":[{"id":"%s"}],"visibility":"buShared","visibility_scope":[{"domain_id":"%s"}]}'%(subnet_id,domain_id)
     r = requests.put(send_url,verify = False,data = data,headers={"content-type":"application/json","X-Auth-Token":project_token})
     j = json.loads(r.text)
 except Exception as e:
-    print e
+    print (e)
     sys.exit(1)
-print "Updated the DevOps default network, ID: %s.\n\n"%(network_id)
+print ("Updated the DevOps default network, ID: %s.\n\n"%(network_id))
 
 control_vms = ['Ansible Control','OpenShift Control','Cloudforms']
-print "Creating control instances in DevOps Control project"
+print ("Creating control instances in DevOps Control project")
 
 for vm in control_vms:
-   print "Building %s instance."%(vm)
+   print ("Building %s instance."%(vm))
    try:
        send_url = 'https://console.zerostack.com/v2/clusters/%s/projects/%s/vm'%(region_id,project_id)
        data = '{"name":"%s","resources":{"server":{"type":"OS::Nova::Server","os_req":{"server":{"name":"%s","flavorRef":"4","block_device_mapping_v2":[{"device_type":"disk","disk_bus":"virtio","device_name":"/dev/vda","source_type":"volume","destination_type":"volume","delete_on_termination":true,"boot_index":"0","uuid":"{{.bootVol}}"}],"networks":[{"uuid":"%s"}],"security_groups":[{"name":"Basic"}],"metadata":{"created_by":"%s","owner":"DevOps Control","zs_internal_vm_ha":"false","delete_volume_on_termination":"true","isReservedFloatingIP":"false"},"user_data":"","delete_on_termination":true,"key_name":"%s"},"os:scheduler_hints":{"volume_id":"{{.bootVol}}"}}},"bootVol":{"type":"OS::Cinder::Volume","os_req":{"volume":{"availability_zone":null,"description":null,"size":20,"name":"bootVolume-ansible","volume_type":"relhighcap_type","disk_bus":"virtio","device_type":"disk","source_type":"image","device_name":"/dev/vda","bootable":true,"tenant_id":"%s","imageRef":"%s","enabled":true}}},"fip":{"type":"OS::Neutron::FloatingIP","os_req":{"floatingip":{"floating_network_id":"%s","tenant_id":"%s","port_id":"{{.port_id_0}}"}}}}}'%(vm,vm,network_id,username,devops_key,project_id,image_id,ext_net_id,project_id)
        r = requests.post(send_url,verify = False,data = data,headers={"content-type":"application/json","X-Auth-Token":project_token})
        #j = json.loads(r.text)
    except Exception as e:
-      print e
+      print (e)
       sys.exit(1)
-   print "Built %s with ID: %s\n\n"%(vm,r.text)
+   print ("Built %s with ID: %s\n\n"%(vm,r.text))
 
 #createing the pipeline project
-print "Creating the Devops BU %s Pipeline project."%(zsbuname)
+print ("Creating the Devops BU %s Pipeline project."%(zsbuname))
 pipe_project_id = None
 try:
     send_url = 'https://console.zerostack.com/v2/clusters/%s/projects'%(region_id)
@@ -343,11 +343,11 @@ try:
     j = json.loads(r.text)
     pipe_project_id = j['id']
 except Exception as e:
-    print e
+    print (e)
     sys.exit(1)
-print "Created build pipeline project with ID: %s\n\n"%(project_id)
+print ("Created build pipeline project with ID: %s\n\n"%(project_id))
 
-print "Creating a pipeline project scoped token for %s."%(username)
+print ("Creating a pipeline project scoped token for %s."%(username))
 pipe_token = None
 try:
     send_url = auth_url+"/auth/tokens"
@@ -355,12 +355,12 @@ try:
     r = requests.post(send_url,verify = False,data = data,headers={"content-type":"application/json","X-Auth-Token":token})
     pipe_token = r.headers.get('X-Subject-Token')
 except Exception as e:
-    print e
+    print (e)
     sys.exit(1)
-print "Created pipeline project token key: %s.\n\n"%(pipe_token)
+print ("Created pipeline project token key: %s.\n\n"%(pipe_token))
 
 #add the basic security group
-print "Creating a basic Security group for pipeline project."
+print ("Creating a basic Security group for pipeline project.")
 pipe_secgroup_id = None
 try:
     send_url = baseurl + '/neutron/v2.0/security-groups'
@@ -369,9 +369,9 @@ try:
     j = json.loads(r.text)
     pipe_secgroup_id = j['security_group']['id']
 except Exception as e:
-    print e
+    print (e)
     sys.exit(1)
-print "Created the basic security group with ID: %s.\n\n"%(j['security_group']['id'])
+print ("Created the basic security group with ID: %s.\n\n"%(j['security_group']['id']))
 
 #add the ports to the security group
 ports = [{'icmp':'null'},{'tcp':'22'},{'tcp':'80'},{'tcp':'443'}]
@@ -382,9 +382,9 @@ for port in ports:
         r = requests.post(send_url,verify = False,data = data,headers={"content-type":"application/json","X-Auth-Token":pipe_token})
         j = json.loads(r.text.encode('latin-1'))
     except Exception as e:
-        print e
+        print (e)
         sys.exit(1)
-    print "Created the basic security group rule, ID: %s.\n\n"%(j['security_group_rule']['id'])
+    print ("Created the basic security group rule, ID: %s.\n\n"%(j['security_group_rule']['id']))
 
 
 gitjson = {"template": """heat_template_version: 2013-05-23\n\ndescription: GitLab Community Edition Single instance server\n\nparameter_groups:\n - label: GitLab CE server parameters\n   description: GitLab CE server Parameters\n   parameters:\n        - image\n        - flavor\n        - boot_volume_type\n        - boot_volume_size\n        - key_name\n        - private_network\n        - public_network\n\nparameters:\n  image:\n    type: string\n    label: Image name or ID\n    description: Image to be used for compute instance\n    constraints:\n      - custom_constraint: glance.image\n  \n  boot_volume_type:\n    type: string\n    default: relhighcap_type\n    label: Boot volume type\n    description: Boot volume type\n    constraints:\n      - custom_constraint: cinder.vtype\n        description: Volume type must be relhighcap_type or highiops_type or relhighiops_type or highcap_type\n  \n  boot_volume_size:\n    type: number\n    label: Bootable Volume Size (GB)\n    description: Bootable Volume Size in GB\n    default: 40\n\n  flavor:\n    type: string\n    label: Flavor\n    description: Type of instance (flavor) to be used\n    default: m1.large\n    constraints:\n      - custom_constraint: nova.flavor\n\n  private_network:\n    type: string\n    label: Private network name or ID\n    description: Network to attach instance to.\n    constraints:\n      - custom_constraint: neutron.network\n\n  key_name:\n    type: string\n    description: SSH key pair\n    constraints:\n      - custom_constraint: nova.keypair\n\n  public_network:\n    type: string\n    label: Public network name or ID\n    description: External network name which this instance will be attached to\n    constraints:\n      - custom_constraint: neutron.network\n\n\nresources:\n  cinder_volume:\n    type: OS::Cinder::Volume\n    properties:\n      size: { get_param: boot_volume_size }\n      volume_type: { get_param: boot_volume_type }\n      image: {get_param: image }\n\n  stack-string:\n    type: OS::Heat::RandomString\n    properties:\n      length: 6\n      sequence: lettersdigits\n\n  secgroup:\n    type: OS::Neutron::SecurityGroup\n    properties:\n      description: Open icmp ssh https ports\n      name:\n        str_replace:\n          template: gitlab-$stackstr-secgroup\n          params:\n            $stackstr:\n              get_attr:\n                - stack-string\n                - value\n      rules:\n        - protocol: tcp\n          port_range_min: 443\n          port_range_max: 443\n        - protocol: icmp\n        - protocol: tcp\n          port_range_min: 22\n          port_range_max: 22\n        - protocol: tcp\n          port_range_min: 80\n          port_range_max: 80\n\n  my_port:\n    type: OS::Neutron::Port\n    properties:\n      network: { get_param: private_network }\n      security_groups:\n        - { get_resource: secgroup }\n\n  my_instance:\n    type: OS::Nova::Server\n    depends_on: [ cinder_volume, floating_ip ]\n    properties:\n      block_device_mapping: [{ device_name: "vda", volume_id : { get_resource : cinder_volume }, delete_on_termination : "true" }]\n      flavor: { get_param: flavor }\n      key_name: { get_param: key_name }\n      networks:\n        - port: { get_resource: my_port }\n      user_data_format: RAW\n      user_data:\n        str_replace:\n                params:\n                        wc_notify: { get_attr: [gitlab_wait_handle, curl_cli] }\n                        $floating_ip: { get_attr: [floating_ip, floating_ip_address] }\n                template: |\n                        #!/bin/sh\n                        echo "found floating ip: $floating_ip"\n                        wc_notify --data-binary '{"status": "SUCCESS", "reason": "Setting up Gitlab packages."}'\n                        # MY_OS=`awk 'NR==1{print $1}' /etc/issue`\n                        # MY_OS=`awk 'NR==1{print $1}' /etc/*-release`\n                        # MY_OS=`cat /etc/*-release|grep "^ID="|cut -f 2 -d'='`\n                        MY_OS=`cat /etc/*-release|grep "^ID="|cut -f 2 -d'='|sed -e 's/^"//'  -e 's/"$//'`\n                        declare -i centos_count=0\n                        centos_count=`grep -ri "centos" /etc/*-release|wc -l`\n                        declare -i ubuntu_count=0\n                        ubuntu_count=`grep -ri "ubuntu" /etc/*-release|wc -l`\n                        if [ $ubuntu_count -gt 0 ]; then\n                                set -e -x\n                                apt-get --yes --quiet update\n                                apt-get --yes --quiet install git\n                                apt-get --yes --quiet install curl openssh-server ca-certificates\n                                curl -sS https://s3.amazonaws.com/zapps.zerostack.com/binaries/script.deb.sh | sudo bash #https://packages.gitlab.com/install/repositories/gitlab/gitlab-ce/script.deb.sh\n                                apt-get --yes --quiet install gitlab-ce\n                                sed -i "s/^external_url .*/external_url \\"http:\\/\\/$floating_ip\\"/g" /etc/gitlab/gitlab.rb\n                                gitlab-ctl reconfigure\n                                gitlab-ctl restart\n                                wc_notify --data-binary '{"status": "SUCCESS", "reason": "Gitlab setup successfully."}'\n                        elif [ $centos_count -gt 0 ]; then\n                                #disable selinux and iptables\n                                service iptables stop\n                                chkconfig iptables off\n                                sed -i 's/=enforcing/=disabled/' /etc/sysconfig/selinux\n                                setenforce 0\n                                yum -"y" install curl policycoreutils openssh-server openssh-clients\n                                yum -"y" install postfix\n                                curl -sS https://packages.gitlab.com/install/repositories/gitlab/gitlab-ce/script.rpm.sh | bash\n                                yum -"y" install gitlab-ce\n                                sed -i "s/^external_url .*/external_url \\"http:\\/\\/$floating_ip\\"/g" /etc/gitlab/gitlab.rb\n                                gitlab-ctl reconfigure\n                                gitlab-ctl restart\n                                wc_notify --data-binary '{"status": "SUCCESS", "reason": "Gitlab setup successfully."}'\n                        else\n                                wc_notify --data-binary '{"status": "FAILURE", "reason": "Operating system not supported."}'\n                        fi\n\n  floating_ip:\n    type: OS::Neutron::FloatingIP\n    properties:\n      floating_network: { get_param: public_network }\n\n  floating_ip_assoc:\n    type: OS::Neutron::FloatingIPAssociation\n    properties:\n      floatingip_id: { get_resource: floating_ip }\n      port_id: { get_resource: my_port }\n\n  gitlab_wait:\n    type: "OS::Heat::WaitCondition"\n    depends_on: my_instance\n    properties:\n      handle:\n        get_resource: gitlab_wait_handle\n      timeout: 1800\n      count: 2\n\n  gitlab_wait_handle:\n    type: "OS::Heat::WaitConditionHandle"\n\noutputs:\n  instance_ip:\n    description: Gitlab Web URL\n    value:\n        str_replace:\n                template: |\n                        http://__instance_ip\n                params:\n                        __instance_ip: { get_attr: [floating_ip, floating_ip_address] }\n  instance_name:\n    description: Gitlab Instance name\n    value: { get_attr: [my_instance, name] }\n""",
@@ -397,19 +397,19 @@ gitjson = json.dumps(gitjson['template'])
 jenkinsjson = json.dumps(jenkinsjson['template'])
 
 #get the app stack templates
-print "Gathering the templates"
+print ("Gathering the templates")
 try:
     send_url = 'https://console.zerostack.com/v2/clusters/%s/app_templates'%(region_id)
     r = requests.get(send_url,verify = False,headers={"content-type":"application/json","X-Auth-Token":pipe_token})
     templates = json.loads(r.text)
 except Exception as e:
-    print e
+    print (e)
     sys.exit(1)
 
 for template in templates:
     if template['name'] == 'GitLab':
         #print template['template_content']
-        print "Creating GitLab code repository."
+        print ("Creating GitLab code repository.")
         try:
             send_url = baseurl + '/heat/v1/%s/stacks'%(pipe_project_id)
 
@@ -426,13 +426,13 @@ for template in templates:
             r = requests.post(send_url,verify = False,data = data,headers={"content-type":"application/json","X-Auth-Token":pipe_token,"ZS-Template-Id":template['id']})
             j = json.loads(r.text)
         except Exception as e:
-            print e
+            print (e)
             sys.exit(1)
 
-        print "Building the Gitlab code repository, ID: %s\n"%(j['stack']['id'])
+        print ("Building the Gitlab code repository, ID: %s\n"%(j['stack']['id']))
 
     if template['name'] == 'Jenkins':
-        print "Creating Jenkins CI/CD piplein tool."
+        print ("Creating Jenkins CI/CD piplein tool.")
         try:
             send_url = baseurl + '/heat/v1/%s/stacks'%(pipe_project_id)
             data = '{"tenant_id":"%s",\
@@ -452,29 +452,29 @@ for template in templates:
             r = requests.post(send_url,verify = False,data = data,headers={"content-type":"application/json","X-Auth-Token":pipe_token,"ZS-Template-Id":template['id']})
             j = json.loads(r.text)
         except Exception as e:
-            print e
+            print (e)
             sys.exit(1)
-        print "Building the Jenkins CI/CD toolset, ID: %s\n"%(j['stack']['id'])
+        print ("Building the Jenkins CI/CD toolset, ID: %s\n"%(j['stack']['id']))
 
 pipeline_vms = ['Container Repo']
-print "Creating build pipeline support instances in Pipeline project"
+print ("Creating build pipeline support instances in Pipeline project")
 
 for vm in pipeline_vms:
-   print "Building %s instance."%(vm)
+   print ("Building %s instance."%(vm))
    try:
        send_url = 'https://console.zerostack.com/v2/clusters/%s/projects/%s/vm'%(region_id,pipe_project_id)
        data = '{"name":"%s","resources":{"server":{"type":"OS::Nova::Server","os_req":{"server":{"name":"%s","flavorRef":"4","block_device_mapping_v2":[{"device_type":"disk","disk_bus":"virtio","device_name":"/dev/vda","source_type":"volume","destination_type":"volume","delete_on_termination":true,"boot_index":"0","uuid":"{{.bootVol}}"}],"networks":[{"uuid":"%s"}],"security_groups":[{"name":"Basic"}],"metadata":{"created_by":"%s","owner":"DevOps Control","zs_internal_vm_ha":"false","delete_volume_on_termination":"true","isReservedFloatingIP":"false"},"user_data":"","delete_on_termination":true,"key_name":"%s"},"os:scheduler_hints":{"volume_id":"{{.bootVol}}"}}},"bootVol":{"type":"OS::Cinder::Volume","os_req":{"volume":{"availability_zone":null,"description":null,"size":20,"name":"bootVolume-ansible","volume_type":"relhighcap_type","disk_bus":"virtio","device_type":"disk","source_type":"image","device_name":"/dev/vda","bootable":true,"tenant_id":"%s","imageRef":"%s","enabled":true}}},"fip":{"type":"OS::Neutron::FloatingIP","os_req":{"floatingip":{"floating_network_id":"%s","tenant_id":"%s","port_id":"{{.port_id_0}}"}}}}}'%(vm,vm,network_id,username,devops_key,pipe_project_id,image_id,ext_net_id,pipe_project_id)
        r = requests.post(send_url,verify = False,data = data,headers={"content-type":"application/json","X-Auth-Token":pipe_token})
        #j = json.loads(r.text)
    except Exception as e:
-      print e
+      print (e)
       sys.exit(1)
-   print "Built %s with ID: %s\n\n"%(vm,r.text)
+   print ("Built %s with ID: %s\n\n"%(vm,r.text))
 
 #build all of the other devops projects
 projects = ['Blue','Green','Canary','Development','TestQA']
 for project in projects:
-    print "Creating the Devops BU %s %s project."%(zsbuname,project)
+    print ("Creating the Devops BU %s %s project."%(zsbuname,project))
     project_id = None
     try:
         send_url = 'https://console.zerostack.com/v2/clusters/%s/projects'%(region_id)
@@ -487,22 +487,22 @@ for project in projects:
         j = json.loads(r.text)
         project_id = j['id']
     except Exception as e:
-        print e
+        print (e)
         sys.exit(1)
-    print "Created control project with ID: %s\n\n"%(project_id)
+    print ("Created control project with ID: %s\n\n"%(project_id))
 
     #add the admin
-    print "Adding the admin account to the devops control project."
+    print ("Adding the admin account to the devops control project.")
     try:
         send_url = auth_url + '/projects/%s/users/%s/roles/%s'%(project_id,user_id,admin_id)
         r = requests.put(send_url,verify = False,headers={"content-type":"application/json","X-Auth-Token":token})
     except Exception as e:
-        print e
+        print (e)
         sys.exit(1)
-    print "Admin user added.\n\n"
+    print ("Admin user added.\n\n")
 
     #add the basic security group
-    print "Creating a basic Security group for %s BU."%(zsbuname)
+    print ("Creating a basic Security group for %s BU."%(zsbuname))
     secgroup_id = None
     try:
         send_url = baseurl + '/neutron/v2.0/security-groups'
@@ -511,9 +511,9 @@ for project in projects:
         j = json.loads(r.text)
         secgroup_id = j['security_group']['id']
     except Exception as e:
-        print e
+        print (e)
         sys.exit(1)
-    print "Created the basic security group with ID: %s.\n\n"%(j['security_group']['id'])
+    print ("Created the basic security group with ID: %s.\n\n"%(j['security_group']['id']))
 
     #add the ports to the security group
     ports = [{'icmp':'null'},{'tcp':'22'},{'tcp':'80'},{'tcp':'443'}]
@@ -524,11 +524,11 @@ for project in projects:
             r = requests.post(send_url,verify = False,data = data,headers={"content-type":"application/json","X-Auth-Token":token})
             j = json.loads(r.text.encode('latin-1'))
         except Exception as e:
-            print e
+            print (e)
             sys.exit(1)
-        print "Created the basic security group rule, ID: %s.\n\n"%(j['security_group_rule']['id'])
+        print ("Created the basic security group rule, ID: %s.\n\n"%(j['security_group_rule']['id']))
 
-    print "Creating a %s scoped token for %s."%(project,username)
+    print ("Creating a %s scoped token for %s."%(project,username))
     project_token = None
     try:
         send_url = auth_url+"/auth/tokens"
@@ -536,17 +536,17 @@ for project in projects:
         r = requests.post(send_url,verify = False,data = data,headers={"content-type":"application/json","X-Auth-Token":token})
         project_token = r.headers.get('X-Subject-Token')
     except Exception as e:
-        print e
+        print (e)
         sys.exit(1)
-    print "Created project token key: %s.\n\n"%(project_token)
+    print ("Created project token key: %s.\n\n"%(project_token))
 
-    print "Building %s instance."%(project)
+    print ("Building %s instance."%(project))
     try:
         send_url = 'https://console.zerostack.com/v2/clusters/%s/projects/%s/vm'%(region_id,project_id)
         data = '{"name":"%s","resources":{"server":{"type":"OS::Nova::Server","os_req":{"server":{"name":"%s","flavorRef":"4","block_device_mapping_v2":[{"device_type":"disk","disk_bus":"virtio","device_name":"/dev/vda","source_type":"volume","destination_type":"volume","delete_on_termination":true,"boot_index":"0","uuid":"{{.bootVol}}"}],"networks":[{"uuid":"%s"}],"security_groups":[{"name":"Basic"}],"metadata":{"created_by":"%s","owner":"DevOps Control","zs_internal_vm_ha":"false","delete_volume_on_termination":"true","isReservedFloatingIP":"false"},"user_data":"","delete_on_termination":true,"key_name":"%s"},"os:scheduler_hints":{"volume_id":"{{.bootVol}}"}}},"bootVol":{"type":"OS::Cinder::Volume","os_req":{"volume":{"availability_zone":null,"description":null,"size":20,"name":"bootVolume-ansible","volume_type":"relhighcap_type","disk_bus":"virtio","device_type":"disk","source_type":"image","device_name":"/dev/vda","bootable":true,"tenant_id":"%s","imageRef":"%s","enabled":true}}},"fip":{"type":"OS::Neutron::FloatingIP","os_req":{"floatingip":{"floating_network_id":"%s","tenant_id":"%s","port_id":"{{.port_id_0}}"}}}}}'%(project,project,network_id,username,devops_key,project_id,image_id,ext_net_id,project_id)
         r = requests.post(send_url,verify = False,data = data,headers={"content-type":"application/json","X-Auth-Token":project_token})
         #j = json.loads(r.text)
     except Exception as e:
-       print e
+       print (e)
        sys.exit(1)
-    print "Built %s instance with ID: %s\n\n"%(project,r.text)
+    print ("Built %s instance with ID: %s\n\n"%(project,r.text))

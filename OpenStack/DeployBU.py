@@ -10,10 +10,10 @@ import urllib3
 import time
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
-zsbuname = raw_input("Please enter a Business Unit name: ")
-username = raw_input("Please enter a Business Unit Admin name: ")
-password = raw_input("Please enter the admin password, CAUTION: This is in plain text: ")
-email = raw_input("Please enter the BU admin email: ")
+zsbuname = input("Please enter a Business Unit name: ")
+username = input("Please enter a Business Unit Admin name: ")
+password = input("Please enter the admin password, CAUTION: This is in plain text: ")
+email = input("Please enter the BU admin email: ")
 #imagename = raw_input("Please enter a valid OS image name from your image library: ")
 
 auth_username = os.getenv('OS_USERNAME',None)

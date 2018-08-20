@@ -14,7 +14,7 @@ urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 zsbuname = input("Please enter a Business Unit name: ")
 username = input("Please enter a Business Unit Admin name: ")
-password = getpass.getpass("Please enter the admin password, CAUTION: This is in plain text: ")
+password = getpass.getpass("Please enter the admin password: ")
 email = input("Please enter the BU admin email: ")
 #imagename = raw_input("Please enter a valid OS image name from your image library: ")
 
@@ -46,6 +46,7 @@ region_id = regionsplit[6]
 baseurl = auth_url[:-12]
 
 #get the login token
+print ("Attempting to get Token")
 try:
     body = '{"auth":{"identity":{"methods":["password"],"password":{"user":{"domain":{"name":"%s"},"name":"%s","password":"%s"}}},"scope":{"domain":{"name":"%s"}}}}' \
            %(project_domain_name,auth_username,auth_password,project_domain_name)
@@ -56,7 +57,7 @@ try:
     admin_user_id = jtoken['token']['user']['id']
     token = trequest.headers.get('X-Subject-Token')
 except Exception as e:
-    print ("There was a Login Token Exception: " + e)
+    print (e)
     sys.exit(1)
 
 print ("Looking for the default image")

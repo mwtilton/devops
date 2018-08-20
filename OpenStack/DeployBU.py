@@ -8,11 +8,13 @@ import json
 import pprint
 import urllib3
 import time
+import getpass
+
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 zsbuname = input("Please enter a Business Unit name: ")
 username = input("Please enter a Business Unit Admin name: ")
-password = input("Please enter the admin password, CAUTION: This is in plain text: ")
+password = getpass.getpass("Please enter the admin password, CAUTION: This is in plain text: ")
 email = input("Please enter the BU admin email: ")
 #imagename = raw_input("Please enter a valid OS image name from your image library: ")
 

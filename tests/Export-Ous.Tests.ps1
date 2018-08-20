@@ -24,13 +24,19 @@ Describe "Export-Ous" -Tags "UNIT" {
     Context "Mocking unit tests" {
         Mock Get-ADOrganizationalUnit {return @{Name = "DemoCloud"}}
         Mock Export-Csv {return $true}
-
+        Mock Import-Csv {}
         Export-Ous -SrceDomain $env:USERDOMAIN -Path $path
         It "has the workingfolder" {
             "TestDrive:\Desktop\WorkingFolder" | Should Exist
         }
         It "Calls the Get-ADOU one time" {
             Assert-MockCalled -CommandName Get-ADOrganizationalUnit -Exactly 1 -Scope Context
+        }
+        It "shows the OU's" {
+            Assert-MockCalled -CommandName Import-Csv -Exactly 1 -Scope Context
+        }
+        It "exports to a csv" {
+            Assert-MockCalled -CommandName Export-Csv -Exactly 1 -Scope Context
         }
     }
     Context "Throwing tests" {
@@ -39,7 +45,6 @@ Describe "Export-Ous" -Tags "UNIT" {
 
         It "doesn't throw with a domain and path selected" {
             {Export-Ous -SrceDomain $env:USERDOMAIN -Path $path} | Should Not throw
-
         }
     }
 }

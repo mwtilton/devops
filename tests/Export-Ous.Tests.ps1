@@ -2,8 +2,13 @@ Import-Module "$env:WORKINGFOLDER\DevOps\DevOps\Functions\Export-Ous.ps1" -Force
 
 Describe "Export-Ous" -Tags "UNIT" {
     Setup -Dir "Desktop\WorkingFolder"
-
-
+    Setup -File "Desktop\WorkingFolder\Import.csv"
+    $path = "TestDrive:\Desktop\WorkingFolder"
+    Context "Setup Tests" {
+        It "has a valid path" {
+            $path | Should Not BeNullOrEmpty
+        }
+    }
     Context "Mocking getting the Organizational Units" {
         Mock Get-ADOrganizationalUnit {return $true} -ParameterFilter {$filter -eq "Name -like 'OU=DEMOCLOUD,DC=DEMOCLOUD,DC=LOCAL'"}
         It "should not be null or empty" {
@@ -16,10 +21,24 @@ Describe "Export-Ous" -Tags "UNIT" {
             {Get-ADOrganizationalUnit -Filter "Name -like 'OU=DEMOCLOUD,DC=DEMOCLOUD,DC=LOCAL'"} | Should not throw
         }
     }
-    Context "Throwing unit tests" {
-        Mock Get-ADOrganizationalUnit {return $null}
-        Export-Ous
-        It "will throw" {
+    Context "Mocking unit tests" {
+        Mock Get-ADOrganizationalUnit {return @{Name = "DemoCloud"}}
+        Mock Export-Csv {return $true}
+
+        Export-Ous -SrceDomain $env:USERDOMAIN -Path $path
+        It "has the workingfolder" {
+            "TestDrive:\Desktop\WorkingFolder" | Should Exist
+        }
+        It "Calls the Get-ADOU one time" {
+            Assert-MockCalled -CommandName Get-ADOrganizationalUnit -Exactly 1 -Scope Context
+        }
+    }
+    Context "Throwing tests" {
+        Mock Get-ADOrganizationalUnit {return @{Name = "DemoCloud"}}
+        Mock Export-Csv {}
+
+        It "doesn't throw with a domain and path selected" {
+            {Export-Ous -SrceDomain $env:USERDOMAIN -Path $path} | Should Not throw
 
         }
     }

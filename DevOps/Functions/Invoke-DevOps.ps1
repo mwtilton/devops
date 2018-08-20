@@ -3,6 +3,9 @@ Function Invoke-DevOps {
     Param(
         [Parameter(Mandatory=$true)]
         [String]
+        $DestServer, # Destination Server
+        [Parameter(Mandatory=$true)]
+        [String]
         $job # Job you are looking to run
     )
     #Write-Host $job
@@ -36,9 +39,8 @@ Function Invoke-DevOps {
         }
         "Get"{
             #Gets
-            Get-FilesFolders
-            Get-FileShares -DestServer FileServer01 -BackupPath $BackupPath
-            Get-OpenFiles -DestServer FileServer01 #-search data
+            Get-FileShares -DestServer $DestServer -BackupPath $BackupPath
+            Get-OpenFiles -DestServer $DestServer #-search data
             Get-UsersInOU -ou $company
             Get-UserVHDFile
             Break

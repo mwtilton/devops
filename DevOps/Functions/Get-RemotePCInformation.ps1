@@ -234,9 +234,11 @@ function GetInfo{
 }
 
 #---------Start Main--------------
+<#
 $compname = $args[0]
 if($compname){CheckHost}
 else{GetCompName}
+#>
 
 
 Function Get-ComputerInfo

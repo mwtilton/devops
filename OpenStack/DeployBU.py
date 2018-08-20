@@ -75,7 +75,7 @@ for i in im:
     print ("ID: %s   Name: %s"%(i['count'],i['imagename']))
 
 try:
-    imid = raw_input('Enter the ID of the image to use: ')
+    imid = input('Enter the ID of the image to use: ')
     for i in im:
         if(i['count'] == int(imid)):
             image_id = i['imageid']

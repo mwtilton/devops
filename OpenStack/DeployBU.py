@@ -54,7 +54,7 @@ try:
     admin_user_id = jtoken['token']['user']['id']
     token = trequest.headers.get('X-Subject-Token')
 except Exception as e:
-    print (e)
+    print ("There was a Login Token Exception: " + e)
     sys.exit(1)
 
 print ("Looking for the default image")

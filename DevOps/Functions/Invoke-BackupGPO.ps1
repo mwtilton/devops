@@ -22,7 +22,7 @@ function Invoke-BackupGPO {
         $Path # Base path where backup folder will be created
     )
 
-    $BackupPath = Join-Path $Path "\GPOBackup-DemoCloud\"
+    $BackupPath = Join-Path $Path "\GPOBackup\"
     New-Item -Path $BackupPath -ItemType Directory -Force | Out-Null
 
     If ($All) {

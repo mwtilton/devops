@@ -33,7 +33,7 @@ Function Invoke-DevOps {
         "Export"{
             $DisplayName = Get-GPO -All -Domain $SrceDomain -Server $SrceServer | Select-Object DisplayName
             #Exports
-            Start-DCExport -Path $path
+            Start-DCExport -Path $path -SrceDomain $SrceDomain
             Start-GPOExport -SrceDomain $SrceDomain -SrceServer $SrceServer -DisplayName $DisplayName -Path $Path
             Break
         }

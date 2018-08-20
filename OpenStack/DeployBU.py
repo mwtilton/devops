@@ -25,6 +25,8 @@ project_domain_name = os.getenv('OS_PROJECT_DOMAIN_NAME',None)
 cacert = os.getenv('OS_CACERT',None)
 user_region = os.getenv('OS_REGION',None)
 
+print (auth_username,auth_password,auth_url,project_name,user_domain_name,project_domain_name,cacert,user_region)
+
 if(auth_username == None or auth_password == None or auth_url == None or \
    project_name == None or user_region == None or user_domain_name == None or \
    project_domain_name == None or cacert == None):

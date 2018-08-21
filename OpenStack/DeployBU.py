@@ -47,19 +47,19 @@ baseurl = auth_url[:-12]
 
 #get the login token
 print ("Attempting to get Token from \n" + baseurl)
-try:
-    body = '{"auth":{"identity":{"methods":["password"],"password":{"user":{"domain":{"name":"%s"},"name":"%s","password":"%s"}}},"scope":{"domain":{"name":"%s"}}}}' \
-           %(project_domain_name,auth_username,auth_password,project_domain_name)
-    #headers={"content-type":"application/json"}
-    token_url = auth_url+'/auth/tokens'
-    trequest = requests.post(token_url,verify = False,data = body,headers={"content-type":"application/json"})
-    jtoken = json.loads(trequest.text)
-    admin_user_id = jtoken['token']['user']['id']
-    token = trequest.headers.get('X-Subject-Token')
+#try:
+body = '{"auth":{"identity":{"methods":["password"],"password":{"user":{"domain":{"name":"%s"},"name":"%s","password":"%s"}}},"scope":{"domain":{"name":"%s"}}}}' \
+        %(project_domain_name,auth_username,auth_password,project_domain_name)
+#headers={"content-type":"application/json"}
+token_url = auth_url+'/auth/tokens'
+trequest = requests.post(token_url,verify = False,data = body,headers={"content-type":"application/json"})
+jtoken = json.loads(trequest.text)
+admin_user_id = jtoken['token']['user']['id']
+token = trequest.headers.get('X-Subject-Token')
 
-except Exception as e:
-    print (e)
-    sys.exit(1)
+#except Exception as e:
+#    print (e)
+#    sys.exit(1)
 
 
 print ("Looking for the default image")

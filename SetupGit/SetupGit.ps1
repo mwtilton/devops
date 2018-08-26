@@ -1,5 +1,7 @@
-git config --global user.name ""
-git config --global user.email ""
+$user = Read-Host "User Name"
+git config --global user.name "$user"
+$email = Read-Host "User Email"
+git config --global user.email "$email"
 
 
 git config --global alias.last "log -1 HEAD"

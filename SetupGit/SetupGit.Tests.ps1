@@ -4,9 +4,13 @@ $sut = (Split-Path -Leaf $MyInvocation.MyCommand.Path) -replace '\.Tests\.', '.'
 
 Describe "Invoke-SetupGit" {
     Context "Sets the user information"{
-        Mock Invoke-SetupGit {}
-        Mock Read-Host {} -MockWith {"JohnDoe"}
+        Mock Read-Host {}
+        
+        Invoke-SetupGit
 
+        It "calls read-host" {
+            Assert-MockCalled -CommandName read-host -Exactly 2 -Scope Context
+        }
         It "sets the user" {
             git config --get-regexp user.name | Should BeLike "*mwtilton*"
         }
@@ -25,12 +29,17 @@ Describe "Invoke-SetupGit" {
     }
     Context "Sets up the editor" {
         It "has vscode as the default editor" {
-
+            git config --get-regexp core.editor | Should BeLike "*code*"
         }
     }
     Context "Displays the new setup" {
-        It "shows end results" {
+        Mock Read-Host {}
+        Mock git {}
+        
+        Invoke-SetupGit
 
+        It "shows end results" {
+            Assert-MockCalled -CommandName git #-Exactly 2 -Scope Context
         }
     }
 }

@@ -1,2 +1,3 @@
-$projectFolder = "$env:WORKINGFOLDER\DevOps"
-Invoke-Pester $projectFolder\Tests -CodeCoverage $projectFolder\DevOps\DevOps.psm1 -tags "UNIT"
+$parent = (get-item $PSScriptRoot).FullName
+$select = "*Export-SharesACL*"
+Invoke-Pester "$parent\Tests\$select" -CodeCoverage $parent\DevOps\Functions\$select -tags "UNIT"

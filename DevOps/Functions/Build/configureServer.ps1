@@ -1,13 +1,7 @@
 <# Notes:
-
-Author - Greg Shields
-
 Goal - Configure minimal post-installation settings for a server.
-
 This script must be run after prepServer.ps1
-
 Disclaimer - This example code is provided without copyright and AS IS.  It is free for you to use and modify.
-
 #>
 
 <#
@@ -19,7 +13,7 @@ configuration configureServer
 {
     Import-DscResource -ModuleName xComputerManagement -ModuleVersion 3.2.0.0
     Import-DscResource -ModuleName xNetworking -ModuleVersion 5.4.0.0
-    Import-DSCResource -ModuleName xStorage
+    #Import-DSCResource -ModuleName xStorage
 
     Node localhost
     {

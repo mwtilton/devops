@@ -124,21 +124,12 @@ configuration buildDomainController
         }
         #>
 
-        xADGroup IT {
-            GroupName = "IT"
-            Path = "CN=Users,$($node.DomainDN)"
-            Category = "Security"
-            GroupScope = "Global"
-            MembersToInclude = "gshields", "jhelmick", "myaccount"
-            DependsOn = "[xADDomain]FirstDC"
-        }
-
         xADGroup DomainAdmins {
             GroupName = "Domain Admins"
             Path = "CN=Users,$($node.DomainDN)"
             Category = "Security"
             GroupScope = "Global"
-            MembersToInclude = "gshields", "myaccount"
+            MembersToInclude = "myaccount"
             DependsOn = "[xADDomain]FirstDC"
         }
 
@@ -147,7 +138,7 @@ configuration buildDomainController
             Path = "CN=Users,$($node.DomainDN)"
             Category = "Security"
             GroupScope = "Universal"
-            MembersToInclude = "gshields", "myaccount"
+            MembersToInclude = "myaccount"
             DependsOn = "[xADDomain]FirstDC"
         }
 
@@ -156,21 +147,8 @@ configuration buildDomainController
             Path = "CN=Users,$($node.DomainDN)"
             Category = "Security"
             GroupScope = "Universal"
-            MembersToInclude = "gshields", "myaccount"
+            MembersToInclude = "myaccount"
             DependsOn = "[xADDomain]FirstDC"
-        }
-        xWaitforDisk Disk2 {
-            DiskNumber = 2
-            RetryIntervalSec = 60
-            Count = 60
-        }
-
-        xDisk DVolume {
-            DiskNumber = 2
-            DriveLetter = 'D'
-            FSLabel = 'Data'
-            Size = 60000
-            FSFormat = NTFS
         }
     }
 }

@@ -1,20 +1,12 @@
 <# Notes:
-
-Authors: Greg Shields
-
-Goal - Configure a Nano Server.
-
 Disclaimers
-
 !!!!!!!!!!
 This script is provided primarily as an example series of cmdlets and
 is not directly intended to be run as-is.
 !!!!!!!!!!
-
 This example code is provided without copyright and AS IS.  It is free for you to use and modify.
-Note: These demos should not be run as a script. These are the commands that I use in the 
+Note: These demos should not be run as a script. These are the commands that I use in the
 demonstrations and would need to be modified for your environment.
-
 #>
 
 set-item wsman:\localhost\client\trustedhosts -value 192.168.3.112

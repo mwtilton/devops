@@ -3,6 +3,7 @@ Notes:
 The modules to be installed are versioned to protect against future breaking changes.
 This script must be run before configureServer.ps1.
 #>
+#sysprep.exe /generalize /oobe
 
 Get-PackageSource -Name PSGallery | Set-PackageSource -Trusted -Force -ForceBootstrap
 

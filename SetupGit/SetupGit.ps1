@@ -1,5 +1,5 @@
 Function Invoke-SetupGit {
-    
+
     $user = Read-Host "User Name"
     git config --global user.name "$user"
     $email = Read-Host "User Email"
@@ -12,9 +12,12 @@ Function Invoke-SetupGit {
     git config --global alias.stashes "stash list"
     git config --global alias.s "status -s"
     git config --global core.editor "code --wait --new-window"
+    git config --global credential.helper cache
 
     git config --get-regexp alias
     git config --get-regexp user
+    git config --get-regexp core.editor
+    git config --get-regexp credential
     #git log — all — grep=’commit message’
     #git config --global alias.prum "pull --rebase upstream master"
 }

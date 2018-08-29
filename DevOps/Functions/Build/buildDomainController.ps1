@@ -108,7 +108,7 @@ configuration buildDomainController
             SysvolPath = $node.SysvolPath
             DependsOn = "[WindowsFeature]ADDSInstall"
         }
-        <#
+
         xADUser myaccount {
             DomainName = $node.DomainName
             Path = "CN=Users,$($node.DomainDN)"
@@ -122,7 +122,6 @@ configuration buildDomainController
             PasswordNeverExpires = $true
             DependsOn = "[xADDomain]FirstDC"
         }
-        #>
 
         xADGroup DomainAdmins {
             GroupName = "Domain Admins"
@@ -149,25 +148,6 @@ configuration buildDomainController
             GroupScope = "Universal"
             MembersToInclude = "myaccount"
             DependsOn = "[xADDomain]FirstDC"
-        }
-        cRDSessionDeployment QuickDeployment {
-            ConnectionBroker     = $Node.NodeName
-            WebAccess            = $Node.NodeName
-            SessionHost          = $Node.NodeName
-            Credential           = $Credential
-            DependsOn            = '[WindowsFeature]FeatureRDCB', '[WindowsFeature]FeatureRDSH', '[WindowsFeature]FeatureRDWA'
-        }
-        cRDSessionHost Deployment {
-            Ensure               = 'Present'
-            ConnectionBroker     = $AllNodes.Where{$_.Role -icontains 'ConnectionBroker'}.NodeName
-            Credential           = $Credential
-            DependsOn            = '[WindowsFeature]RDS-RD-Server'
-        }
-        cRDWebAccessHost Deployment {
-            Ensure               = 'Present'
-            ConnectionBroker     = $AllNodes.Where{$_.Role -icontains 'ConnectionBroker'}.NodeName
-            Credential           = $Credential
-            DependsOn            = '[WindowsFeature] RDS-Web-Access'
         }
     }
 }

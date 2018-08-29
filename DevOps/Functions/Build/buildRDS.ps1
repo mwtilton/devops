@@ -1,14 +1,14 @@
 param (
     [string]$brokerFQDN,
     [string]$webFQDN,
-    [string]$collectionName,
+    [string]$collectionName = "",
     [string]$collectionDescription
 )
 
 $localhost = [System.Net.Dns]::GetHostByName((hostname)).HostName
 
-if (!$collectionName) {$collectionName = "Tenant Jump Box"}
-if (!$collectionDescription) {$collectionDescription = "Remote Desktop instance for accessing an isolated network environment."}
+if (!$collectionName) {$collectionName = "democloud"}
+if (!$collectionDescription) {$collectionDescription = "Remote Desktop instance for $collectionName"}
 
 Configuration RemoteDesktopSessionHost
 {
@@ -36,7 +36,6 @@ Configuration RemoteDesktopSessionHost
 
     Node "localhost"
     {
-
         LocalConfigurationManager
         {
             RebootNodeIfNeeded = $true
@@ -107,28 +106,28 @@ Configuration RemoteDesktopSessionHost
         }
         xRDSessionCollectionConfiguration CollectionConfiguration
         {
-        CollectionName = $collectionName
-        CollectionDescription = $collectionDescription
-        ConnectionBroker = if ($ConnectionBroker) {$ConnectionBroker} else {$localhost}
-        TemporaryFoldersDeletedOnExit = $false
-        SecurityLayer = "SSL"
-        DependsOn = "[xRDSessionCollection]Collection"
+            CollectionName = $collectionName
+            CollectionDescription = $collectionDescription
+            ConnectionBroker = if ($ConnectionBroker) {$ConnectionBroker} else {$localhost}
+            TemporaryFoldersDeletedOnExit = $false
+            SecurityLayer = "SSL"
+            DependsOn = "[xRDSessionCollection]Collection"
         }
         xRDRemoteApp Calc
         {
-        CollectionName = $collectionName
-        DisplayName = "Calculator"
-        FilePath = "C:\Windows\System32\calc.exe"
-        Alias = "calc"
-        DependsOn = "[xRDSessionCollection]Collection"
+            CollectionName = $collectionName
+            DisplayName = "Calculator"
+            FilePath = "C:\Windows\System32\calc.exe"
+            Alias = "calc"
+            DependsOn = "[xRDSessionCollection]Collection"
         }
         xRDRemoteApp Mstsc
         {
-        CollectionName = $collectionName
-        DisplayName = "Remote Desktop"
-        FilePath = "C:\Windows\System32\mstsc.exe"
-        Alias = "mstsc"
-        DependsOn = "[xRDSessionCollection]Collection"
+            CollectionName = $collectionName
+            DisplayName = "Remote Desktop"
+            FilePath = "C:\Windows\System32\mstsc.exe"
+            Alias = "mstsc"
+            DependsOn = "[xRDSessionCollection]Collection"
         }
     }
 }

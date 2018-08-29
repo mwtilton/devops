@@ -18,4 +18,4 @@ Function Set-UsersPassword {
 #RNG Pass
 
 #[Reflection.Assembly]::LoadWithPartialName(“System.Web”)
-#$password = [system.web.security.membership]::GeneratePassword(12,3)
+#[system.web.security.membership]::GeneratePassword(12,3)

@@ -150,6 +150,7 @@ configuration buildDomainController
             MembersToInclude = "myaccount"
             DependsOn = "[xADDomain]FirstDC"
         }
+
     }
 }
 

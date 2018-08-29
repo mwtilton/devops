@@ -1,7 +1,7 @@
 param (
-    [string]$brokerFQDN,
-    [string]$webFQDN,
-    [string]$collectionName = "",
+    [string]$brokerFQDN = "dc01.domain.local",
+    [string]$webFQDN = "dc01.domain.local",
+    [string]$collectionName = "DemoCloud",
     [string]$collectionDescription
 )
 

@@ -3,4 +3,3 @@ Get-PackageSource -Name PSGallery | Set-PackageSource -Trusted -Force -ForceBoot
 Install-PackageProvider -Name NuGet -Force
 
 Install-Module -Name xRemoteDesktopSessionHost
-

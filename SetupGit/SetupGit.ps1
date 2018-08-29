@@ -16,6 +16,8 @@ Function Invoke-SetupGit {
 
     git config --get-regexp alias
     git config --get-regexp user
+    git config --get-regexp core.editor
+    git config --get-regexp credential
     #git log — all — grep=’commit message’
     #git config --global alias.prum "pull --rebase upstream master"
 }

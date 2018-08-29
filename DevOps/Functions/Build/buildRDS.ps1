@@ -1,6 +1,6 @@
 param (
-    [string]$brokerFQDN = "dc01.domain.local",
-    [string]$webFQDN = "dc01.domain.local",
+    [string]$brokerFQDN,
+    [string]$webFQDN,
     [string]$collectionName = "DemoCloud",
     [string]$collectionDescription
 )
@@ -90,7 +90,7 @@ Configuration RemoteDesktopSessionHost
 
         xRDSessionDeployment Deployment
         {
-            SessionHost = $localhost
+            SessionHost = "APP01"
             ConnectionBroker = if ($ConnectionBroker) {$ConnectionBroker} else {$localhost}
             WebAccessServer = if ($WebAccessServer) {$WebAccessServer} else {$localhost}
             DependsOn = "[WindowsFeature]Remote-Desktop-Services", "[WindowsFeature]RDS-RD-Server"

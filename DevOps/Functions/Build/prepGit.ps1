@@ -5,7 +5,7 @@ Set-Location $gitFolder
 . .\SetupGit\SetupGit.ps1
 Invoke-SetupGit
 
-git clone "https://mwtilton@bitbucket.org/mwtilton/sm-web.git"
+git clone "https://mwtilton@bitbucket.org/mwtilton/devops.git"
 
 git branch
 

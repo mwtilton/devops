@@ -140,6 +140,6 @@ write-verbose "Web Access Server: $webFQDN"
 
 RemoteDesktopSessionHost -collectionName $collectionName -collectionDescription $collectionDescription -connectionBroker $brokerFQDN -webAccessServer $webFQDN -OutputPath .\RDSDSC\
 
-Set-DscLocalConfigurationManager -verbose -path .\RDSDSC\
+Set-DscLocalConfigurationManager -verbose -path $env:USERPROFILE\Desktop\RDSDSC\
 
-Start-DscConfiguration -wait -force -verbose -path .\RDSDSC\
+Start-DscConfiguration -wait -force -verbose -path $env:USERPROFILE\Desktop\RDSDSC\

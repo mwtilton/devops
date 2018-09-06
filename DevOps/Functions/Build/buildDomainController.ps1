@@ -62,7 +62,7 @@ configuration buildDomainController
 
         xDnsServerPrimaryZone addForwardZoneCompanyPri {
             Ensure = "Present"
-            Name = "company.pri"
+            Name = "democloud.local"
             DynamicUpdate = "NonsecureAndSecure"
             DependsOn = "[WindowsFeature]DNSInstall"
         }

@@ -20,3 +20,17 @@ $PSVersionTable > C:\logs\PSVersionTable.txt
 Compress-Archive -Path C:\logs\*.evtx,C:\logs\*.config,C:\logs\*.txt `
     -DestinationPath "C:\logs\$($env:COMPUTERNAME)_DSC_Logs.zip" -Update
 #>
+
+function Get-DSCConfig{
+    Param($computer=$env:COMPUTERNAME)
+
+    Get-CimClass -cn $computer MSFT_DSCMetaConfiguration -name root/Microsoft/Windows/DesiredStateConfiguration|
+        Select-Object -ExpandProperty CimClassProperties
+}
+
+Get-DSCConfig omega | select name
+
+
+# Servers with desktop experience
+$servers = (Get-ADComputer -properties OperatingSystem -F {OperatingSystem -like "*Server*"}|select -exp Name)
+$Servers|%{ Import-module servermanager ; $inst = ((Get-WindowsFeature -ComputerName $_ -name desktop-experience).Installed); if($inst) { write-host "Installed on $_" } }

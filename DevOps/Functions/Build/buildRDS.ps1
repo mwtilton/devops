@@ -90,7 +90,7 @@ Configuration RemoteDesktopSessionHost
 
         xRDSessionDeployment Deployment
         {
-            SessionHost = "APP01"
+            SessionHost = "APP01.democloud.local"
             ConnectionBroker = if ($ConnectionBroker) {$ConnectionBroker} else {$localhost}
             WebAccessServer = if ($WebAccessServer) {$WebAccessServer} else {$localhost}
             DependsOn = "[WindowsFeature]Remote-Desktop-Services", "[WindowsFeature]RDS-RD-Server"

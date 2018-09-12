@@ -121,6 +121,12 @@ Configuration RemoteDesktopSessionHost
             DependsOn = "[xRDSessionCollection]Collection"
         }
         <#
+        xRDLicenseConfiguration License
+        {
+            ConnectionBroker = $localhost
+            LicenseMode = PerDevice
+        }
+
         xRDRemoteApp Calc
         {
             CollectionName = $collectionName

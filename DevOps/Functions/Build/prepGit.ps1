@@ -1,23 +1,32 @@
-Set-Location $env:USERPROFILE\Documents
-$gitFolder = New-Item -ItemType Directory GitHub
-Set-Location $gitFolder
+Function Start-PrepGit {
 
-. .\SetupGit\SetupGit.ps1
-Invoke-SetupGit
+    $folder = New-Item -ItemType Directory $env:USERPROFILE\Documents\GitHub
+    Set-Location $Folder
 
-git clone "https://mwtilton@bitbucket.org/mwtilton/devops.git"
+    <#
+    #Start-Process "https://github.com/git-for-windows/git/releases/download/v2.18.0.windows.1/Git-2.18.0-64-bit.exe"
 
-git branch
+    #git clone "https://mwtilton@bitbucket.org/mwtilton/devops.git"
 
-git branch build
+    Set-Location .\Devops
 
-git branch -u origin/build
+    . .\SetupGit\SetupGit.ps1
+    Invoke-SetupGit
 
-git checkout build
+    git branch
 
-git pull
+    git branch build
 
-. ".\$gitFolder\Devops\Devops\Functions\Build\prepDomainController.ps1"
+    git branch -u origin/build
 
-Start-Process powershell_ise -ArgumentList "$gitFolder\Devops\Devops\Functions\Build\prepDomainController.ps1" -verb RunAs
-#reboot???
+    git checkout build
+
+    git pull
+
+
+    . "$gitFolder\Devops\Devops\Functions\Build\prepDomainController.ps1"
+
+    Start-Process powershell_ise -ArgumentList "$gitFolder\Devops\Devops\Functions\Build\prepDomainController.ps1" -verb RunAs
+    #reboot???
+    #>
+}

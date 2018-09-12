@@ -138,7 +138,7 @@ write-verbose "Collection Description: $collectionDescription"
 write-verbose "Connection Broker: $brokerFQDN"
 write-verbose "Web Access Server: $webFQDN"
 
-RemoteDesktopSessionHost -collectionName $collectionName -collectionDescription $collectionDescription -connectionBroker $brokerFQDN -webAccessServer $webFQDN -OutputPath .\RDSDSC\
+RemoteDesktopSessionHost -collectionName $collectionName -collectionDescription $collectionDescription -connectionBroker $brokerFQDN -webAccessServer $webFQDN -OutputPath $env:USERPROFILE\Desktop\RDSDSC\
 
 Set-DscLocalConfigurationManager -verbose -path $env:USERPROFILE\Desktop\RDSDSC\
 

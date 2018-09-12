@@ -111,6 +111,13 @@ Configuration RemoteDesktopSessionHost
             ConnectionBroker = if ($ConnectionBroker) {$ConnectionBroker} else {$localhost}
             TemporaryFoldersDeletedOnExit = $false
             SecurityLayer = "SSL"
+            <#
+                ActiveSessionLimitMin = "90"
+                UserGroup = @("Domain Admins","RD Users")
+                DiskPath = "\\fileserver\users$"
+                ClientPrinterRedirected = $true
+            #>
+
             DependsOn = "[xRDSessionCollection]Collection"
         }
         <#

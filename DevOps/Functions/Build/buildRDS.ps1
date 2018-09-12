@@ -52,13 +52,13 @@ Configuration RemoteDesktopSessionHost
             Ensure = "Present"
             Name = "RDS-RD-Server"
         }
-
+        <#
         WindowsFeature Desktop-Experience
         {
             Ensure = "Present"
             Name = "Desktop-Experience"
         }
-
+        #>
         WindowsFeature RSAT-RDS-Tools
         {
             Ensure = "Present"
@@ -113,6 +113,7 @@ Configuration RemoteDesktopSessionHost
             SecurityLayer = "SSL"
             DependsOn = "[xRDSessionCollection]Collection"
         }
+        <#
         xRDRemoteApp Calc
         {
             CollectionName = $collectionName
@@ -129,6 +130,7 @@ Configuration RemoteDesktopSessionHost
             Alias = "mstsc"
             DependsOn = "[xRDSessionCollection]Collection"
         }
+        #>
     }
 }
 

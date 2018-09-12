@@ -5,7 +5,7 @@ This script must be run before configureServer.ps1.
 #>
 #Set-Location C:\Windows\System32\Sysprep
 #sysprep.exe /generalize /oobe
-#Update-Help -ErrorAction SilentlyContinue
+Update-Help -ErrorAction SilentlyContinue
 
 Get-PackageSource -Name PSGallery | Set-PackageSource -Trusted -Force -ForceBootstrap
 

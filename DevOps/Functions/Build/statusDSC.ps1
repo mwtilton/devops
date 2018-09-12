@@ -1,5 +1,8 @@
 Get-DscConfigurationStatus -all | fl
 
+#firewall rules
+Get-NetFirewallRule *winmgmt*|select name,enabled
+
 Get-WinEvent -LogName "*DSC*" | ? {$_.leveldisplayname -notlike "*information*"} | Sort-Object -Property TimeCreated | fl | Out-File $env:USERPROFILE\Desktop\dsc.log -Force
 
 <#
@@ -34,3 +37,25 @@ Get-DSCConfig omega | select name
 # Servers with desktop experience
 $servers = (Get-ADComputer -properties OperatingSystem -F {OperatingSystem -like "*Server*"}|select -exp Name)
 $Servers|%{ Import-module servermanager ; $inst = ((Get-WindowsFeature -ComputerName $_ -name desktop-experience).Installed); if($inst) { write-host "Installed on $_" } }
+
+
+<#
+Try {
+
+    $params = @{
+        SessionHost = "APP01.democloud.local"
+        ConnectionBroker = "DC01.democloud.local"
+        WebAccessServer = "DC01.democloud.local"
+    }
+
+
+    New-RDSessionDeployment @params -Verbose
+}
+Catch {
+    # AD object not found. Warning written below.
+    $_ | fl * -force
+    $_.InvocationInfo.BoundParameters | fl * -force
+    $_.Exception
+}
+
+#>

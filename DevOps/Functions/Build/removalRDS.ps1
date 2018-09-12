@@ -43,25 +43,19 @@ Configuration RemoteDesktopSessionHost
 
         WindowsFeature Remote-Desktop-Services
         {
-            Ensure = "Present"
+            Ensure = "absent"
             Name = "Remote-Desktop-Services"
         }
 
         WindowsFeature RDS-RD-Server
         {
-            Ensure = "Present"
+            Ensure = "absent"
             Name = "RDS-RD-Server"
         }
-        <#
-        WindowsFeature Desktop-Experience
-        {
-            Ensure = "Present"
-            Name = "Desktop-Experience"
-        }
-        #>
+
         WindowsFeature RSAT-RDS-Tools
         {
-            Ensure = "Present"
+            Ensure = "absent"
             Name = "RSAT-RDS-Tools"
             IncludeAllSubFeature = $true
         }
@@ -69,7 +63,7 @@ Configuration RemoteDesktopSessionHost
         if ($localhost -eq $connectionBroker) {
             WindowsFeature RDS-Connection-Broker
             {
-                Ensure = "Present"
+                Ensure = "absent"
                 Name = "RDS-Connection-Broker"
             }
         }
@@ -77,60 +71,17 @@ Configuration RemoteDesktopSessionHost
         if ($localhost -eq $webAccessServer) {
             WindowsFeature RDS-Web-Access
             {
-                Ensure = "Present"
+                Ensure = "absent"
                 Name = "RDS-Web-Access"
             }
         }
 
         WindowsFeature RDS-Licensing
         {
-            Ensure = "Present"
+            Ensure = "absent"
             Name = "RDS-Licensing"
         }
 
-        xRDSessionDeployment Deployment
-        {
-            SessionHost = "APP01.democloud.local"
-            ConnectionBroker = if ($ConnectionBroker) {$ConnectionBroker} else {$localhost}
-            WebAccessServer = if ($WebAccessServer) {$WebAccessServer} else {$localhost}
-            DependsOn = "[WindowsFeature]Remote-Desktop-Services", "[WindowsFeature]RDS-RD-Server"
-        }
-
-        xRDSessionCollection Collection
-        {
-            CollectionName = $collectionName
-            CollectionDescription = $collectionDescription
-            SessionHost = "APP01.democloud.local"
-            ConnectionBroker = if ($ConnectionBroker) {$ConnectionBroker} else {$localhost}
-            DependsOn = "[xRDSessionDeployment]Deployment"
-        }
-        xRDSessionCollectionConfiguration CollectionConfiguration
-        {
-            CollectionName = $collectionName
-            CollectionDescription = $collectionDescription
-            ConnectionBroker = if ($ConnectionBroker) {$ConnectionBroker} else {$localhost}
-            TemporaryFoldersDeletedOnExit = $false
-            SecurityLayer = "SSL"
-            DependsOn = "[xRDSessionCollection]Collection"
-        }
-        <#
-        xRDRemoteApp Calc
-        {
-            CollectionName = $collectionName
-            DisplayName = "Calculator"
-            FilePath = "C:\Windows\System32\calc.exe"
-            Alias = "calc"
-            DependsOn = "[xRDSessionCollection]Collection"
-        }
-        xRDRemoteApp Mstsc
-        {
-            CollectionName = $collectionName
-            DisplayName = "Remote Desktop"
-            FilePath = "C:\Windows\System32\mstsc.exe"
-            Alias = "mstsc"
-            DependsOn = "[xRDSessionCollection]Collection"
-        }
-        #>
     }
 }
 

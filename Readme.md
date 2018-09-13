@@ -14,7 +14,8 @@ Authored by mwtilton
 `select disk [disk number]  
 `clean  
 `convert gpt  
-`exit  
+`exit    
+--Create administrator account  
 --Login into new VM  
 --Install Wmware tools  
 `open file explorer

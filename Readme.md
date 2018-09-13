@@ -4,10 +4,17 @@ Holder of all things DevOps related
 
 Authored by mwtilton
 
-**Fresh Template Install**
+**Fresh Template Install**  
 --Create VM in Vcloud  
 --Load with ISO (ex. Win 2016)  
 --Run through installation process  
+`  --shift+F10  
+`  --diskpart  
+`  --list disk  
+`  --select disk [disk number]  
+`  --clean  
+`  --convert gpt  
+`  --exit  
 --Login into new VM  
 --Install Wmware tools  
 --Remove VMware tools CD  
@@ -118,7 +125,7 @@ Post Power-On/Rebuild checks
 --Server Manager (Servers are up)  
 --nmap [the subnet] –F -Pn  
 
-DEV vAPP prep-Rebuild  
+**DEV vAPP prep-Rebuild**  
 --shutdown remote pcs  
 
 Setting up IIS/RDWeb  
@@ -131,3 +138,9 @@ Setup still needed for template
 
 DSC Force Removal  
 --absent to all options  
+
+
+# DemoCloud changes
+[ ] Need to rebuild APP01 to fix IP address issues
+[ ] Rebuild/Check App01 for IP issues
+

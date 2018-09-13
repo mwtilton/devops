@@ -81,7 +81,11 @@ Configuration RemoteDesktopSessionHost
             Ensure = "absent"
             Name = "RDS-Licensing"
         }
-
+        WindowsFeature Web-Server
+        {
+            Ensure = "absent"
+            Name = "Web-Server"
+        }
     }
 }
 

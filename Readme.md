@@ -8,15 +8,19 @@ Authored by mwtilton
 --Create VM in Vcloud  
 --Load with ISO (ex. Win 2016)  
 --Run through installation process  
-`  --shift+F10  
-`  --diskpart  
-`  --list disk  
-`  --select disk [disk number]  
-`  --clean  
-`  --convert gpt  
-`  --exit  
+`shift+F10  
+`diskpart  
+`list disk  
+`select disk [disk number]  
+`clean  
+`convert gpt  
+`exit  
 --Login into new VM  
 --Install Wmware tools  
+`open file explorer
+`shift + tab
+`down arrow
+
 --Remove VMware tools CD  
 --disk cleanup wizard  
 --Sysprep to shutdown  

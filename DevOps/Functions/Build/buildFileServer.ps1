@@ -112,7 +112,7 @@ configuration against the settings on this local server.
 #$domainCred = Get-Credential -UserName company\Administrator -Message "Please enter a new password for Domain Administrator."
 #$Cred = Get-Credential -UserName Administrator -Message "Please enter a new password for Local Administrator and other accounts."
 
-buildFileServer -ConfigurationData $ConfigData
+buildFileServer #-ConfigurationData $ConfigData
 
 Set-DSCLocalConfigurationManager -Path .\buildFileServer –Verbose
 Start-DscConfiguration -Wait -Force -Path .\buildFileServer -Verbose

@@ -1,3 +1,3 @@
 $parent = (get-item $PSScriptRoot).FullName
-$select = "*Export-SharesACL*"
-Invoke-Pester "$parent\Tests\$select" -CodeCoverage $parent\DevOps\Functions\$select -tags "UNIT"
+$select = "*prepGit*"
+Invoke-Pester "$parent\Tests\$select" -CodeCoverage $parent\DevOps\Functions\build\$select -tags "Git"

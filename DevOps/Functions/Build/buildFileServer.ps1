@@ -8,61 +8,16 @@ Disclaimer - This example code is provided without copyright and AS IS.  It is f
 Specify the configuration to be applied to the server.  This section
 defines which configurations you're interested in managing.
 #>
-Configuration Example
-{
-    Import-DSCResource -ModuleName
 
-    Node localhost
-    {
-        WaitForDisk Disk2
-        {
-             DiskId = 2
-             RetryIntervalSec = 60
-             RetryCount = 60
-        }
-
-        Disk GVolume
-        {
-             DiskId = 2
-             DriveLetter = 'G'
-             Size = 10GB
-             DependsOn = '[WaitForDisk]Disk2'
-        }
-
-        Disk JVolume
-        {
-             DiskId = 2
-             DriveLetter = 'J'
-             FSLabel = 'Data'
-             DependsOn = '[Disk]GVolume'
-        }
-
-        WaitForDisk Disk3
-        {
-             DiskId = 3
-             RetryIntervalSec = 60
-             RetryCount = 60
-        }
-
-        Disk SVolume
-        {
-             DiskId = 3
-             DriveLetter = 'S'
-             Size = 100GB
-             FSFormat = 'ReFS'
-             AllocationUnitSize = 64KB
-             DependsOn = '[WaitForDisk]Disk3'
-        }
-    }
-}
 configuration buildFileServer
 {
-    Import-DscResource -ModuleName xComputerManagement -ModuleVersion 3.2.0.0
-    Import-DscResource -ModuleName xNetworking -ModuleVersion 5.4.0.0
+    #Import-DscResource -ModuleName xComputerManagement -ModuleVersion 3.2.0.0
+    #Import-DscResource -ModuleName xNetworking -ModuleVersion 5.4.0.0
     Import-DSCResource -ModuleName StorageDsc
 
     Node localhost
     {
+        <#
         LocalConfigurationManager {
             ActionAfterReboot = "ContinueConfiguration"
             ConfigurationMode = "ApplyOnly"
@@ -102,13 +57,36 @@ configuration buildFileServer
             Credential    = $domainCred
             DependsOn = "[User]Administrator"
         }
+        #>
+        WaitForDisk Disk1
+        {
+             DiskId = 1
+             RetryIntervalSec = 60
+             RetryCount = 60
+        }
+
+        Disk CVolume
+        {
+             DiskId = 1
+             DriveLetter = 'C'
+             Size = 32GB
+        }
+
+        Disk DVolume
+        {
+             DiskId = 2
+             DriveLetter = 'D'
+             Size = 60GB
+             FSLabel = 'Data'
+             DependsOn = '[Disk]CVolume'
+        }
+
     }
 }
 
 <#
 Specify values for the configurations you're interested in managing.
 See in the configuration above how variables are used to reference values listed here.
-#>
 
 $ConfigData = @{
     AllNodes = @(
@@ -126,7 +104,6 @@ $ConfigData = @{
     )
 }
 
-<#
 Lastly, prompt for the necessary username and password combinations, then
 compile the configuration, and then instruct the server to execute that
 configuration against the settings on this local server.

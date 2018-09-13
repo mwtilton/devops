@@ -6,15 +6,18 @@ Authored by mwtilton
 
 **Fresh Template Install**  
 --Create VM in Vcloud  
+`Set HDD to "LSI Logic SAS"
 --Load with ISO (ex. Win 2016)  
 --Run through installation process  
+
 `shift+F10  
 `diskpart  
 `list disk  
 `select disk [disk number]  
 `clean  
 `convert gpt  
-`exit    
+`exit  
+
 --Create administrator account  
 --Login into new VM  
 --Install Wmware tools  

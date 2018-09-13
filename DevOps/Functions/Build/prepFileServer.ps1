@@ -13,7 +13,8 @@ Install-PackageProvider -Name NuGet -Force
 
 Install-Module xComputerManagement -RequiredVersion 3.2.0.0 -Force
 Install-Module xNetworking -RequiredVersion 5.4.0.0 -Force
+Install-Module StorageDsc
 
-Enable-PSRemoting -Force
+#Enable-PSRemoting -Force
 
 Write-Host "You may now execute '.\configureServer.ps1'"

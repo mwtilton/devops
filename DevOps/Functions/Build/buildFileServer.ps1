@@ -8,11 +8,58 @@ Disclaimer - This example code is provided without copyright and AS IS.  It is f
 Specify the configuration to be applied to the server.  This section
 defines which configurations you're interested in managing.
 #>
+Configuration Example
+{
+    Import-DSCResource -ModuleName
 
-configuration configureServer
+    Node localhost
+    {
+        WaitForDisk Disk2
+        {
+             DiskId = 2
+             RetryIntervalSec = 60
+             RetryCount = 60
+        }
+
+        Disk GVolume
+        {
+             DiskId = 2
+             DriveLetter = 'G'
+             Size = 10GB
+             DependsOn = '[WaitForDisk]Disk2'
+        }
+
+        Disk JVolume
+        {
+             DiskId = 2
+             DriveLetter = 'J'
+             FSLabel = 'Data'
+             DependsOn = '[Disk]GVolume'
+        }
+
+        WaitForDisk Disk3
+        {
+             DiskId = 3
+             RetryIntervalSec = 60
+             RetryCount = 60
+        }
+
+        Disk SVolume
+        {
+             DiskId = 3
+             DriveLetter = 'S'
+             Size = 100GB
+             FSFormat = 'ReFS'
+             AllocationUnitSize = 64KB
+             DependsOn = '[WaitForDisk]Disk3'
+        }
+    }
+}
+configuration buildFileServer
 {
     Import-DscResource -ModuleName xComputerManagement -ModuleVersion 3.2.0.0
     Import-DscResource -ModuleName xNetworking -ModuleVersion 5.4.0.0
+    Import-DSCResource -ModuleName StorageDsc
 
     Node localhost
     {
@@ -72,7 +119,7 @@ $ConfigData = @{
             IPAddressCIDR = "192.168.3.102/24"
             GatewayAddress = "192.168.3.2"
             DNSAddress = "192.168.3.10"
-            DomainName = "company.pri"
+Â Â Â Â Â Â Â Â Â Â Â Â DomainName = "company.pri"
             PSDscAllowPlainTextPassword = $true
             PSDscAllowDomainUser = $true
         }
@@ -90,5 +137,5 @@ $Cred = Get-Credential -UserName Administrator -Message "Please enter a new pass
 
 configureServer -ConfigurationData $ConfigData
 
-Set-DSCLocalConfigurationManager -Path .\configureServer –Verbose
+Set-DSCLocalConfigurationManager -Path .\configureServer â€“Verbose
 Start-DscConfiguration -Wait -Force -Path .\configureServer -Verbose

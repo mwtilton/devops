@@ -58,25 +58,25 @@ configuration buildFileServer
             DependsOn = "[User]Administrator"
         }
         #>
-        WaitForDisk Disk1
+        WaitForDisk Disk0
         {
-             DiskId = 1
-             RetryIntervalSec = 60
-             RetryCount = 60
+             DiskId = 0
+             RetryIntervalSec = 10
+             RetryCount = 10
         }
 
         Disk CVolume
         {
-             DiskId = 1
+             DiskId = 0
              DriveLetter = 'C'
              Size = 32GB
         }
 
-        Disk DVolume
+        Disk EVolume
         {
-             DiskId = 2
-             DriveLetter = 'D'
-             Size = 60GB
+             DiskId = 0
+             DriveLetter = 'E'
+             #Size = 60GB
              FSLabel = 'Data'
              DependsOn = '[Disk]CVolume'
         }
@@ -109,10 +109,10 @@ compile the configuration, and then instruct the server to execute that
 configuration against the settings on this local server.
 #>
 
-$domainCred = Get-Credential -UserName company\Administrator -Message "Please enter a new password for Domain Administrator."
-$Cred = Get-Credential -UserName Administrator -Message "Please enter a new password for Local Administrator and other accounts."
+#$domainCred = Get-Credential -UserName company\Administrator -Message "Please enter a new password for Domain Administrator."
+#$Cred = Get-Credential -UserName Administrator -Message "Please enter a new password for Local Administrator and other accounts."
 
 buildFileServer -ConfigurationData $ConfigData
 
-Set-DSCLocalConfigurationManager -Path .\configureServer –Verbose
-Start-DscConfiguration -Wait -Force -Path .\configureServer -Verbose
+Set-DSCLocalConfigurationManager -Path .\buildFileServer –Verbose
+Start-DscConfiguration -Wait -Force -Path .\buildFileServer -Verbose

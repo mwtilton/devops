@@ -4,8 +4,7 @@ Holder of all things DevOps related
 
 Authored by mwtilton
 
-Fresh Template Install
-
+**Fresh Template Install**
 --Create VM in Vcloud  
 --Load with ISO (ex. Win 2016)  
 --Run through installation process  
@@ -16,7 +15,7 @@ Fresh Template Install
 --Sysprep to shutdown  
 --Needs to be Datacenter (Desktop Edition)  
 
-YK-DC01 – Template  
+**YK-DC01 – Template**  
 Normal RDP  
 Vmware Tools  
 Updates as of Aug 2018  
@@ -34,14 +33,14 @@ Updates as of Aug 2018
 --ran prep  
 --ran build DC  
 --Get-DSCConfigurationStatus  
-******DO NOT OVERWRITE THIS SHIT*****  
+**DO NOT OVERWRITE THIS SHIT**  
 
 
-DEV Additions - DC  
+**DEV Additions - DC**  
 X Run Sysprep  
-DO NOT SET IP SETTINGS UNTIL AFTER SYSPREP  
+*DO NOT SET IP SETTINGS UNTIL AFTER SYSPREP*  
 X Set IP to 8.8.8.8 for initial DNS server  
-REBOOT  
+**REBOOT**  
 X Need to remove IE enhanced security  
 X Need to set folder options for admin user  
 X Need to setup indexing  
@@ -63,7 +62,7 @@ X Set myaccount to personal account in all places
 REBOOT  
 
 APP Servers  
-***ONLY AFTER YOU BUILD THE DC***  
+**ONLY AFTER YOU BUILD THE DC**  
 --Run Prep server w/ update help –erroraction sil con  
 --RunConfigureserver w/ ip information  
 [?] install O365 stuff here??? Or file server???  

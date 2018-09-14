@@ -4,5 +4,5 @@ Function Move-PageFileSys {
     $computer.Put()
     $CurrentPageFile = Get-WmiObject -Query "select * from Win32_PageFileSetting where name='c:\\pagefile.sys'"
     $CurrentPageFile.delete()
-    Set-WMIInstance -Class Win32_PageFileSetting -Arguments @{name="d:\pagefile.sys";InitialSize = 0; MaximumSize = 0
+    Set-WMIInstance -Class Win32_PageFileSetting -Arguments @{name="d:\pagefile.sys";InitialSize = 0; MaximumSize = 0}
 }

@@ -1,56 +1,33 @@
-# What is DevOps
+# What is DevOps  
+Holder of all things DevOps related  
+Authored by mwtilton  
 
-Holder of all things DevOps related
+#DEV vAPP  
 
-Authored by mwtilton
-
-**Fresh Template Install**  
+##Fresh Template Install  
 --Create VM in Vcloud  
-*GPT HDD Failures*
 
+###GPT HDD Failures*  
 `[-]Set HDD to "LSI Logic SAS"  
 `[-]Set HDD to "ParaVirtual"  
 `[-]Set HDD to "SATA"  
-`[-]converting GPT at installation
-`[?]converting to GPT after installation with two disks and moving pagesys file
-`[-]EFI Boot hass issues with select the virutal disk need to rebuild from scratch
+`[-]converting GPT at installation  
+`[?]converting to GPT after installation with two disks and moving pagesys file  
+`[-]EFI Boot hass issues with select the virutal disk need to rebuild from scratch  
 
 --Load with ISO (ex. Win 2016)  
 --Run through installation process  
 --Create administrator account  
 --Login into new VM  
 --Install Wmware tools  
-`win + d:
-`enter
+`win + d:  
+`enter  
 
 --Remove VMware tools CD  
 --disk cleanup wizard  
-
 --Sysprep to shutdown  
 
-
-**YK-DC01 – Template**  
-Normal RDP  
-Vmware Tools  
-Updates as of Aug 2018  
-
---Need to hardset/configure IP addresses after bootup as well  
---Indexing setup  
---Git installed and devops pulled  
---No activation  
-
---Ran sysprep to shutdown  
---Installed git  
---auto delayed start for windows search  
---added repo  
---changed files  
---ran prep  
---ran build DC  
---Get-DSCConfigurationStatus  
-**DO NOT OVERWRITE THIS SHIT**  
-
-
-**DEV Additions - DC**  
+##DEV vAPP DC  
 X Run Sysprep  
 *DO NOT SET IP SETTINGS UNTIL AFTER SYSPREP*  
 X Set IP to 8.8.8.8 for initial DNS server  
@@ -71,20 +48,28 @@ X xDNSServer*Zones
 [?] Keeping DNS Zones to 3.168.192 but those are the same as the servers IP addresses...  
 X Uncomment out MyAccount  
 X Set myaccount to personal account in all places  
+
 --Run prepDC  
 --Run BuildDC  
 REBOOT  
 
-APP Servers  
+###Volume activation Tools  
+1.	Add roles and features  
+2.	Check the box for Volume Activation Services  
+
+##DEV vAPP APP Servers  
 **ONLY AFTER YOU BUILD THE DC**  
 --Run Prep server w/ update help –erroraction sil con  
 --RunConfigureserver w/ ip information  
 [?] install O365 stuff here??? Or file server???  
 --Enable PSremoting for RDS deployment  
+###Setup still needed for template  
+--Allowing indexing from files and contents on APP01  
 
-FileServer deployment  
+
+##FileServer deployment  
 --Run Prep server w/ update help –erroraction sil con  
---RunConfigureserver w/ ip information  
+--Run buildFileServer w/ ip information  
 --Set up Disk Partition  
 --Set up shares and ACL  
 --StorageDSC requires GPT and not MBR to make changes  
@@ -92,16 +77,53 @@ VMware Remote Console > Send CTRL+ALT+DEL
 F2  
 
 
-RDS Deployment  
+##RDS Deployment  
 **After DC and all VM’s are booted up and running**  
 --prep RDS  
-
 --Setup script for server locations to app01/02/fileserver locations  
 --UPD file location: \\fileserver01\Users$  
 --UserGroups: democloud\Domain Admins  
 Democloud\RD Users  
 
+###Setting up IIS/RDWeb  
+--Need to setup password resets  
+https://social.technet.microsoft.com/wiki/contents/articles/10755.windows-server-2012-rds-enabling-the-rd-webaccess-expired-password-reset-option.aspx  
 
+###DSC Force Removal - For INTEGRATION TESTING  
+--absent to all options  
+
+##Post Power-On/Rebuild checks  
+--RDP  
+--Server Manager (Servers are up)  
+--nmap [the subnet] –F -Pn  
+
+##prep-Rebuild  
+--shutdown remote pcs  
+
+#YK Main  
+
+##YK-DC01 – Template  
+Normal RDP  
+Vmware Tools  
+Updates as of Aug 2018  
+
+--Need to hardset/configure IP addresses after bootup as well  
+--Indexing setup  
+--Git installed and devops pulled  
+--No activation  
+
+--Ran sysprep to shutdown  
+--Installed git  
+--auto delayed start for windows search  
+--added repo  
+--changed files  
+--ran prep  
+--ran build DC  
+--Get-DSCConfigurationStatus  
+**DO NOT OVERWRITE THIS**  
+
+
+##YK-SqlServer
 SQL Install  
 1.	Install SQL Server Express Edition 2017  
 2.	Install media to folder %downloads%  
@@ -116,38 +138,17 @@ h.	Installation completion process
 3.	Install SQL SMS 17.8.1  
 4.	Download setup file from internet redirect  
 
-SQL setup for Firewall  
+###SQL setup for Firewall  
 Ports 1433 49172 TCP  
 1434 UDP  
 
 $cred = get-credential  
 Invoke-Sqlcmd -ServerInstance 10.1.1.5\sqlexpress -Database Tickets -Query "Select * from Tickets" -credential $cred  
 
-Volume activation Tools  
-1.	Add roles and features  
-2.	Check the box for Volume Activation Services  
-
-Post Power-On/Rebuild checks  
---RDP  
---Server Manager (Servers are up)  
---nmap [the subnet] –F -Pn  
-
-**DEV vAPP prep-Rebuild**  
---shutdown remote pcs  
-
-Setting up IIS/RDWeb  
---Need to setup password resets  
-https://social.technet.microsoft.com/wiki/contents/articles/10755.windows-server-2012-rds-enabling-the-rd-webaccess-expired-password-reset-option.aspx  
 
 
-Setup still needed for template  
---Allowing indexing from files and contents on APP01  
-
-DSC Force Removal  
---absent to all options  
-
-
-# DemoCloud changes
-[ ] Need to rebuild APP01 to fix IP address issues
-[ ] Rebuild/Check App01 for IP issues
+#Research - Change Log
+[ ] Need to rebuild APP01 to fix IP address issues  
+[ ] Rebuild/Check App01 for IP issues  
+[ ] Need to lookup powershell options for indexing servers auto matically from DSC  
 

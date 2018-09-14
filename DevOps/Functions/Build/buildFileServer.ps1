@@ -17,7 +17,7 @@ configuration buildFileServer
 
     Node localhost
     {
-        <#
+
         LocalConfigurationManager {
             ActionAfterReboot = "ContinueConfiguration"
             ConfigurationMode = "ApplyOnly"
@@ -57,7 +57,7 @@ configuration buildFileServer
             Credential    = $domainCred
             DependsOn = "[User]Administrator"
         }
-        #>
+        <#
         WaitForDisk Disk0
         {
              DiskId = 0
@@ -76,18 +76,17 @@ configuration buildFileServer
         {
              DiskId = 0
              DriveLetter = 'E'
-             #Size = 60GB
              FSLabel = 'Data'
-             DependsOn = '[Disk]CVolume'
+             #DependsOn = '[Disk]CVolume'
         }
-
+        #>
     }
 }
 
 <#
 Specify values for the configurations you're interested in managing.
 See in the configuration above how variables are used to reference values listed here.
-
+#>
 $ConfigData = @{
     AllNodes = @(
         @{
@@ -103,16 +102,16 @@ $ConfigData = @{
         }
     )
 }
-
+<#
 Lastly, prompt for the necessary username and password combinations, then
 compile the configuration, and then instruct the server to execute that
 configuration against the settings on this local server.
 #>
 
-#$domainCred = Get-Credential -UserName company\Administrator -Message "Please enter a new password for Domain Administrator."
-#$Cred = Get-Credential -UserName Administrator -Message "Please enter a new password for Local Administrator and other accounts."
+$domainCred = Get-Credential -UserName company\Administrator -Message "Please enter a new password for Domain Administrator."
+$Cred = Get-Credential -UserName Administrator -Message "Please enter a new password for Local Administrator and other accounts."
 
-buildFileServer #-ConfigurationData $ConfigData
+buildFileServer -ConfigurationData $ConfigData
 
 Set-DSCLocalConfigurationManager -Path .\buildFileServer –Verbose
 Start-DscConfiguration -Wait -Force -Path .\buildFileServer -Verbose

@@ -6,16 +6,28 @@ Authored by mwtilton
 
 **Fresh Template Install**  
 --Create VM in Vcloud  
-`Set HDD to "LSI Logic SAS"
+*GPT HDD Failures*
+
+`[-]Set HDD to "LSI Logic SAS"  
+`[-]Set HDD to "ParaVirtual"  
+`[-]Set HDD to "SATA"  
+`[-]converting GPT at installation
+
 --Load with ISO (ex. Win 2016)  
 --Run through installation process  
 
 `shift+F10  
+
 `diskpart  
+
 `list disk  
+
 `select disk [disk number]  
+
 `clean  
+
 `convert gpt  
+
 `exit  
 
 --Create administrator account  

@@ -12,7 +12,7 @@ Authored by mwtilton
 `[-]Set HDD to "ParaVirtual"  
 `[-]Set HDD to "SATA"  
 `[-]converting GPT at installation
-
+`[?]converting to GPT after installation with two disks and moving pagesys file
 --Load with ISO (ex. Win 2016)  
 --Run through installation process  
 
@@ -33,9 +33,9 @@ Authored by mwtilton
 --Create administrator account  
 --Login into new VM  
 --Install Wmware tools  
-`open file explorer
-`shift + tab
-`down arrow
+`win + d:
+`enter
+
 
 --Remove VMware tools CD  
 --disk cleanup wizard  

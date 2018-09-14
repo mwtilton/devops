@@ -11,7 +11,7 @@ Authored by mwtilton
 --Create administrator account  
 --Login into new VM  
 --Install Wmware tools  
-`win + d:`  
+`win + d`  
 `enter`  
 
 --Remove VMware tools CD  

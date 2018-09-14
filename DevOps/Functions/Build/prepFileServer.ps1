@@ -13,9 +13,10 @@ Install-PackageProvider -Name NuGet -Force
 
 Install-Module xComputerManagement -RequiredVersion 3.2.0.0 -Force
 Install-Module xNetworking -RequiredVersion 5.4.0.0 -Force
-Install-Module StorageDsc
+Install-Module -Name MSFT_xSmbShare -ModuleVersion 2.1.0.0
+Install-Module -ModuleName StorageDsc -ModuleVersion 1.7.0.0
 
-#Enable-PSRemoting -Force
+Enable-PSRemoting -Force
 
 Write-Host "You may now execute '.\buildFileServer.ps1'"
 

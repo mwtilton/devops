@@ -11,9 +11,10 @@ defines which configurations you're interested in managing.
 
 configuration buildFileServer
 {
-    #Import-DscResource -ModuleName xComputerManagement -ModuleVersion 3.2.0.0
-    #Import-DscResource -ModuleName xNetworking -ModuleVersion 5.4.0.0
-    Import-DSCResource -ModuleName StorageDsc
+    Import-DscResource -ModuleName xComputerManagement -ModuleVersion 3.2.0.0
+    Import-DscResource -ModuleName xNetworking -ModuleVersion 5.4.0.0
+    Import-DscResource -Name MSFT_xSmbShare -ModuleVersion 2.1.0.0
+    Import-DSCResource -ModuleName StorageDsc -ModuleVersion 1.7.0.0
 
     Node localhost
     {
@@ -56,6 +57,86 @@ configuration buildFileServer
             DomainName    = $node.DomainName
             Credential    = $domainCred
             DependsOn = "[User]Administrator"
+        }
+        xSmbShare MainDriveShare
+        {
+            Ensure = "Present"
+            Name   = "E$"
+            Path = "E:\"
+            FullAccess = "Domain Admin"
+            Description = "This is the main drive share"
+        }
+        xSmbShare DataShare
+        {
+            Ensure = "Present"
+            Name   = "Data$"
+            Path = "E:\CompanyData\Data"
+            FullAccess = "Domain Admin"
+            Description = "This is the main Data share"
+        }
+        xSmbShare DataShare
+        {
+            Ensure = "Present"
+            Name   = "Data"
+            Path = "E:\"
+            FullAccess = "Domain Admin"
+            Description = "This is the main Data Share"
+        }
+        xSmbShare DataShare
+        {
+            Ensure = "Present"
+            Name   = "Data"
+            Path = "E:\"
+            FullAccess = "Domain Admin"
+            Description = "This is the main Data Share"
+        }
+        xSmbShare DataShare
+        {
+            Ensure = "Present"
+            Name   = "Data"
+            Path = "E:\"
+            FullAccess = "Domain Admin"
+            Description = "This is the main Data Share"
+        }
+        xSmbShare DataShare
+        {
+            Ensure = "Present"
+            Name   = "Data"
+            Path = "E:\"
+            FullAccess = "Domain Admin"
+            Description = "This is the main Data Share"
+        }
+        xSmbShare DataShare
+        {
+            Ensure = "Present"
+            Name   = "Data"
+            Path = "E:\"
+            FullAccess = "Domain Admin"
+            Description = "This is the main Data Share"
+        }
+        xSmbShare DataShare
+        {
+            Ensure = "Present"
+            Name   = "Data"
+            Path = "E:\"
+            FullAccess = "Domain Admin"
+            Description = "This is the main Data Share"
+        }
+        xSmbShare DataShare
+        {
+            Ensure = "Present"
+            Name   = "Data"
+            Path = "E:\"
+            FullAccess = "Domain Admin"
+            Description = "This is the main Data Share"
+        }
+        xSmbShare DataShare
+        {
+            Ensure = "Present"
+            Name   = "Data"
+            Path = "E:\"
+            FullAccess = "Domain Admin"
+            Description = "This is the main Data Share"
         }
         <#
         WaitForDisk Disk0

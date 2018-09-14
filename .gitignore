@@ -1,5 +1,7 @@
 # Add any directories, files, or patterns you don't want to be tracked by version control
 *.Machine.*
 *.csv
-*.xml
 *.xlsx
+*.docx
+git-q-formatwindow.md
+git-q-Disk-MBR.md

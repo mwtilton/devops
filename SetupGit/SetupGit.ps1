@@ -20,4 +20,5 @@ Function Invoke-SetupGit {
     git config --get-regexp credential
     #git log — all — grep=’commit message’
     #git config --global alias.prum "pull --rebase upstream master"
+    #git status --ignored
 }

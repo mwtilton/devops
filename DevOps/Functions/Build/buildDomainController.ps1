@@ -62,7 +62,7 @@ configuration buildDomainController
 
         xDnsServerPrimaryZone addForwardZoneCompanyPri {
             Ensure = "Present"
-            Name = "company.pri"
+            Name = "democloud.local"
             DynamicUpdate = "NonsecureAndSecure"
             DependsOn = "[WindowsFeature]DNSInstall"
         }
@@ -108,7 +108,7 @@ configuration buildDomainController
             SysvolPath = $node.SysvolPath
             DependsOn = "[WindowsFeature]ADDSInstall"
         }
-        <#
+
         xADUser myaccount {
             DomainName = $node.DomainName
             Path = "CN=Users,$($node.DomainDN)"
@@ -122,7 +122,6 @@ configuration buildDomainController
             PasswordNeverExpires = $true
             DependsOn = "[xADDomain]FirstDC"
         }
-        #>
 
         xADGroup DomainAdmins {
             GroupName = "Domain Admins"

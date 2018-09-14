@@ -9,13 +9,15 @@ Specify the configuration to be applied to the server.  This section
 defines which configurations you're interested in managing.
 #>
 
-configuration configureServer
+configuration buildFileServer
 {
-    Import-DscResource -ModuleName xComputerManagement -ModuleVersion 3.2.0.0
-    Import-DscResource -ModuleName xNetworking -ModuleVersion 5.4.0.0
+    #Import-DscResource -ModuleName xComputerManagement -ModuleVersion 3.2.0.0
+    #Import-DscResource -ModuleName xNetworking -ModuleVersion 5.4.0.0
+    Import-DSCResource -ModuleName StorageDsc
 
     Node localhost
     {
+
         LocalConfigurationManager {
             ActionAfterReboot = "ContinueConfiguration"
             ConfigurationMode = "ApplyOnly"
@@ -55,6 +57,29 @@ configuration configureServer
             Credential    = $domainCred
             DependsOn = "[User]Administrator"
         }
+        <#
+        WaitForDisk Disk0
+        {
+             DiskId = 0
+             RetryIntervalSec = 10
+             RetryCount = 10
+        }
+
+        Disk CVolume
+        {
+             DiskId = 0
+             DriveLetter = 'C'
+             Size = 32GB
+        }
+
+        Disk EVolume
+        {
+             DiskId = 0
+             DriveLetter = 'E'
+             FSLabel = 'Data'
+             #DependsOn = '[Disk]CVolume'
+        }
+        #>
     }
 }
 
@@ -62,7 +87,6 @@ configuration configureServer
 Specify values for the configurations you're interested in managing.
 See in the configuration above how variables are used to reference values listed here.
 #>
-
 $ConfigData = @{
     AllNodes = @(
         @{
@@ -72,13 +96,12 @@ $ConfigData = @{
             IPAddressCIDR = "192.168.3.102/24"
             GatewayAddress = "192.168.3.2"
             DNSAddress = "192.168.3.10"
-            DomainName = "company.pri"
+Â Â Â Â Â Â Â Â Â Â Â Â DomainName = "company.pri"
             PSDscAllowPlainTextPassword = $true
             PSDscAllowDomainUser = $true
         }
     )
 }
-
 <#
 Lastly, prompt for the necessary username and password combinations, then
 compile the configuration, and then instruct the server to execute that
@@ -88,7 +111,7 @@ configuration against the settings on this local server.
 $domainCred = Get-Credential -UserName company\Administrator -Message "Please enter a new password for Domain Administrator."
 $Cred = Get-Credential -UserName Administrator -Message "Please enter a new password for Local Administrator and other accounts."
 
-configureServer -ConfigurationData $ConfigData
+buildFileServer -ConfigurationData $ConfigData
 
-Set-DSCLocalConfigurationManager -Path .\configureServer –Verbose
-Start-DscConfiguration -Wait -Force -Path .\configureServer -Verbose
+Set-DSCLocalConfigurationManager -Path .\buildFileServer â€“Verbose
+Start-DscConfiguration -Wait -Force -Path .\buildFileServer -Verbose

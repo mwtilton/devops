@@ -13,34 +13,21 @@ Authored by mwtilton
 `[-]Set HDD to "SATA"  
 `[-]converting GPT at installation
 `[?]converting to GPT after installation with two disks and moving pagesys file
+`[-]EFI Boot hass issues with select the virutal disk need to rebuild from scratch
+
 --Load with ISO (ex. Win 2016)  
 --Run through installation process  
-
-`shift+F10  
-
-`diskpart  
-
-`list disk  
-
-`select disk [disk number]  
-
-`clean  
-
-`convert gpt  
-
-`exit  
-
 --Create administrator account  
 --Login into new VM  
 --Install Wmware tools  
 `win + d:
 `enter
 
-
 --Remove VMware tools CD  
 --disk cleanup wizard  
+
 --Sysprep to shutdown  
---Needs to be Datacenter (Desktop Edition)  
+
 
 **YK-DC01 – Template**  
 Normal RDP  

@@ -16,7 +16,7 @@ Authored by mwtilton
 
 --Remove VMware tools CD  
 --disk cleanup wizard  
---Folder Options
+[ ] Folder Options
 `Hidden Folders`
 `File extensions`
 --Sysprep to shutdown  

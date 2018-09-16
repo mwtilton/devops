@@ -16,6 +16,9 @@ Authored by mwtilton
 
 --Remove VMware tools CD  
 --disk cleanup wizard  
+--Folder Options
+`Hidden Folders`
+`File extensions`
 --Sysprep to shutdown  
 
 ###GPT HDD Failures  

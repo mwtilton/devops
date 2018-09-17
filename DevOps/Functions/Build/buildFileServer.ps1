@@ -174,7 +174,74 @@ configuration buildFileServer
         #>
     }
 }
+<#
+Configuration FileResourceDemo
+{
+    Node "localhost"
+    {
+        File DirectoryCopy
+        {
+            Ensure = "Present"  # You can also set Ensure to "Absent"
+            Type = "Directory" # Default is "File".
+            Recurse = $true # Ensure presence of subdirectories, too
+            SourcePath = "C:\Users\Public\Documents\DSCDemo\DemoSource"
+            DestinationPath = "C:\Users\Public\Documents\DSCDemo\DemoDestination"
+        }
 
+        Log AfterDirectoryCopy
+        {
+            # The message below gets written to the Microsoft-Windows-Desired State Configuration/Analytic log
+            Message = "Finished running the file resource with ID DirectoryCopy"
+            DependsOn = "[File]DirectoryCopy" # This means run "DirectoryCopy" first.
+        }
+    }
+}
+
+Configuration MyConfiguration {
+
+  Node "Localhost" {
+
+    ForEach ($Folder in $Node.FolderStructure) {
+
+      # Each of our 'file' resources will be named after the path, but...
+      #   we have to replace : with __ as colons aren't allowed in resource names
+      File $Folder.Path.Replace(':','__') {
+        DestinationPath = $Folder.Path
+        Ensure = $Folder.Ensure
+      }
+
+    } # ForEach
+
+  } # Node "Localhost"
+
+} # configuration MyConfiguration
+
+
+
+$ConfigurationData =
+@{
+    AllNodes = @(
+        @{
+            NodeName = "localhost"
+
+            FolderStructure = @(
+
+                @{
+                    Path =   "D:\Management\Packages"
+                    Ensure = "Present"
+                }
+
+                @{
+                    Path =   "D:\Management\Wallpaper"
+                    Ensure = "Present"
+                }
+
+            ) #FolderStruture = @(...
+
+        } # localhost
+    ) # AllNodes = @(...
+}
+#>
 <#
 Specify values for the configurations you're interested in managing.
 See in the configuration above how variables are used to reference values listed here.

@@ -7,19 +7,21 @@ Function Get-CredCheck {
 
     #Prompt for Credentials and verify them using the DirectoryServices.AccountManagement assembly.
     Write-Host "Please provide your credentials so the script can continue."
-    Add-Type -AssemblyName System.DirectoryServices.AccountManagement
+    #Add-Type -AssemblyName System.DirectoryServices.AccountManagement
     # Extract the current user's domain and also pre-format the user name to be used in the credential prompt.
     $UserDomain = $env:USERDOMAIN
     $UserName = "$UserDomain\$env:USERNAME"
 
-
+    <#
     # Define the starting number (always #1) and the desired maximum number of attempts, and the initial credential prompt message to use.
     $Attempt = 1
     $MaxAttempts = 1
     $CredentialPrompt = "Enter your Domain account password (attempt #$Attempt out of $MaxAttempts):"
     # Set ValidAccount to false so it can be used to exit the loop when a valid account is found (and the value is changed to $True).
     $ValidAccount = $False
-    $cred = Get-Credential #Read credentials
+    #>
+    $cred = Get-Credential -UserName $UserName -Message "Please enter your Credentials"
+
     $username = $cred.username
     $password = $cred.GetNetworkCredential().password
 
@@ -30,12 +32,16 @@ Function Get-CredCheck {
     if ($domain.name -eq $null)
     {
         write-host "Authentication failed - please verify your username and password."
+        return $null
         Break #terminate the script.
     }
     else
     {
         write-host "Successfully authenticated with domain $domain.name"
+        return $cred
     }
+
+
     <#
     $Credentials = Get-Credential -UserName $UserName -Message $CredentialPrompt
     $ContextType = [System.DirectoryServices.AccountManagement.ContextType]::Domain
@@ -94,4 +100,8 @@ Function Get-CredCheck {
         }
     } Until (($ValidAccount) -or ($Attempt -gt $MaxAttempts))
     #>
+
 }
+$validCred = Get-CredCheck
+
+Enter-PSSession -Credential $validCred -ComputerName FileServer01

@@ -13,8 +13,10 @@ configuration buildFileServer
 {
     Import-DscResource -ModuleName xComputerManagement -ModuleVersion 3.2.0.0
     Import-DscResource -ModuleName xNetworking -ModuleVersion 5.4.0.0
-    Import-DscResource -Name MSFT_xSmbShare -ModuleVersion 2.1.0.0
+    Import-DscResource -ModuleName xSmbShare -ModuleVersion 2.1.0.0
     Import-DSCResource -ModuleName StorageDsc -ModuleVersion 1.7.0.0
+    Import-DscResource -ModuleName cNtfsAccessControl -ModuleVersion 1.3.1
+    Import-DscResource -ModuleName xPSDesiredStateConfiguration -ModuleVersion 8.4.0.0
 
     Node localhost
     {
@@ -58,28 +60,36 @@ configuration buildFileServer
             Credential    = $domainCred
             DependsOn = "[User]Administrator"
         }
+        File DataDirectory
+        {
+            Ensure = 'Present'
+            DestinationPath = "E:\CompanyData\Data"
+            Type = 'Directory'
+        }
         xSmbShare MainDriveShare
         {
             Ensure = "Present"
             Name   = "E$"
             Path = "E:\"
-            FullAccess = "Domain Admin"
+            FullAccess = "Domain Admins"
             Description = "This is the main drive share"
         }
+
         xSmbShare DataShare
         {
             Ensure = "Present"
             Name   = "Data$"
             Path = "E:\CompanyData\Data"
-            FullAccess = "Domain Admin"
+            FullAccess = "Domain Admins"
             Description = "This is the main Data share"
         }
+        <#
         xSmbShare ExecShare
         {
             Ensure = "Present"
             Name   = "Executive$"
             Path = "E:\Company Data\Executive"
-            FullAccess = "Domain Admin"
+            FullAccess = "Domain Admins"
             Description = "This is the main Executive Share"
         }
         xSmbShare HRShare
@@ -87,7 +97,7 @@ configuration buildFileServer
             Ensure = "Present"
             Name   = "HR$"
             Path = "E:\Company Data\HR"
-            FullAccess = "Domain Admin"
+            FullAccess = "Domain Admins"
             Description = "This is the main HR Share"
         }
         xSmbShare MarketingShare
@@ -95,7 +105,7 @@ configuration buildFileServer
             Ensure = "Present"
             Name   = "Marketing$"
             Path = "E:\Company Data\Marketing"
-            FullAccess = "Domain Admin"
+            FullAccess = "Domain Admins"
             Description = "This is the main Marketing Share"
         }
         xSmbShare OneDriveShare
@@ -103,7 +113,7 @@ configuration buildFileServer
             Ensure = "Present"
             Name   = "OneDrive$"
             Path = "E:\Company Data\OneDrive"
-            FullAccess = "Domain Admin"
+            FullAccess = "Domain Admins"
             Description = "This is the main OneDrive Share"
         }
         xSmbShare PrivateShare
@@ -111,7 +121,7 @@ configuration buildFileServer
             Ensure = "Present"
             Name   = "Private$"
             Path = "E:\Company Data\Private"
-            FullAccess = "Domain Admin"
+            FullAccess = "Domain Admins"
             Description = "This is the main Private Share"
         }
         xSmbShare QBTestShare
@@ -119,7 +129,7 @@ configuration buildFileServer
             Ensure = "Present"
             Name   = "QBTest$"
             Path = "E:\QBTest"
-            FullAccess = "Domain Admin"
+            FullAccess = "Domain Admins"
             Description = "This is the main QBTest Share"
         }
         xSmbShare UserFilesShare
@@ -127,7 +137,7 @@ configuration buildFileServer
             Ensure = "Present"
             Name   = "UserFiles$"
             Path = "E:\Company Data\UserFiles"
-            FullAccess = "Domain Admin"
+            FullAccess = "Domain Admins"
             Description = "This is the main UserFiles Share"
         }
         xSmbShare UsersShare
@@ -135,9 +145,10 @@ configuration buildFileServer
             Ensure = "Present"
             Name   = "Users$"
             Path = "E:\Users"
-            FullAccess = "Domain Admin"
+            FullAccess = "Domain Admins"
             Description = "This is the main Users Share"
         }
+        #>
         <#
         WaitForDisk Disk0
         {
@@ -189,7 +200,7 @@ compile the configuration, and then instruct the server to execute that
 configuration against the settings on this local server.
 #>
 
-$domainCred = Get-Credential -UserName company\Administrator -Message "Please enter a new password for Domain Administrator."
+$domainCred = Get-Credential -UserName company\Administrator -Message "Please enter a new password for Domain Adminsistrator."
 $Cred = Get-Credential -UserName Administrator -Message "Please enter a new password for Local Administrator and other accounts."
 
 buildFileServer -ConfigurationData $ConfigData

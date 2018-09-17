@@ -13,8 +13,10 @@ Install-PackageProvider -Name NuGet -Force
 
 Install-Module xComputerManagement -RequiredVersion 3.2.0.0 -Force
 Install-Module xNetworking -RequiredVersion 5.4.0.0 -Force
-Install-Module -Name MSFT_xSmbShare -ModuleVersion 2.1.0.0
-Install-Module -ModuleName StorageDsc -ModuleVersion 1.7.0.0
+Install-Module xSmbShare -RequiredVersion 2.1.0.0
+Install-Module StorageDsc -RequiredVersion 4.1.0.0
+Install-Module cNtfsAccessControl -RequiredVersion 1.3.1
+Install-Module xPSDesiredStateConfiguration -RequiredVersion 8.4.0.0
 
 Enable-PSRemoting -Force
 

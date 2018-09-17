@@ -10,7 +10,7 @@ Function Get-CredCheck {
     #Add-Type -AssemblyName System.DirectoryServices.AccountManagement
     # Extract the current user's domain and also pre-format the user name to be used in the credential prompt.
     $UserDomain = $env:USERDOMAIN
-    $UserName = "$UserDomain\$env:USERNAME"
+    $UserName = "$userdomain\demouser" #"$UserDomain\$env:USERNAME"
 
     <#
     # Define the starting number (always #1) and the desired maximum number of attempts, and the initial credential prompt message to use.
@@ -37,7 +37,7 @@ Function Get-CredCheck {
     }
     else
     {
-        write-host "Successfully authenticated with domain $domain.name"
+        write-host "Successfully authenticated with domain $($domain.name)"
         return $cred
     }
 
@@ -102,6 +102,6 @@ Function Get-CredCheck {
     #>
 
 }
-$validCred = Get-CredCheck
+Get-CredCheck
 
-Enter-PSSession -Credential $validCred -ComputerName FileServer01
+#Enter-PSSession -Credential $validCred -ComputerName FileServer01

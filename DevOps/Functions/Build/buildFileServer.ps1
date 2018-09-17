@@ -74,69 +74,69 @@ configuration buildFileServer
             FullAccess = "Domain Admin"
             Description = "This is the main Data share"
         }
-        xSmbShare DataShare
+        xSmbShare ExecShare
         {
             Ensure = "Present"
-            Name   = "Data"
-            Path = "E:\"
+            Name   = "Executive$"
+            Path = "E:\Company Data\Executive"
             FullAccess = "Domain Admin"
-            Description = "This is the main Data Share"
+            Description = "This is the main Executive Share"
         }
-        xSmbShare DataShare
+        xSmbShare HRShare
         {
             Ensure = "Present"
-            Name   = "Data"
-            Path = "E:\"
+            Name   = "HR$"
+            Path = "E:\Company Data\HR"
             FullAccess = "Domain Admin"
-            Description = "This is the main Data Share"
+            Description = "This is the main HR Share"
         }
-        xSmbShare DataShare
+        xSmbShare MarketingShare
         {
             Ensure = "Present"
-            Name   = "Data"
-            Path = "E:\"
+            Name   = "Marketing$"
+            Path = "E:\Company Data\Marketing"
             FullAccess = "Domain Admin"
-            Description = "This is the main Data Share"
+            Description = "This is the main Marketing Share"
         }
-        xSmbShare DataShare
+        xSmbShare OneDriveShare
         {
             Ensure = "Present"
-            Name   = "Data"
-            Path = "E:\"
+            Name   = "OneDrive$"
+            Path = "E:\Company Data\OneDrive"
             FullAccess = "Domain Admin"
-            Description = "This is the main Data Share"
+            Description = "This is the main OneDrive Share"
         }
-        xSmbShare DataShare
+        xSmbShare PrivateShare
         {
             Ensure = "Present"
-            Name   = "Data"
-            Path = "E:\"
+            Name   = "Private$"
+            Path = "E:\Company Data\Private"
             FullAccess = "Domain Admin"
-            Description = "This is the main Data Share"
+            Description = "This is the main Private Share"
         }
-        xSmbShare DataShare
+        xSmbShare QBTestShare
         {
             Ensure = "Present"
-            Name   = "Data"
-            Path = "E:\"
+            Name   = "QBTest$"
+            Path = "E:\QBTest"
             FullAccess = "Domain Admin"
-            Description = "This is the main Data Share"
+            Description = "This is the main QBTest Share"
         }
-        xSmbShare DataShare
+        xSmbShare UserFilesShare
         {
             Ensure = "Present"
-            Name   = "Data"
-            Path = "E:\"
+            Name   = "UserFiles$"
+            Path = "E:\Company Data\UserFiles"
             FullAccess = "Domain Admin"
-            Description = "This is the main Data Share"
+            Description = "This is the main UserFiles Share"
         }
-        xSmbShare DataShare
+        xSmbShare UsersShare
         {
             Ensure = "Present"
-            Name   = "Data"
-            Path = "E:\"
+            Name   = "Users$"
+            Path = "E:\Users"
             FullAccess = "Domain Admin"
-            Description = "This is the main Data Share"
+            Description = "This is the main Users Share"
         }
         <#
         WaitForDisk Disk0

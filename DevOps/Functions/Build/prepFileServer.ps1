@@ -25,5 +25,8 @@ Write-Host "You may now execute '.\buildFileServer.ps1'"
 <#
 Get-Partition -DriveLetter 'C' | Resize-Partition -Size 32GB
 New-Partition -DiskNumber 0 -UseMaximumSize -DriveLetter 'E'
+
+Stop-Service -Name ShellHWDetection
 Format-Volume -DriveLetter 'E' -FileSystem NTFS -NewFileSystemLabel 'Data' -Full -Force
+Start-Service -Name ShellHWDetection
 #>

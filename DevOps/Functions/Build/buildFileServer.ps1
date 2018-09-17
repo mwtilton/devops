@@ -14,7 +14,7 @@ configuration buildFileServer
     Import-DscResource -ModuleName xComputerManagement -ModuleVersion 3.2.0.0
     Import-DscResource -ModuleName xNetworking -ModuleVersion 5.4.0.0
     Import-DscResource -ModuleName xSmbShare -ModuleVersion 2.1.0.0
-    Import-DSCResource -ModuleName StorageDsc -ModuleVersion 1.7.0.0
+    Import-DSCResource -ModuleName StorageDsc -ModuleVersion 4.1.0.0
     Import-DscResource -ModuleName cNtfsAccessControl -ModuleVersion 1.3.1
     Import-DscResource -ModuleName xPSDesiredStateConfiguration -ModuleVersion 8.4.0.0
 
@@ -270,7 +270,25 @@ configuration against the settings on this local server.
 $domainCred = Get-Credential -UserName company\Administrator -Message "Please enter a new password for Domain Adminsistrator."
 $Cred = Get-Credential -UserName Administrator -Message "Please enter a new password for Local Administrator and other accounts."
 
-buildFileServer -ConfigurationData $ConfigData
+$cred = Get-Credential #Read credentials
+$username = $cred.username
+$password = $cred.GetNetworkCredential().password
 
-Set-DSCLocalConfigurationManager -Path .\buildFileServer –Verbose
-Start-DscConfiguration -Wait -Force -Path .\buildFileServer -Verbose
+ # Get current domain using logged-on user's credentials
+$CurrentDomain = "LDAP://" + ([ADSI]"").distinguishedName
+$domain = New-Object System.DirectoryServices.DirectoryEntry($CurrentDomain,$UserName,$Password)
+
+if ($domain.name -eq $null)
+{
+    write-host "Authentication failed - please verify your username and password."
+    exit #terminate the script.
+}
+else
+{
+    write-host "Successfully authenticated with domain $domain.name"
+    buildFileServer -ConfigurationData $ConfigData
+
+    Set-DSCLocalConfigurationManager -Path $env:USERPROFILE\Desktop\buildFileServer –Verbose
+    Start-DscConfiguration -Wait -Force -Path $env:USERPROFILE\Desktop\buildFileServer -Verbose
+}
+

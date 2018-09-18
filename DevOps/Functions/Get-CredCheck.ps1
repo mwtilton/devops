@@ -1,3 +1,52 @@
+
+Function Test-Credential {
+    [OutputType([Bool])]
+
+    Param (
+        [Parameter(
+            Mandatory = $true,
+            ValueFromPipeLine = $true,
+            ValueFromPipelineByPropertyName = $true
+        )]
+        [Alias(
+            'PSCredential'
+        )]
+        [ValidateNotNull()]
+        [System.Management.Automation.PSCredential]
+        [System.Management.Automation.Credential()]
+        $Credential,
+
+        [Parameter()]
+        [String]
+        $Domain = $Credential.GetNetworkCredential().Domain
+    )
+
+    Begin {
+        [System.Reflection.Assembly]::LoadWithPartialName("System.DirectoryServices.AccountManagement") |
+            Out-Null
+
+        $principalContext = New-Object System.DirectoryServices.AccountManagement.PrincipalContext(
+            [System.DirectoryServices.AccountManagement.ContextType]::Domain, $Domain
+        )
+    }
+
+    Process {
+        foreach ($item in $Credential) {
+            $networkCredential = $Credential.GetNetworkCredential()
+
+            Write-Output -InputObject $(
+                $principalContext.ValidateCredentials(
+                    $networkCredential.UserName, $networkCredential.Password
+                )
+            )
+        }
+    }
+
+    End {
+        $principalContext.Dispose()
+    }
+}
+
 Function Get-CredCheck {
     [CmdletBinding()]
     param (
@@ -11,7 +60,7 @@ Function Get-CredCheck {
     $UserName = "$UserDomain\$env:USERNAME"
     # Define the starting number (always #1) and the desired maximum number of attempts, and the initial credential prompt message to use.
     $Attempt = 1
-    $MaxAttempts = 5
+    $MaxAttempts = 3
     $CredentialPrompt = "Enter your Domain account password (attempt #$Attempt out of $MaxAttempts):"
     # Set ValidAccount to false so it can be used to exit the loop when a valid account is found (and the value is changed to $True).
     $ValidAccount = $False
@@ -34,13 +83,15 @@ Function Get-CredCheck {
             } Catch {
                 If ($_.Exception.InnerException -like "*The server could not be contacted*") {
                     $FailureMessage = "Could not contact a server for the specified domain on attempt #$Attempt out of $MaxAttempts."
-                } Else {
+                }
+                Else {
                     $FailureMessage = "Unpredicted failure: `"$($_.Exception.Message)`" on attempt #$Attempt out of $MaxAttempts."
                 }
             }
             # If there wasn't a failure talking to the domain test the validation of the credentials, and if it fails record a failure message.
             If (-not($FailureMessage)) {
-                $ValidAccount = $PrincipalContext.ValidateCredentials($UserName,$Credentials.GetNetworkCredential().Password)
+
+                $ValidAccount = $PrincipalContext.ValidateCredentials($UserName,$Credentials.GetNetworkCredential().Password) #GetNetworkCredential()
                 If (-not($ValidAccount)) {
                     $FailureMessage = "Bad user name or password used on credential prompt attempt #$Attempt out of $MaxAttempts."
                 }
@@ -66,6 +117,6 @@ Function Get-CredCheck {
     } Until (($ValidAccount) -or ($Attempt -gt $MaxAttempts))
 
 }
-$validcred = Get-CredCheck
-
+#$validcred = Get-CredCheck
+Test-Credential
 #Enter-PSSession -Credential $validCred -ComputerName FileServer01

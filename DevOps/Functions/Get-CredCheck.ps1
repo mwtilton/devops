@@ -50,6 +50,7 @@ Function Test-Credential {
 Function Get-CredCheck {
     [CmdletBinding()]
     Param (
+        <#
         [Parameter(
             Mandatory = $true,
             ValueFromPipeLine = $true,
@@ -61,11 +62,12 @@ Function Get-CredCheck {
         [ValidateNotNull()]
         [System.Management.Automation.PSCredential]
         [System.Management.Automation.Credential()]
-        $Credentials,
+        $Credentials = [System.Management.Automation.PSCredential]::Empty,
 
         [Parameter()]
         [String]
         $Domain = $Credentials.GetNetworkCredential().Domain
+        #>
     )
     Begin {
         # Prompt for Credentials and verify them using the DirectoryServices.AccountManagement assembly.
@@ -81,12 +83,6 @@ Function Get-CredCheck {
         # Set ValidAccount to false so it can be used to exit the loop when a valid account is found (and the value is changed to $True).
         $ValidAccount = $False
 
-        [System.Reflection.Assembly]::LoadWithPartialName("System.DirectoryServices.AccountManagement") |
-            Out-Null
-
-        $principalContext = New-Object System.DirectoryServices.AccountManagement.PrincipalContext(
-            [System.DirectoryServices.AccountManagement.ContextType]::Domain, $Domain
-        )
     }
     Process {
         Do {
@@ -100,8 +96,21 @@ Function Get-CredCheck {
                     )
                 )
             }
+                [System.Management.Automation.PSCredential]
+            [System.Management.Automation.Credential()]
+            $Credentials = [System.Management.Automation.PSCredential]::Empty,
             #>
+
+            $Credentials = Get-Credential -UserName $UserName -Message $CredentialPrompt
             $FailureMessage = $Null
+            $Domain = $Credentials.GetNetworkCredential().Domain
+
+            [System.Reflection.Assembly]::LoadWithPartialName("System.DirectoryServices.AccountManagement") |
+                Out-Null
+
+            $principalContext = New-Object System.DirectoryServices.AccountManagement.PrincipalContext(
+                [System.DirectoryServices.AccountManagement.ContextType]::Domain, $Domain
+            )
 
             # Verify the credentials prompt wasn't bypassed.
             If ($Credentials) {
@@ -114,6 +123,9 @@ Function Get-CredCheck {
                     $ValidAccount = $principalContext.ValidateCredentials($networkCredential.UserName, $networkCredential.Password)
                     If (-not($ValidAccount)) {
                         $FailureMessage = "Bad user name or password used on credential prompt attempt #$Attempt out of $MaxAttempts."
+                    }
+                    Else{
+                        "it thinks its valid"
                     }
                 }
             # Otherwise the credential prompt was (most likely accidentally) bypassed so record a failure message.
@@ -145,4 +157,4 @@ Function Get-CredCheck {
 }
 $validcred = Get-CredCheck
 #Test-Credential
-Enter-PSSession -Credential $validCred -ComputerName FileServer01
+#Enter-PSSession -Credential $validCred -ComputerName FileServer01

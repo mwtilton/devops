@@ -1,29 +1,9 @@
 Function Get-CredCheck {
     [CmdletBinding()]
     Param (
-        <#
-        [Parameter(
-            Mandatory = $true,
-            ValueFromPipeLine = $true,
-            ValueFromPipelineByPropertyName = $true
-        )]
-        [Alias(
-            'PSCredential'
-        )]
-        [ValidateNotNull()]
-        [System.Management.Automation.PSCredential]
-        [System.Management.Automation.Credential()]
-        $Credentials = [System.Management.Automation.PSCredential]::Empty,
 
-        [Parameter()]
-        [String]
-        $Domain = $Credentials.GetNetworkCredential().Domain
-        #>
     )
     Begin {
-        # Prompt for Credentials and verify them using the DirectoryServices.AccountManagement assembly.
-        Write-Host "Please provide your credentials so the script can continue."
-        #Add-Type -AssemblyName System.DirectoryServices.AccountManagement
         # Extract the current user's domain and also pre-format the user name to be used in the credential prompt.
         $UserDomain = $env:USERDOMAIN
         $UserName = "$UserDomain\$env:USERNAME"
@@ -37,21 +17,6 @@ Function Get-CredCheck {
     }
     Process {
         Do {
-            <#
-            foreach ($item in $Credential) {
-                $networkCredential = $Credential.GetNetworkCredential()
-
-                Write-Output -InputObject $(
-                    $principalContext.ValidateCredentials(
-                        $networkCredential.UserName, $networkCredential.Password
-                    )
-                )
-            }
-                [System.Management.Automation.PSCredential]
-            [System.Management.Automation.Credential()]
-            $Credentials = [System.Management.Automation.PSCredential]::Empty,
-            #>
-
             $Credentials = Get-Credential -UserName $UserName -Message $CredentialPrompt
             $FailureMessage = $Null
             $Domain = $Credentials.GetNetworkCredential().Domain

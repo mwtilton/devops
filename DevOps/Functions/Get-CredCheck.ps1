@@ -1,52 +1,3 @@
-
-Function Test-Credential {
-    [OutputType([Bool])]
-
-    Param (
-        [Parameter(
-            Mandatory = $true,
-            ValueFromPipeLine = $true,
-            ValueFromPipelineByPropertyName = $true
-        )]
-        [Alias(
-            'PSCredential'
-        )]
-        [ValidateNotNull()]
-        [System.Management.Automation.PSCredential]
-        [System.Management.Automation.Credential()]
-        $Credential,
-
-        [Parameter()]
-        [String]
-        $Domain = $Credential.GetNetworkCredential().Domain
-    )
-
-    Begin {
-        [System.Reflection.Assembly]::LoadWithPartialName("System.DirectoryServices.AccountManagement") |
-            Out-Null
-
-        $principalContext = New-Object System.DirectoryServices.AccountManagement.PrincipalContext(
-            [System.DirectoryServices.AccountManagement.ContextType]::Domain, $Domain
-        )
-    }
-
-    Process {
-        foreach ($item in $Credential) {
-            $networkCredential = $Credential.GetNetworkCredential()
-
-            Write-Output -InputObject $(
-                $principalContext.ValidateCredentials(
-                    $networkCredential.UserName, $networkCredential.Password
-                )
-            )
-        }
-    }
-
-    End {
-        $principalContext.Dispose()
-    }
-}
-
 Function Get-CredCheck {
     [CmdletBinding()]
     Param (
@@ -125,7 +76,7 @@ Function Get-CredCheck {
                         $FailureMessage = "Bad user name or password used on credential prompt attempt #$Attempt out of $MaxAttempts."
                     }
                     Else{
-                        "it thinks its valid"
+                        Write-host "it thinks its valid"
                     }
                 }
             # Otherwise the credential prompt was (most likely accidentally) bypassed so record a failure message.
@@ -146,7 +97,10 @@ Function Get-CredCheck {
                     $CredentialPrompt = "Authentication error. THIS IS YOUR LAST CHANCE (attempt #$Attempt out of $MaxAttempts):"
                 }
             }
-
+            Else{
+                Write-Host "Returning credentials"
+                return [PScredential]$Credentials
+            }
         }Until (($ValidAccount) -or ($Attempt -gt $MaxAttempts))
     }
     End {
@@ -155,6 +109,3 @@ Function Get-CredCheck {
 
 
 }
-$validcred = Get-CredCheck
-#Test-Credential
-#Enter-PSSession -Credential $validCred -ComputerName FileServer01

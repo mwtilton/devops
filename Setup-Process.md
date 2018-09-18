@@ -67,10 +67,8 @@ https://social.technet.microsoft.com/wiki/contents/articles/10755.windows-server
 ####DSC Force Removal - For INTEGRATION TESTING  
 --absent to all options  
 
-
-###Features
+###Features  
 [ ] Need DSC for Volume activation Tools  
-
 
 ##APP Servers  
 **ONLY AFTER YOU BUILD THE DC**  
@@ -86,10 +84,7 @@ https://social.technet.microsoft.com/wiki/contents/articles/10755.windows-server
 ##FileServer deployment  
 --Run prepFileServer w/ update help –erroraction sil con  
 --Run buildFileServer w/ ip information  
-[ ] Set up shares and ACL  
-
-
-
+[ ] Create Folders then associate shares to them
 
 #YK Main  
 
@@ -112,10 +107,10 @@ Updates as of Aug 2018
 --Get-DSCConfigurationStatus  
 **DO NOT OVERWRITE THIS**  
 [ ] No activation  
-[ ] Requires Rebuild
+[ ] Requires Rebuild  
 
 
-##YK-SqlServer
+##YK-SqlServer  
 ###SQL Install  
 1.	Install SQL Server Express Edition 2017  
 2.	Install media to folder %downloads%  
@@ -137,18 +132,25 @@ Ports 1433 49172 TCP
 ```$cred = get-credential```  
 ```Invoke-Sqlcmd -ServerInstance 10.1.1.5\sqlexpress -Database Tickets -Query "Select * from Tickets" -credential $cred```  
 
-###Setup
-[ ] Need script to open up firewall to correct ports for SQL
+###Setup  
+[ ] Need script to open up firewall to correct ports for SQL  
 
-#DEV vAPP Rebuild
+#DEV vAPP Rebuild  
 ##Post Power-On/Rebuild checks  
 --RDP  
 --Server Manager (Servers are up)  
 --nmap [the subnet] –F -Pn  
 
 ##prep-Rebuild  
---shutdown remote pcs  
+[ ] shutdown remote pcs  
 
-#General Features
+#General Features  
 [ ] Need to lookup powershell options for indexing servers auto matically from DSC  
-[ ] Cred check on buildS
+[ ] Cred check on buildS  
+  -- Created Get-CredCheck function  
+[ ] Remotely configure from DC or Push updates to servers  
+
+#Notes for VCloud ENV setup  
+[ ] DNS in Org VDC Networks  
+[ ] Use static IP Pool and not manual  
+[ ] RDP gateway 3391 UDP  

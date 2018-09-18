@@ -1,4 +1,3 @@
-#Requires -Version 2.0
 Function Get-LockedOutLocation {
     <#
     .SYNOPSIS
@@ -109,5 +108,3 @@ Function Get-LockedOutLocation {
     }#end process
 
 }#end function
-
-Get-LockedOutLocation MLABR647

@@ -11,9 +11,13 @@ defines which configurations you're interested in managing.
 
 configuration buildFileServer
 {
-    #Import-DscResource -ModuleName xComputerManagement -ModuleVersion 3.2.0.0
-    #Import-DscResource -ModuleName xNetworking -ModuleVersion 5.4.0.0
-    Import-DSCResource -ModuleName StorageDsc
+    Import-DscResource -ModuleName PSDesiredStateConfiguration
+    Import-DscResource -ModuleName xComputerManagement -ModuleVersion 3.2.0.0
+    Import-DscResource -ModuleName xNetworking -ModuleVersion 5.4.0.0
+    Import-DscResource -ModuleName xSmbShare -ModuleVersion 2.1.0.0
+    Import-DSCResource -ModuleName StorageDsc -ModuleVersion 4.1.0.0
+    Import-DscResource -ModuleName cNtfsAccessControl -ModuleVersion 1.3.1
+    Import-DscResource -ModuleName xPSDesiredStateConfiguration -ModuleVersion 8.4.0.0
 
     Node localhost
     {
@@ -47,16 +51,105 @@ configuration buildFileServer
         User Administrator {
             Ensure = "Present"
             UserName = "Administrator"
-            Password = $Cred
+            Password = $credentials
             DependsOn = "[xDnsServerAddress]PrimaryDNSClient"
         }
 
         xComputer ChangeNameAndJoinDomain {
             Name = $node.ThisComputerName
             DomainName    = $node.DomainName
-            Credential    = $domainCred
+            Credential    = $credentials
             DependsOn = "[User]Administrator"
         }
+        File DataDirectory
+        {
+            Ensure = 'Present'
+            DestinationPath = "E:\CompanyData\Data"
+            Type = 'Directory'
+        }
+        xSmbShare MainDriveShare
+        {
+            Ensure = "Present"
+            Name   = "E$"
+            Path = "E:\"
+            FullAccess = "Domain Admins"
+            Description = "This is the main drive share"
+        }
+
+        xSmbShare DataShare
+        {
+            Ensure = "Present"
+            Name   = "Data$"
+            Path = "E:\CompanyData\Data"
+            FullAccess = "Domain Admins"
+            Description = "This is the main Data share"
+        }
+        <#
+        xSmbShare ExecShare
+        {
+            Ensure = "Present"
+            Name   = "Executive$"
+            Path = "E:\Company Data\Executive"
+            FullAccess = "Domain Admins"
+            Description = "This is the main Executive Share"
+        }
+        xSmbShare HRShare
+        {
+            Ensure = "Present"
+            Name   = "HR$"
+            Path = "E:\Company Data\HR"
+            FullAccess = "Domain Admins"
+            Description = "This is the main HR Share"
+        }
+        xSmbShare MarketingShare
+        {
+            Ensure = "Present"
+            Name   = "Marketing$"
+            Path = "E:\Company Data\Marketing"
+            FullAccess = "Domain Admins"
+            Description = "This is the main Marketing Share"
+        }
+        xSmbShare OneDriveShare
+        {
+            Ensure = "Present"
+            Name   = "OneDrive$"
+            Path = "E:\Company Data\OneDrive"
+            FullAccess = "Domain Admins"
+            Description = "This is the main OneDrive Share"
+        }
+        xSmbShare PrivateShare
+        {
+            Ensure = "Present"
+            Name   = "Private$"
+            Path = "E:\Company Data\Private"
+            FullAccess = "Domain Admins"
+            Description = "This is the main Private Share"
+        }
+        xSmbShare QBTestShare
+        {
+            Ensure = "Present"
+            Name   = "QBTest$"
+            Path = "E:\QBTest"
+            FullAccess = "Domain Admins"
+            Description = "This is the main QBTest Share"
+        }
+        xSmbShare UserFilesShare
+        {
+            Ensure = "Present"
+            Name   = "UserFiles$"
+            Path = "E:\Company Data\UserFiles"
+            FullAccess = "Domain Admins"
+            Description = "This is the main UserFiles Share"
+        }
+        xSmbShare UsersShare
+        {
+            Ensure = "Present"
+            Name   = "Users$"
+            Path = "E:\Users"
+            FullAccess = "Domain Admins"
+            Description = "This is the main Users Share"
+        }
+        #>
         <#
         WaitForDisk Disk0
         {
@@ -82,7 +175,74 @@ configuration buildFileServer
         #>
     }
 }
+<#
+Configuration FileResourceDemo
+{
+    Node "localhost"
+    {
+        File DirectoryCopy
+        {
+            Ensure = "Present"  # You can also set Ensure to "Absent"
+            Type = "Directory" # Default is "File".
+            Recurse = $true # Ensure presence of subdirectories, too
+            SourcePath = "C:\Users\Public\Documents\DSCDemo\DemoSource"
+            DestinationPath = "C:\Users\Public\Documents\DSCDemo\DemoDestination"
+        }
 
+        Log AfterDirectoryCopy
+        {
+            # The message below gets written to the Microsoft-Windows-Desired State Configuration/Analytic log
+            Message = "Finished running the file resource with ID DirectoryCopy"
+            DependsOn = "[File]DirectoryCopy" # This means run "DirectoryCopy" first.
+        }
+    }
+}
+
+Configuration MyConfiguration {
+
+  Node "Localhost" {
+
+    ForEach ($Folder in $Node.FolderStructure) {
+
+      # Each of our 'file' resources will be named after the path, but...
+      #   we have to replace : with __ as colons aren't allowed in resource names
+      File $Folder.Path.Replace(':','__') {
+        DestinationPath = $Folder.Path
+        Ensure = $Folder.Ensure
+      }
+
+    } # ForEach
+
+  } # Node "Localhost"
+
+} # configuration MyConfiguration
+
+
+
+$ConfigurationData =
+@{
+    AllNodes = @(
+        @{
+            NodeName = "localhost"
+
+            FolderStructure = @(
+
+                @{
+                    Path =   "D:\Management\Packages"
+                    Ensure = "Present"
+                }
+
+                @{
+                    Path =   "D:\Management\Wallpaper"
+                    Ensure = "Present"
+                }
+
+            ) #FolderStruture = @(...
+
+        } # localhost
+    ) # AllNodes = @(...
+}
+#>
 <#
 Specify values for the configurations you're interested in managing.
 See in the configuration above how variables are used to reference values listed here.
@@ -107,11 +267,13 @@ Lastly, prompt for the necessary username and password combinations, then
 compile the configuration, and then instruct the server to execute that
 configuration against the settings on this local server.
 #>
+Import-Module $env:USERPROFILE\Desktop\GitHub\DevOps\DevOps\DevOps.psm1 -Force -verbose
 
-$domainCred = Get-Credential -UserName company\Administrator -Message "Please enter a new password for Domain Administrator."
-$Cred = Get-Credential -UserName Administrator -Message "Please enter a new password for Local Administrator and other accounts."
 
-buildFileServer -ConfigurationData $ConfigData
+$credentials = Get-CredCheck
+#$Cred = Get-Credential -UserName Administrator -Message "Please enter a new password for Local Administrator and other accounts."
 
-Set-DSCLocalConfigurationManager -Path .\buildFileServer –Verbose
-Start-DscConfiguration -Wait -Force -Path .\buildFileServer -Verbose
+buildFileServer -ConfigurationData $ConfigData -OutputPath $env:USERPROFILE\Desktop\buildFileServer\
+
+Set-DSCLocalConfigurationManager -Path $env:USERPROFILE\Desktop\buildFileServer –Verbose
+Start-DscConfiguration -Wait -Force -Path $env:USERPROFILE\Desktop\buildFileServer -Verbose

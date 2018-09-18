@@ -13,14 +13,18 @@ Install-PackageProvider -Name NuGet -Force
 
 Install-Module xComputerManagement -RequiredVersion 3.2.0.0 -Force
 Install-Module xNetworking -RequiredVersion 5.4.0.0 -Force
-Install-Module StorageDsc
+Install-Module xSmbShare -RequiredVersion 2.1.0.0
+Install-Module StorageDsc -RequiredVersion 4.1.0.0
+Install-Module cNtfsAccessControl -RequiredVersion 1.3.1
+Install-Module xPSDesiredStateConfiguration -RequiredVersion 8.4.0.0
 
-#Enable-PSRemoting -Force
+Enable-PSRemoting -Force
 
 Write-Host "You may now execute '.\buildFileServer.ps1'"
 
 <#
 Get-Partition -DriveLetter 'C' | Resize-Partition -Size 32GB
 New-Partition -DiskNumber 0 -UseMaximumSize -DriveLetter 'E'
-Format-Volume -DriveLetter 'E' -FileSystem NTFS -NewFileSystemLabel 'Data' -Full -Force
+$Edrive = Get-Partition -DriveLetter 'E'
+Format-Volume -DriveLetter $Edrive.DriveLetter -FileSystem NTFS -NewFileSystemLabel 'Data' -Full -Force -Confirm:$false
 #>

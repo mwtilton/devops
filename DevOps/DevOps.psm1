@@ -1,14 +1,14 @@
 $PSDefaultParameterValues=@{'Write-host:BackGroundColor'='Black';'Write-host:ForeGroundColor'='Green'}
 #requires -Version 5.1
 . "$PSScriptRoot\DevOps.Machine.Ps1"
-Import-Module $PSScriptRoot\DevOps.Machine.ps1 -Force -ErrorAction Stop
+Import-Module $PSScriptRoot\DevOps.Machine.ps1 -Force #-ErrorAction Continue
 
 ############################################################################
 #Import related functions
 $functions = Get-ChildItem $PSScriptRoot\Functions -Filter "*.ps1"
 $functions | ForEach-Object {
     #Write-Host $_.Name
-    Import-Module $PSScriptRoot\Functions\$($_.name) -Force
+    Import-Module $PSScriptRoot\Functions\$($_.name) -Force -Verbose
 }
 Export-ModuleMember *
 

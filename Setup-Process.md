@@ -149,3 +149,9 @@ Ports 1433 49172 TCP
 [ ] Need to lookup powershell options for indexing servers auto matically from DSC  
 [ ] Cred check on buildS
   -- Created Get-CredCheck function
+[ ] Remotely configure from DC or Push updates to servers
+
+#Notes for VCloud ENV setup
+[ ] DNS in Org VDC Networks
+[ ] Use static IP Pool and not manual
+[ ] RDP gateway 3391 UDP

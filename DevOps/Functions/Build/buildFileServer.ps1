@@ -50,14 +50,14 @@ configuration buildFileServer
         User Administrator {
             Ensure = "Present"
             UserName = "Administrator"
-            Password = $Cred
+            Password = $credentials
             DependsOn = "[xDnsServerAddress]PrimaryDNSClient"
         }
 
         xComputer ChangeNameAndJoinDomain {
             Name = $node.ThisComputerName
             DomainName    = $node.DomainName
-            Credential    = $domainCred
+            Credential    = $credentials
             DependsOn = "[User]Administrator"
         }
         File DataDirectory
@@ -266,9 +266,11 @@ Lastly, prompt for the necessary username and password combinations, then
 compile the configuration, and then instruct the server to execute that
 configuration against the settings on this local server.
 #>
+Import-Module $env:USERPROFILE\Desktop\GitHub\DevOps\DevOps\DevOps.psm1 -Force -verbose
 
-$domainCred = Get-Credential -UserName company\Administrator -Message "Please enter a new password for Domain Adminsistrator."
-$Cred = Get-Credential -UserName Administrator -Message "Please enter a new password for Local Administrator and other accounts."
+
+$credentials = Get-CredCheck
+#$Cred = Get-Credential -UserName Administrator -Message "Please enter a new password for Local Administrator and other accounts."
 
 buildFileServer -ConfigurationData $ConfigData
 

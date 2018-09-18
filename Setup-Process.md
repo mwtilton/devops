@@ -108,7 +108,7 @@ Updates as of Aug 2018
 --Get-DSCConfigurationStatus  
 **DO NOT OVERWRITE THIS**  
 [ ] No activation  
-[ ] Requires Rebuild
+[ ] Requires Rebuild  
 
 
 ##YK-SqlServer
@@ -133,25 +133,25 @@ Ports 1433 49172 TCP
 ```$cred = get-credential```  
 ```Invoke-Sqlcmd -ServerInstance 10.1.1.5\sqlexpress -Database Tickets -Query "Select * from Tickets" -credential $cred```  
 
-###Setup
-[ ] Need script to open up firewall to correct ports for SQL
+###Setup  
+[ ] Need script to open up firewall to correct ports for SQL  
 
-#DEV vAPP Rebuild
+#DEV vAPP Rebuild  
 ##Post Power-On/Rebuild checks  
 --RDP  
 --Server Manager (Servers are up)  
 --nmap [the subnet] –F -Pn  
 
 ##prep-Rebuild  
---shutdown remote pcs  
+[ ] shutdown remote pcs  
 
-#General Features
+#General Features  
 [ ] Need to lookup powershell options for indexing servers auto matically from DSC  
-[ ] Cred check on buildS
-  -- Created Get-CredCheck function
-[ ] Remotely configure from DC or Push updates to servers
+[ ] Cred check on buildS  
+  -- Created Get-CredCheck function  
+[ ] Remotely configure from DC or Push updates to servers  
 
-#Notes for VCloud ENV setup
-[ ] DNS in Org VDC Networks
-[ ] Use static IP Pool and not manual
-[ ] RDP gateway 3391 UDP
+#Notes for VCloud ENV setup  
+[ ] DNS in Org VDC Networks  
+[ ] Use static IP Pool and not manual  
+[ ] RDP gateway 3391 UDP  

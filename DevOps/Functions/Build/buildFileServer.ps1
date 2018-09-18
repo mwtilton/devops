@@ -11,6 +11,7 @@ defines which configurations you're interested in managing.
 
 configuration buildFileServer
 {
+    Import-DscResource -ModuleName PSDesiredStateConfiguration
     Import-DscResource -ModuleName xComputerManagement -ModuleVersion 3.2.0.0
     Import-DscResource -ModuleName xNetworking -ModuleVersion 5.4.0.0
     Import-DscResource -ModuleName xSmbShare -ModuleVersion 2.1.0.0
@@ -272,7 +273,7 @@ Import-Module $env:USERPROFILE\Desktop\GitHub\DevOps\DevOps\DevOps.psm1 -Force -
 $credentials = Get-CredCheck
 #$Cred = Get-Credential -UserName Administrator -Message "Please enter a new password for Local Administrator and other accounts."
 
-buildFileServer -ConfigurationData $ConfigData
+buildFileServer -ConfigurationData $ConfigData -OutputPath $env:USERPROFILE\Desktop\buildFileServer\
 
 Set-DSCLocalConfigurationManager -Path $env:USERPROFILE\Desktop\buildFileServer –Verbose
 Start-DscConfiguration -Wait -Force -Path $env:USERPROFILE\Desktop\buildFileServer -Verbose

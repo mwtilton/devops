@@ -48,15 +48,12 @@ Authored by mwtilton
 [ ] pin Firefox to taskbar  
 [X] Get Website link location  
 [X] Update link in prepGit  
-X Need to install Git  
-X Make Github dir  
---Clone repo into that  
---Installed new git cred manager 2.19  
---Ran updates 8/29/18  
+[X] Install Git  
+`Defaults v2.19.0`  
+--Run prepPostRebuild
+[ ] Make Github dir  
+[ ] Clone repo into that  
 
-[?]REBOOT – Git doesn’t seem to take effect after install  
-X Pull in Devops Git  
---Set build scripts to domain adherent setup status  
 X xDNSServer*Zones  
 [?] Keeping DNS Zones to 3.168.192 but those are the same as the servers IP addresses...  
 X Uncomment out MyAccount  

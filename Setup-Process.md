@@ -13,13 +13,13 @@ Authored by mwtilton
 --Install Wmware tools  
 `win + d:`  
 `enter`  
-
 --Remove VMware tools CD  
 --disk cleanup wizard  
-[ ] Folder Options
-`Hidden Folders`
-`File extensions`
+[ ] WinUpdates
 --Sysprep to shutdown  
+[-] IP changes do not hold after Rebuild power on  
+[-] Windows Search doesn't hold after rebuild
+[+] VMWare tools does hold after Rebuild  
 
 ###GPT HDD Failures  
 `[-]Set HDD to "LSI Logic SAS"`  
@@ -30,10 +30,16 @@ Authored by mwtilton
 `[-]EFI Boot hass issues with select the virutal disk need to rebuild from scratch`  
 
 ##DEV vAPP DC  
-X Set IP to 8.8.8.8 for initial DNS server  
-X Need to remove IE enhanced security  
-X Need to set folder options for admin user  
-X Need to setup indexing  
+-- Set IP to 8.8.8.8 for initial DNS server  
+[X] Change VCD to DNAT to new STATIC IP
+[X] Enable RDP into BoX
+[X] Enable RDP Firewall settings
+[-] CredSSIP Error
+-- Need to remove IE enhanced security  
+[ ] File/Folder Options
+`Hidden Folders`
+`File extensions`
+[ ] Windows Search
 X Need to install Firefox  
 X Need to install Git  
 X Make Github dir  

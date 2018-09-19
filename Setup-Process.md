@@ -13,13 +13,13 @@ Authored by mwtilton
 --Install Wmware tools  
 `win + d:`  
 `enter`  
-
 --Remove VMware tools CD  
 --disk cleanup wizard  
-[ ] Folder Options
-`Hidden Folders`
-`File extensions`
+[ ] Run Windows Updates before sysprep  
 --Sysprep to shutdown  
+[-] IP changes do not hold after Rebuild power on  
+[-] Windows Search doesn't hold after rebuild
+[+] VMWare tools does hold after Rebuild  
 
 ###GPT HDD Failures  
 `[-]Set HDD to "LSI Logic SAS"`  
@@ -30,13 +30,27 @@ Authored by mwtilton
 `[-]EFI Boot hass issues with select the virutal disk need to rebuild from scratch`  
 
 ##DEV vAPP DC  
-X Set IP to 8.8.8.8 for initial DNS server  
-X Need to remove IE enhanced security  
-X Need to set folder options for admin user  
-X Need to setup indexing  
-X Need to install Firefox  
+-- Set IP to with 8.8.8.8 for initial DNS server  
+[X] Change VCD to DNAT to new STATIC IP  
+[X] Enable RDP into BoX  
+[X] Enable RDP Firewall settings  
+--RDP into the box  
+
+[-] CredSSIP Error  
+-- Need to remove IE enhanced security  
+[X] File/Folder Options  
+[ ] Script to run this automatically -- add to prepGIT  
+`Hidden Folders`  
+`File extensions`  
+[X] Windows Search  
+[X] Need to install Firefox  
+[X] Set Firefox as default  
+[ ] pin Firefox to taskbar  
+[X] Get Website link location  
+[X] Update link in prepGit  
 X Need to install Git  
 X Make Github dir  
+--Clone repo into that  
 --Installed new git cred manager 2.19  
 --Ran updates 8/29/18  
 
@@ -67,7 +81,7 @@ https://social.technet.microsoft.com/wiki/contents/articles/10755.windows-server
 ####DSC Force Removal - For INTEGRATION TESTING  
 --absent to all options  
 
-###Features
+###Features  
 [ ] Need DSC for Volume activation Tools  
 
 ##APP Servers  
@@ -84,7 +98,6 @@ https://social.technet.microsoft.com/wiki/contents/articles/10755.windows-server
 ##FileServer deployment  
 --Run prepFileServer w/ update help –erroraction sil con  
 --Run buildFileServer w/ ip information  
-[ ] Set up shares and ACL  
 [ ] Create Folders then associate shares to them
 
 #YK Main  
@@ -111,7 +124,7 @@ Updates as of Aug 2018
 [ ] Requires Rebuild  
 
 
-##YK-SqlServer
+##YK-SqlServer  
 ###SQL Install  
 1.	Install SQL Server Express Edition 2017  
 2.	Install media to folder %downloads%  
@@ -155,3 +168,5 @@ Ports 1433 49172 TCP
 [ ] DNS in Org VDC Networks  
 [ ] Use static IP Pool and not manual  
 [ ] RDP gateway 3391 UDP  
+[ ] Add vscode default to setupGit and enforcing it as editor
+[ ] Change prepGit to prep rebuild

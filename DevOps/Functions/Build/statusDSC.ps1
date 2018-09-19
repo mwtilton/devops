@@ -43,9 +43,9 @@ $Servers|%{ Import-module servermanager ; $inst = ((Get-WindowsFeature -Computer
 Try {
 
     $params = @{
-        SessionHost = "APP01.democloud.local"
-        ConnectionBroker = "DC01.democloud.local"
-        WebAccessServer = "DC01.democloud.local"
+        SessionHost = ".democloud.local"
+        ConnectionBroker = ".democloud.local"
+        WebAccessServer = ".democloud.local"
     }
 
 

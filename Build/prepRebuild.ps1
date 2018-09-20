@@ -43,7 +43,16 @@ Function Start-PrepRebuild {
     Write-Host $pwd.Path
     Read-Host "Ready to clone DevOps Repo?"
     #git clone --single-branch -b branch host:/dir.git
-    git clone --single-branch -b $branch "https://mwtilton@bitbucket.org/mwtilton/devops.git"
+    Try{
+        git clone --single-branch -b $branch "https://mwtilton@bitbucket.org/mwtilton/devops.git"
+    }
+    Catch{
+        "Error cloning the repo from $branch"
+        $_ | fl * -force
+        $_.InvocationInfo.BoundParameters | fl * -force
+        $_.Exception
+        break
+    }
 
     Set-Location $path\DevOps
 

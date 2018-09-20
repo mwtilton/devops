@@ -160,7 +160,7 @@ $ConfigData = @{
             GatewayAddress = "192.168.1.1"
             DNSAddress = "127.0.0.1"
             InterfaceAlias = "Ethernet0"
-            DomainName = "democloud.local"
+            DomainName = "democloud.local"
             DomainDN = "DC=democloud,DC=local"
             DCDatabasePath = "C:\NTDS"
             DCLogPath = "C:\NTDS"

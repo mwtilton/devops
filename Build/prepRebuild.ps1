@@ -55,7 +55,7 @@ Function Start-PrepRebuild {
     Read-Host "Ready to clone DevOps Repo?"
     #git clone --single-branch -b branch host:/dir.git
     Try{
-        git clone --single-branch -b $branch "https://mwtilton@bitbucket.org/mwtilton/devops.git" --progress -q
+        git clone --single-branch -b $branch "https://mwtilton@bitbucket.org/mwtilton/devops.git"
         #if ($LASTEXITCODE) { Throw "git clone failure (exit code $LASTEXITCODE" }
     }
     Catch{

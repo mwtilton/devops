@@ -2,8 +2,8 @@ Function Invoke-SetupGit {
     Write-host "Clearing pre-exisitng config --global settings"
     #git config --global --unset-all alias
     #git config --global --unset-all core
-    #git config --global --unset-all credential.helper
-    #git config --global --unset-all user
+    git config --global --unset-all credential.helper
+    git config --global --unset-all user.name
 
     $user = Read-Host "User Name"
     git config --global user.name "$user"

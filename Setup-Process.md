@@ -36,6 +36,7 @@ Authored by mwtilton
 [X] Enable RDP Firewall settings  
 --RDP into the box  
 [-] CredSSIP Error  
+
 -- Need to remove IE enhanced security  
 [ ] File/Folder Options  
 [ ] Script to run this automatically -- add to prepGIT  

@@ -1,11 +1,4 @@
-<# Notes:
-This script must be run after prepDomainController.ps1.
-#>
-
-<#
-Specify the configuration to be applied to the server.  This section
-defines which configurations you're interested in managing.
-#>
+<# Notes: This script must be run after prepDomainController.ps1. #>
 
 configuration buildDomainController
 {

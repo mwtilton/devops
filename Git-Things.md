@@ -16,3 +16,7 @@ Tests/DevOps.Tests.ps1
 ###git push  
 
 ###git push origin --tag  
+
+####git log — all — grep=’commit message’
+####git config --global alias.prum "pull --rebase upstream master"
+####git status --ignored

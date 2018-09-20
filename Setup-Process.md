@@ -15,7 +15,7 @@ Authored by mwtilton
 `enter`  
 --Remove VMware tools CD  
 --disk cleanup wizard  
-[ ] WinUpdates
+[ ] Run Windows Updates before sysprep  
 --Sysprep to shutdown  
 [-] IP changes do not hold after Rebuild power on  
 [-] Windows Search doesn't hold after rebuild
@@ -30,25 +30,30 @@ Authored by mwtilton
 `[-]EFI Boot hass issues with select the virutal disk need to rebuild from scratch`  
 
 ##DEV vAPP DC  
--- Set IP to 8.8.8.8 for initial DNS server  
-[X] Change VCD to DNAT to new STATIC IP
-[X] Enable RDP into BoX
-[X] Enable RDP Firewall settings
-[-] CredSSIP Error
--- Need to remove IE enhanced security  
-[ ] File/Folder Options
-`Hidden Folders`
-`File extensions`
-[ ] Windows Search
-X Need to install Firefox  
-X Need to install Git  
-X Make Github dir  
---Installed new git cred manager 2.19  
---Ran updates 8/29/18  
+-- Set IP to with 8.8.8.8 for initial DNS server  
+[X] Change VCD to DNAT to new STATIC IP  
+[X] Enable RDP into BoX  
+[X] Enable RDP Firewall settings  
+--RDP into the box  
 
-[?]REBOOT – Git doesn’t seem to take effect after install  
-X Pull in Devops Git  
---Set build scripts to domain adherent setup status  
+[-] CredSSIP Error  
+-- Need to remove IE enhanced security  
+[X] File/Folder Options  
+[ ] Script to run this automatically -- add to prepGIT  
+`Hidden Folders`  
+`File extensions`  
+[X] Windows Search  
+[X] Need to install Firefox  
+[X] Set Firefox as default  
+[ ] pin Firefox to taskbar  
+[X] Get Website link location  
+[X] Update link in prepGit  
+[X] Install Git  
+`Defaults v2.19.0`  
+--Run prepPostRebuild
+[ ] Make Github dir  
+[ ] Clone repo into that  
+
 X xDNSServer*Zones  
 [?] Keeping DNS Zones to 3.168.192 but those are the same as the servers IP addresses...  
 X Uncomment out MyAccount  
@@ -160,3 +165,5 @@ Ports 1433 49172 TCP
 [ ] DNS in Org VDC Networks  
 [ ] Use static IP Pool and not manual  
 [ ] RDP gateway 3391 UDP  
+[ ] Add vscode default to setupGit and enforcing it as editor
+[ ] Change prepGit to prep rebuild

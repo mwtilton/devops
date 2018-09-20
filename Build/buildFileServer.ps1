@@ -269,9 +269,7 @@ configuration against the settings on this local server.
 #>
 Import-Module $env:USERPROFILE\Desktop\GitHub\DevOps\DevOps\DevOps.psm1 -Force -verbose
 
-
 $credentials = Get-CredCheck
-#$Cred = Get-Credential -UserName Administrator -Message "Please enter a new password for Local Administrator and other accounts."
 
 buildFileServer -ConfigurationData $ConfigData -OutputPath $env:USERPROFILE\Desktop\buildFileServer\
 

@@ -1,11 +1,32 @@
 Function Start-PrepRebuild {
-    $path = "$env:USERPROFILE\Documents\Github"
-    New-Item -ItemType Directory -Path $path -ErrorAction SilentlyContinue
+    [CmdletBinding()]
+    Param(
+        #Branch Selection
+        [Parameter(
+            Mandatory=$true
+        )]
+        [string]
+        $branch,
+        #Path Selection
+        [Parameter(
+            Mandatory=$false
+        )]
+        [string]
+        $path = "$env:USERPROFILE\Desktop\Github"
+    )
+    try{
+        New-Item -ItemType Directory -Path $path -ErrorAction Stop
+    }
+    Catch{
+        "Something happened with $_.exception"
+        break
+    }
     Set-Location $path
 
     #Start-Process "https://github.com/git-for-windows/git/releases/download/v2.18.0.windows.1/Git-2.18.0-64-bit.exe"
     #Read-Host "Holding for installation of git"
-    Get-Process -Name git
+    #Get-Process -Name git -ErrorAction stop
+
     Try{
         git --version
     }
@@ -21,24 +42,26 @@ Function Start-PrepRebuild {
 
     Write-Host $pwd.Path
     Read-Host "Ready to clone DevOps Repo?"
-    git clone "https://mwtilton@bitbucket.org/mwtilton/devops.git"
+    #git clone --single-branch -b branch host:/dir.git
+    git clone --single-branch -b $branch "https://mwtilton@bitbucket.org/mwtilton/devops.git"
 
     Set-Location $path\DevOps
 
     . $path\DevOps\SetupGit\SetupGit.ps1
     Invoke-SetupGit
+    git fetch --all
     Read-Host "Ready to set the branch information?"
-    git branch
+    Try {
+        git branch
+        git branch $branch
+        git branch -u origin/$branch
+        git checkout $branch
+        git pull
+    }
+    Catch{
+        "couldn't properly setup the branch information"
+        break
+    }
 
-    git branch build
-
-    git branch -u origin/build
-
-    git checkout build
-
-    git pull
-
-    #. "$gitFolder\Devops\Devops\Functions\Build\prepDomainController.ps1"
-
-    Start-Process powershell_ise -ArgumentList "$gitFolder\Devops\Build\prepDomainController.ps1" -verb RunAs
+    Start-Process powershell_ise -ArgumentList "$path\Devops\Build\prepDomainController.ps1" -verb RunAs
 }

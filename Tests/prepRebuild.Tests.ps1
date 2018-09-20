@@ -7,13 +7,14 @@ Describe "prepGit" -Tags "GIT" {
         Mock Start-Process { return $true}
         Mock Get-Process {}
 
-        Mock Invoke-Command { return $true } -ParameterFilter { $Command -like "*git*"}
+        Mock Invoke-Command { return "/fake-path" } -ParameterFilter { $Command -eq "git branch"}
+        Mock Invoke-Command { return "/fake-path" } -ParameterFilter { $Command -eq "git branch build"}
+        Mock Invoke-Command { return "/fake-path" } -ParameterFilter { $Command -eq "git branch -u origin/build"}
+        Mock Invoke-Command { return "/fake-path" } -ParameterFilter { $Command -eq "git checkout build"}
+        Mock Invoke-Command { return "/fake-path" } -ParameterFilter { $Command -eq "git pull"}
 
         Start-PrepRebuild
 
-        It "has location is set to github location" {
-            $pwd.Path | Should Be "$env:USERPROFILE\Documents\Github"
-        }
         It "has the github folder" {
             "$env:USERPROFILE\Documents\Github" | Should Exist
         }

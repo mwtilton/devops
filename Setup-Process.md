@@ -15,10 +15,10 @@ Authored by mwtilton
 `enter`  
 --Remove VMware tools CD  
 --disk cleanup wizard  
-[ ] Run Windows Updates before sysprep  
+[ ] Run Windows Updates before sysprep (1 restart)  
 --Sysprep to shutdown  
 [-] IP changes do not hold after Rebuild power on  
-[-] Windows Search doesn't hold after rebuild
+[-] Windows Search doesn't hold after rebuild  
 [+] VMWare tools does hold after Rebuild  
 
 ###GPT HDD Failures  
@@ -31,30 +31,29 @@ Authored by mwtilton
 
 ##DEV vAPP DC  
 -- Set IP to with 8.8.8.8 for initial DNS server  
-[X] Change VCD to DNAT to new STATIC IP  
+-- Change VCD to DNAT to new STATIC IP  
 [X] Enable RDP into BoX  
 [X] Enable RDP Firewall settings  
 --RDP into the box  
-
 [-] CredSSIP Error  
 -- Need to remove IE enhanced security  
-[X] File/Folder Options  
+[ ] File/Folder Options  
 [ ] Script to run this automatically -- add to prepGIT  
 `Hidden Folders`  
 `File extensions`  
-[X] Windows Search  
-[X] Need to install Firefox  
-[X] Set Firefox as default  
+[ ] Windows Search  
+[ ] Need to install Firefox  
+[ ] Set Firefox as default  
 [ ] pin Firefox to taskbar  
-[X] Get Website link location  
-[X] Update link in prepGit  
-[X] Install Git  
+[ ] Get Website link location  
+[ ] Update link in prepGit  
+[ ] Install Git  
 `Defaults v2.19.0`  
 --Run prepPostRebuild
 [ ] Make Github dir  
 [ ] Clone repo into that  
 
-X xDNSServer*Zones  
+X xDNSServer Zones  
 [?] Keeping DNS Zones to 3.168.192 but those are the same as the servers IP addresses...  
 X Uncomment out MyAccount  
 X Set myaccount to personal account in all places  

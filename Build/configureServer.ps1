@@ -11,6 +11,7 @@ defines which configurations you're interested in managing.
 
 configuration configureServer
 {
+    Import-DscResource -ModuleName PSDesiredStateConfiguration
     Import-DscResource -ModuleName xComputerManagement -ModuleVersion 3.2.0.0
     Import-DscResource -ModuleName xNetworking -ModuleVersion 5.4.0.0
 

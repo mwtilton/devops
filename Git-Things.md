@@ -1,0 +1,18 @@
+#Useful Git CLI commands  
+
+###git mv tests Tests  
+fatal: source directory is empty, source=tests, destination=tmp  
+Checking rename of 'tests' to 'tmp'  
+####git ls-files  
+Tests/DevOps.Tests.ps1  
+####tree . /a /f  
+\---tests  
+        DevOps.Tests.ps1  
+###Solution is to just rename the folder as git is already tracking it as Tests  
+
+###git mv tests tmp  
+###git mv tests Tests  
+###git commit -a -m "the message"  
+###git push  
+
+###git push origin --tag  

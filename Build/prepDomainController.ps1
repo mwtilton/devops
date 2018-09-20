@@ -10,6 +10,7 @@ Disclaimer - This example code is provided without copyright and AS IS.
 It is free for you to use and modify.
 
 #>
+Update-Help -ErrorAction SilentlyContinue
 
 Get-PackageSource -Name PSGallery | Set-PackageSource -Trusted -Force -ForceBootstrap
 

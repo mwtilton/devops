@@ -49,22 +49,14 @@ Authored by mwtilton
 `Hidden Folders`  
 `File extensions`  
 [X] Windows Search  
+##DO NOT RUN FROM ISE  
+--Run prepRebuild  
 
-
-[ ] Need to install Firefox  
+[X] Need to install Firefox  
 [ ] Set Firefox as default  
 [ ] pin Firefox to taskbar  
 
-
-##DO NOT RUN FROM ISE  
---Run prepPostRebuild  
-[ ] Make Github dir  
-[ ] Clone repo into that  
-
-X xDNSServer Zones  
 [?] Keeping DNS Zones to 3.168.192 but those are the same as the servers IP addresses...  
-X Uncomment out MyAccount  
-X Set myaccount to personal account in all places  
 
 --Run prepDC  
 --Run BuildDC  

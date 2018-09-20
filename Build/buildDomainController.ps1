@@ -95,8 +95,8 @@ configuration buildDomainController
 
         xADDomain FirstDC {
             DomainName = $node.DomainName
-            DomainAdministratorCredential = $domainCred
-            SafemodeAdministratorPassword = $domainCred
+            DomainAdministratorCredential = $credentials
+            SafemodeAdministratorPassword = $credentials
             DatabasePath = $node.DCDatabasePath
             LogPath = $node.DCLogPath
             SysvolPath = $node.SysvolPath
@@ -176,14 +176,11 @@ Lastly, prompt for the necessary username and password combinations, then
 compile the configuration, and then instruct the server to execute that
 configuration against the settings on this local server.
 #>
-Import-Module $env:USERPROFILE\Desktop\GitHub\DevOps\DevOps\DevOps.psm1 -Force -verbose
 
-$credentials = Get-CredCheck
 
-#$domainCred = Get-Credential -UserName company\Administrator -Message "Please enter a new password for Domain Administrator."
-#$Cred = Get-Credential -UserName Administrator -Message "Please enter a new password for Local Administrator and other accounts."
+$credentials = Get-Credential -UserName Administrator -Message "Please enter a new password for Local Administrator and other accounts."
 
-BuildDomainController -ConfigurationData $ConfigData -Path $env:USERPROFILE\Desktop\buildDomainController
+BuildDomainController -ConfigurationData $ConfigData -OutPutPath $env:USERPROFILE\Desktop\buildDomainController
 
 Set-DSCLocalConfigurationManager -Path $env:USERPROFILE\Desktop\buildDomainController –Verbose
 Start-DscConfiguration -Wait -Force -Path $env:USERPROFILE\Desktop\buildDomainController -Verbose

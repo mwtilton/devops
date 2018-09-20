@@ -56,8 +56,8 @@ Authored by mwtilton
 [ ] pin Firefox to taskbar  
 
 
-
---Run prepPostRebuild
+##DO NOT RUN FROM ISE  
+--Run prepPostRebuild  
 [ ] Make Github dir  
 [ ] Clone repo into that  
 

@@ -22,4 +22,3 @@ Install-Module xDnsServer -RequiredVersion 1.9.0.0 -Force
 Install-Module xActiveDirectory -RequiredVersion 2.16.0.0 -Force
 
 Write-Host "You may now execute '.\buildDomainController.ps1'"
-

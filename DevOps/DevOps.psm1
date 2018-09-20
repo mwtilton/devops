@@ -8,7 +8,7 @@ Import-Module $PSScriptRoot\DevOps.Machine.ps1 -Force #-ErrorAction Continue
 $functions = Get-ChildItem $PSScriptRoot\Functions -Filter "*.ps1"
 $functions | ForEach-Object {
     #Write-Host $_.Name
-    Import-Module $PSScriptRoot\Functions\$($_.name) -Force -Verbose
+    Import-Module $PSScriptRoot\Functions\$($_.name) -Force
 }
 Export-ModuleMember *
 

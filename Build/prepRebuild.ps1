@@ -55,13 +55,14 @@ Function Start-PrepRebuild {
     Read-Host "Ready to clone DevOps Repo?"
     #git clone --single-branch -b branch host:/dir.git
     Try{
-        git clone --single-branch -b $branch "https://mwtilton@bitbucket.org/mwtilton/devops.git"
-        if ($?) {throw}
+        git clone --single-branch -b $branch "https://mwtilton@bitbucket.org/mwtilton/devops.git" --progress -q
+        #if ($LASTEXITCODE) { Throw "git clone failure (exit code $LASTEXITCODE" }
     }
     Catch{
-        "Error cloning the repo from $branch"
+        throw "git clone failed"
         break
     }
+
 
     Set-Location $path\DevOps
 
@@ -82,4 +83,5 @@ Function Start-PrepRebuild {
     }
 
     Start-Process powershell_ise -ArgumentList "$path\Devops\Build\prepDomainController.ps1" -verb RunAs
+    Start-Process powershell_ise -ArgumentList "$path\Devops\Build\buildDomainController.ps1" -verb RunAs
 }

@@ -1,4 +1,7 @@
 Function Invoke-SetupGit {
+    Write-host "Clearing preexisitng settings"
+    git config --unset-all
+    git config --global --unset-all
 
     $user = Read-Host "User Name"
     git config --global user.name "$user"

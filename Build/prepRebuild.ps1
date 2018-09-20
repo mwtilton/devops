@@ -18,8 +18,16 @@ Function Start-PrepRebuild {
         New-Item -ItemType Directory -Path $path -ErrorAction Stop
     }
     Catch{
-        "Something happened with $_.exception"
-        break
+        If($_.Exception.ToString().Contains("An item with the specified name")){
+            Write-Host "Folder Exists. Skipping!" -ForegroundColor DarkGreen
+        }
+        Else{
+            $_ | fl * -force
+            $_.InvocationInfo.BoundParameters | fl * -force
+            $_.Exception
+            break
+        }
+
     }
     Set-Location $path
 
@@ -32,6 +40,9 @@ Function Start-PrepRebuild {
     }
     Catch{
         "Git broke for some reason"
+        $_ | fl * -force
+        $_.InvocationInfo.BoundParameters | fl * -force
+        $_.Exception
         break
     }
 
@@ -45,12 +56,10 @@ Function Start-PrepRebuild {
     #git clone --single-branch -b branch host:/dir.git
     Try{
         git clone --single-branch -b $branch "https://mwtilton@bitbucket.org/mwtilton/devops.git"
+        if ($?) {throw}
     }
     Catch{
         "Error cloning the repo from $branch"
-        $_ | fl * -force
-        $_.InvocationInfo.BoundParameters | fl * -force
-        $_.Exception
         break
     }
 
@@ -62,9 +71,9 @@ Function Start-PrepRebuild {
     Read-Host "Ready to set the branch information?"
     Try {
         git branch
-        git branch $branch
+        #git branch $branch
         git branch -u origin/$branch
-        git checkout $branch
+        #git checkout $branch
         git pull
     }
     Catch{

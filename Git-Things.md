@@ -20,3 +20,7 @@ Tests/DevOps.Tests.ps1
 ####git log — all — grep=’commit message’
 ####git config --global alias.prum "pull --rebase upstream master"
 ####git status --ignored
+
+##Forget PW
+####git config --unset-all credential.helper
+####git config --global --unset-all credential.helper

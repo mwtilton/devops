@@ -17,6 +17,12 @@ Authored by mwtilton
 --disk cleanup wizard  
 [ ] Run Windows Updates before sysprep (1 restart)  
 --Sysprep to shutdown  
+[ ] Install Git  
+`Defaults v2.19.0`  
+`Windows CLI`  
+[ ] REBOOT  
+
+--Save Template  
 [-] IP changes do not hold after Rebuild power on  
 [-] Windows Search doesn't hold after rebuild  
 [+] VMWare tools does hold after Rebuild  
@@ -38,18 +44,19 @@ Authored by mwtilton
 [-] CredSSIP Error  
 
 -- Need to remove IE enhanced security  
-[ ] File/Folder Options  
-[ ] Script to run this automatically -- add to prepGIT  
+[X] File/Folder Options  
+[ ] Script to run this automatically -- add to prepRebuild  
 `Hidden Folders`  
 `File extensions`  
-[ ] Windows Search  
+[X] Windows Search  
+
+
 [ ] Need to install Firefox  
 [ ] Set Firefox as default  
 [ ] pin Firefox to taskbar  
-[ ] Get Website link location  
-[ ] Update link in prepGit  
-[ ] Install Git  
-`Defaults v2.19.0`  
+
+
+
 --Run prepPostRebuild
 [ ] Make Github dir  
 [ ] Clone repo into that  

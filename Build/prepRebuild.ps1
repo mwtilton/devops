@@ -1,22 +1,33 @@
-Function Start-PrepGit {
+Function Start-PrepRebuild {
+    $path = "$env:USERPROFILE\Documents\Github"
+    New-Item -ItemType Directory -Path $path -ErrorAction SilentlyContinue
+    Set-Location $path
 
-    $folder = New-Item -ItemType Directory -Path $env:USERPROFILE\Documents\GitHub
-    Set-Location $Folder
+    #Start-Process "https://github.com/git-for-windows/git/releases/download/v2.18.0.windows.1/Git-2.18.0-64-bit.exe"
+    #Read-Host "Holding for installation of git"
+    Get-Process -Name git
+    Try{
+        git --version
+    }
+    Catch{
+        "Git broke for some reason"
+        break
+    }
 
-    Start-Process "https://github.com/git-for-windows/git/releases/download/v2.18.0.windows.1/Git-2.18.0-64-bit.exe"
-    Read-Host "Holding for installation of git"
+    Read-host "We good fam???"
 
     Start-Process "https://www.mozilla.org/en-US/firefox/download/thanks/"
     Read-Host "Holding for installation of FireFox"
 
-        Read-Host "Ready to clone DevOps Repo?"
+    Write-Host $pwd.Path
+    Read-Host "Ready to clone DevOps Repo?"
     git clone "https://mwtilton@bitbucket.org/mwtilton/devops.git"
 
-    Set-Location $gitFolder\DevOps
+    Set-Location $path\DevOps
 
-    . $gitFolder\DevOps\SetupGit\SetupGit.ps1
+    . $path\DevOps\SetupGit\SetupGit.ps1
     Invoke-SetupGit
-
+    Read-Host "Ready to set the branch information?"
     git branch
 
     git branch build

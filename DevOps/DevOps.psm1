@@ -1,7 +1,7 @@
 $PSDefaultParameterValues=@{'Write-host:BackGroundColor'='Black';'Write-host:ForeGroundColor'='Green'}
 #requires -Version 5.1
 . "$PSScriptRoot\DevOps.Machine.Ps1"
-Import-Module $PSScriptRoot\DevOps.Machine.ps1 -Force -ErrorAction Stop
+Import-Module $PSScriptRoot\DevOps.Machine.ps1 -Force #-ErrorAction Continue
 
 ############################################################################
 #Import related functions

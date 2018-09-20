@@ -13,10 +13,19 @@ Authored by mwtilton
 --Install Wmware tools  
 `win + d:`  
 `enter`  
-
 --Remove VMware tools CD  
 --disk cleanup wizard  
+[ ] Run Windows Updates before sysprep (1 restart)  
 --Sysprep to shutdown  
+[ ] Install Git  
+`Defaults v2.19.0`  
+`Windows CLI`  
+[ ] REBOOT  
+
+--Save Template  
+[-] IP changes do not hold after Rebuild power on  
+[-] Windows Search doesn't hold after rebuild  
+[+] VMWare tools does hold after Rebuild  
 
 ###GPT HDD Failures  
 `[-]Set HDD to "LSI Logic SAS"`  
@@ -27,23 +36,27 @@ Authored by mwtilton
 `[-]EFI Boot hass issues with select the virutal disk need to rebuild from scratch`  
 
 ##DEV vAPP DC  
-X Set IP to 8.8.8.8 for initial DNS server  
-X Need to remove IE enhanced security  
-X Need to set folder options for admin user  
-X Need to setup indexing  
-X Need to install Firefox  
-X Need to install Git  
-X Make Github dir  
---Installed new git cred manager 2.19  
---Ran updates 8/29/18  
+-- Set IP to with 8.8.8.8 for initial DNS server  
+-- Change VCD to DNAT to new STATIC IP  
+[X] Enable RDP into BoX  
+[X] Enable RDP Firewall settings  
+--RDP into the box  
+[-] CredSSIP Error  
 
-[?]REBOOT – Git doesn’t seem to take effect after install  
-X Pull in Devops Git  
---Set build scripts to domain adherent setup status  
-X xDNSServer*Zones  
+-- Need to remove IE enhanced security  
+[X] File/Folder Options  
+[ ] Script to run this automatically -- add to prepRebuild  
+`Hidden Folders`  
+`File extensions`  
+[X] Windows Search  
+##DO NOT RUN FROM ISE  
+--Run prepRebuild  
+
+[X] Need to install Firefox  
+[ ] Set Firefox as default  
+[ ] pin Firefox to taskbar  
+
 [?] Keeping DNS Zones to 3.168.192 but those are the same as the servers IP addresses...  
-X Uncomment out MyAccount  
-X Set myaccount to personal account in all places  
 
 --Run prepDC  
 --Run BuildDC  
@@ -64,10 +77,8 @@ https://social.technet.microsoft.com/wiki/contents/articles/10755.windows-server
 ####DSC Force Removal - For INTEGRATION TESTING  
 --absent to all options  
 
-
-###Features
+###Features  
 [ ] Need DSC for Volume activation Tools  
-
 
 ##APP Servers  
 **ONLY AFTER YOU BUILD THE DC**  
@@ -83,10 +94,7 @@ https://social.technet.microsoft.com/wiki/contents/articles/10755.windows-server
 ##FileServer deployment  
 --Run prepFileServer w/ update help –erroraction sil con  
 --Run buildFileServer w/ ip information  
-[ ] Set up shares and ACL  
-
-
-
+[ ] Create Folders then associate shares to them
 
 #YK Main  
 
@@ -109,10 +117,10 @@ Updates as of Aug 2018
 --Get-DSCConfigurationStatus  
 **DO NOT OVERWRITE THIS**  
 [ ] No activation  
-[ ] Requires Rebuild
+[ ] Requires Rebuild  
 
 
-##YK-SqlServer
+##YK-SqlServer  
 ###SQL Install  
 1.	Install SQL Server Express Edition 2017  
 2.	Install media to folder %downloads%  
@@ -134,19 +142,19 @@ Ports 1433 49172 TCP
 ```$cred = get-credential```  
 ```Invoke-Sqlcmd -ServerInstance 10.1.1.5\sqlexpress -Database Tickets -Query "Select * from Tickets" -credential $cred```  
 
-###Setup
-[ ] Need script to open up firewall to correct ports for SQL
+###Setup  
+[ ] Need script to open up firewall to correct ports for SQL  
 
-#DEV vAPP Rebuild
+#DEV vAPP Rebuild  
 ##Post Power-On/Rebuild checks  
 --RDP  
 --Server Manager (Servers are up)  
 --nmap [the subnet] –F -Pn  
 
 ##prep-Rebuild  
---shutdown remote pcs  
+[ ] shutdown remote pcs  
 
-#General Features
+#General Features  
 [ ] Need to lookup powershell options for indexing servers auto matically from DSC  
 [ ] Cred check on build APP/File server  
 

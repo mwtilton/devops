@@ -25,7 +25,7 @@ function Get-ScheduledTasks {
     #Output
     $out
 }
-
+<#
 $tasks = @()
 
 $schedule = New-Object -ComObject "Schedule.Service"
@@ -65,3 +65,4 @@ $Scriptblock =
 }
 $Report = invoke-parallel -input $Computers -scriptblock $Scriptblock -throttle 400 -runspacetimeout 30 -nocloseontimeout
 $Report | ft
+#>

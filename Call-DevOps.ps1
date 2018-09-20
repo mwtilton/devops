@@ -15,6 +15,6 @@ New-Item -ItemType Directory $workingfolder -ea SilentlyContinue
 #Import-Module DevOps -Force
 #Import-Module GroupPolicy -Force
 #Import-Module ActiveDirectory -Force
-#Import-Module "$env:USERPROFILE\Desktop\DevOps\DevOps" -Force
+#Import-Module "$env:USERPROFILE\Documents\Github\DevOps\DevOps" -Force
 
 #Invoke-DevOps

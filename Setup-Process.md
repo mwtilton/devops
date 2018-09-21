@@ -27,7 +27,7 @@
 --Run Disable Powersettings  
 --BOOT ALL VM's Pre-Rebuild  
 --Enable RDP  
-
+--DON'T POWER OFF THROUGH THE GUEST OS ANYMORE  
 
 ##DEV vAPP DC  
 -- Set IP with 8.8.8.8 for initial DNS server  
@@ -56,15 +56,16 @@
 --Run BuildDC  
 REBOOT  
 
-##APP Servers  
-**ONLY AFTER YOU BUILD THE DC**  
---Run Prep server w/ update help –erroraction sil con  
---RunConfigureserver w/ ip information  
-
 ##FileServer deployment  
 --Run prepFileServer w/ update help –erroraction sil con  
 --Run buildFileServer w/ ip information  
 [ ] Create Folders then associate shares to them  
+
+
+##APP Servers  
+**ONLY AFTER YOU BUILD THE DC**  
+--Run Prep server w/ update help –erroraction sil con  
+--RunConfigureserver w/ ip information  
 
 
 ##RDS Deployment  

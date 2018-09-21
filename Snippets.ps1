@@ -16,3 +16,6 @@ Catch{
 
 #one line error thrower
 if ($?) {throw}
+
+#runAs Admin stuffs
+#R equires -RunAsAdministrator

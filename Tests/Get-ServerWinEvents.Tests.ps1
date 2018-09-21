@@ -33,7 +33,10 @@ Describe "Unit Testing for Get-ServerWinEvents" -tags "UNIT" {
             { Get-ServerWinEvents -LogName $logname} | Should Not throw
         }
         It "pull in some information" {
-            Get-WinEvent | Should Not be $null
+            Get-WinEvent -LogName *$logname* | Should Not be $null
+        }
+        It "return true with where-bject selection" {
+            {Get-WinEvent -LogName *$logname* | Where-Object -FilterScript {$_.leveldisplayname -notlike "*information*"}} | Should Not throw
         }
     }
     Context "Where object" {

@@ -22,6 +22,8 @@
 [-] IP changes do not hold after Rebuild power on  
 [-] Windows Search doesn't hold after rebuild  
 [+] VMWare tools does hold after Rebuild  
+[ ] CHECK ALL SLEEP/POWER RELATED SETTINGS
+
 
 ###GPT HDD Failures  
 `[-]Set HDD to "LSI Logic SAS"`  
@@ -32,7 +34,7 @@
 `[-]EFI Boot hass issues with select the virutal disk need to rebuild from scratch`  
 
 ##DEV vAPP DC  
--- Set IP to with 8.8.8.8 for initial DNS server  
+-- Set IP with 8.8.8.8 for initial DNS server  
 -- Change VCD to DNAT to new STATIC IP  
 [X] Enable RDP into BoX  
 [X] Enable RDP Firewall settings  
@@ -90,7 +92,7 @@ https://social.technet.microsoft.com/wiki/contents/articles/10755.windows-server
 ##FileServer deployment  
 --Run prepFileServer w/ update help –erroraction sil con  
 --Run buildFileServer w/ ip information  
-[ ] Create Folders then associate shares to them
+[ ] Create Folders then associate shares to them  
 
 #YK Main  
 
@@ -160,5 +162,5 @@ Ports 1433 49172 TCP
 [ ] DNS in Org VDC Networks  
 [X] Use static IP Pool and not manual  
 [X] RDP gateway 3391 UDP  
-[ ] Add vscode default to setupGit and enforcing it as editor
-[X] Change prepGit to prep rebuild
+[ ] Add vscode default to setupGit and enforcing it as editor  
+[X] Change prepGit to prep rebuild  

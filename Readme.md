@@ -8,6 +8,8 @@ Authored by mwtilton
 --Fully remove extra comments/lines/misc extra stuff  
 --Fix encoding issues  
 --Fix server losing connectivity issues, no idea why that happens  
+--Logging in general and script specific  
+--Server logs/win events and general server status information  
 
 [ ] Beta stages  
 --Finished with RDS/Fileshares/GPO/AD importing process  

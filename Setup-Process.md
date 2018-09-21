@@ -22,7 +22,8 @@
 [-] IP changes do not hold after Rebuild power on  
 [-] Windows Search doesn't hold after rebuild  
 [+] VMWare tools does hold after Rebuild  
-[ ] CHECK ALL SLEEP/POWER RELATED SETTINGS
+[ ] CHECK ALL SLEEP/POWER RELATED SETTINGS  
+--Run Disable Powersettings  
 
 
 ###GPT HDD Failures  

@@ -52,8 +52,8 @@
 --Run prepRebuild  
 
 [X] Need to install Firefox  
-[ ] Set Firefox as default  
-[ ] pin Firefox to taskbar  
+[X] Set Firefox as default  
+[X] pin Firefox to taskbar  
 
 [?] Keeping DNS Zones to 3.168.192 but those are the same as the servers IP addresses...  
 

@@ -52,13 +52,7 @@ Configuration RemoteDesktopSessionHost
             Ensure = "Present"
             Name = "RDS-RD-Server"
         }
-        <#
-        WindowsFeature Desktop-Experience
-        {
-            Ensure = "Present"
-            Name = "Desktop-Experience"
-        }
-        #>
+
         WindowsFeature RSAT-RDS-Tools
         {
             Ensure = "Present"
@@ -112,38 +106,26 @@ Configuration RemoteDesktopSessionHost
             TemporaryFoldersDeletedOnExit = $false
             SecurityLayer = "SSL"
             <#
+                IdleSessionLimitMin = "60"
+                DisconnectedSessionLimitMin = "60"
                 ActiveSessionLimitMin = "90"
                 UserGroup = @("Domain Admins","RD Users")
                 DiskPath = "\\fileserver\users$"
                 ClientPrinterRedirected = $true
+                AuthenticateUsingNLA = $true
+                #UPD's
+                EnableUserProfileDisk = $true
+                MaxUserProfileDiskSizeGB = "20"
             #>
 
             DependsOn = "[xRDSessionCollection]Collection"
         }
-        <#
+
         xRDLicenseConfiguration License
         {
             ConnectionBroker = $localhost
-            LicenseMode = PerDevice
+            LicenseMode = PerUser
         }
-
-        xRDRemoteApp Calc
-        {
-            CollectionName = $collectionName
-            DisplayName = "Calculator"
-            FilePath = "C:\Windows\System32\calc.exe"
-            Alias = "calc"
-            DependsOn = "[xRDSessionCollection]Collection"
-        }
-        xRDRemoteApp Mstsc
-        {
-            CollectionName = $collectionName
-            DisplayName = "Remote Desktop"
-            FilePath = "C:\Windows\System32\mstsc.exe"
-            Alias = "mstsc"
-            DependsOn = "[xRDSessionCollection]Collection"
-        }
-        #>
     }
 }
 
@@ -154,7 +136,8 @@ write-verbose "Connection Broker: $brokerFQDN"
 write-verbose "Web Access Server: $webFQDN"
 
 RemoteDesktopSessionHost -collectionName $collectionName -collectionDescription $collectionDescription -connectionBroker $brokerFQDN -webAccessServer $webFQDN -OutputPath $env:USERPROFILE\Desktop\RDSDSC\
+$outputPath = "$env:USERPROFILE\Desktop\RDSDSC\"
+RemoteDesktopSessionHost -OutputPath $outputPath
 
-Set-DscLocalConfigurationManager -verbose -path $env:USERPROFILE\Desktop\RDSDSC\
-
-Start-DscConfiguration -wait -force -verbose -path $env:USERPROFILE\Desktop\RDSDSC\
+Set-DscLocalConfigurationManager -verbose -path $outputPath
+Start-DscConfiguration -wait -force -verbose -path $outputPath

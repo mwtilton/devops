@@ -1,7 +1,3 @@
-# What is DevOps  
-Holder of all things DevOps related  
-Authored by mwtilton  
-
 #DEV vAPP  
 
 ##Fresh Template Install  
@@ -156,17 +152,13 @@ Ports 1433 49172 TCP
 
 #General Features  
 [ ] Need to lookup powershell options for indexing servers auto matically from DSC  
-[ ] Cred check on build APP/File server  
+[ ] Cred check on buildS  
+  -- Created Get-CredCheck function  
+[ ] Remotely configure from DC or Push updates to servers  
 
-#Release updates  
-[ ] Alpha stages  
---Fully remove extra comments/lines/misc extra stuff  
---Fix encoding issues  
---Fix server losing connectivity issues, no idea why that happens  
-
-[ ] Beta stages  
---Finished with RDS/Fileshares/GPO/AD importing process  
---Finished with plaster framework to build them out  
-
-[ ] Release v1 stage  
---publicly releaseable version for the repo  
+#Notes for VCloud ENV setup  
+[ ] DNS in Org VDC Networks  
+[X] Use static IP Pool and not manual  
+[X] RDP gateway 3391 UDP  
+[ ] Add vscode default to setupGit and enforcing it as editor
+[X] Change prepGit to prep rebuild

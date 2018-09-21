@@ -10,6 +10,7 @@ Authored by mwtilton
 --Fix server losing connectivity issues, no idea why that happens  
 --Logging in general and script specific  
 --Server logs/win events and general server status information  
+--Remotely configure DSC
 
 [ ] Beta stages  
 --Finished with RDS/Fileshares/GPO/AD importing process  

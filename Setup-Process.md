@@ -2,6 +2,7 @@
 
 ##Fresh Template Install  
 --Create VM in Vcloud  
+--Change ETH adapter to VMXnet 3  
 --Load with ISO (ex. Win 2016)  
 --Run through `Datacenter 2016 (Desktop Experience)` installation process  
 --Create administrator account  
@@ -24,15 +25,9 @@
 [+] VMWare tools does hold after Rebuild  
 [ ] CHECK ALL SLEEP/POWER RELATED SETTINGS  
 --Run Disable Powersettings  
+--BOOT ALL VM's Pre-Rebuild  
+--Enable RDP  
 
-
-###GPT HDD Failures  
-`[-]Set HDD to "LSI Logic SAS"`  
-`[-]Set HDD to "ParaVirtual"`  
-`[-]Set HDD to "SATA"`  
-`[-]converting GPT at installation`  
-`[?]converting to GPT after installation with two disks and moving pagesys file`  
-`[-]EFI Boot hass issues with select the virutal disk need to rebuild from scratch`  
 
 ##DEV vAPP DC  
 -- Set IP with 8.8.8.8 for initial DNS server  
@@ -61,7 +56,18 @@
 --Run BuildDC  
 REBOOT  
 
-###RDS Deployment  
+##APP Servers  
+**ONLY AFTER YOU BUILD THE DC**  
+--Run Prep server w/ update help –erroraction sil con  
+--RunConfigureserver w/ ip information  
+
+##FileServer deployment  
+--Run prepFileServer w/ update help –erroraction sil con  
+--Run buildFileServer w/ ip information  
+[ ] Create Folders then associate shares to them  
+
+
+##RDS Deployment  
 **After DC and all VM’s are booted up and running**  
 --prep RDS  
 --Setup script for server locations to app01/02/fileserver locations  
@@ -79,10 +85,6 @@ https://social.technet.microsoft.com/wiki/contents/articles/10755.windows-server
 ###Features  
 [ ] Need DSC for Volume activation Tools  
 
-##APP Servers  
-**ONLY AFTER YOU BUILD THE DC**  
---Run Prep server w/ update help –erroraction sil con  
---RunConfigureserver w/ ip information  
 
 ###Setup still needed for template  
 [?] install O365 stuff here??? Or file server???  
@@ -90,10 +92,7 @@ https://social.technet.microsoft.com/wiki/contents/articles/10755.windows-server
 [ ] Need to rebuild APP01 to fix IP address issues  
 [ ] Rebuild/Check App01 for IP issues  
 
-##FileServer deployment  
---Run prepFileServer w/ update help –erroraction sil con  
---Run buildFileServer w/ ip information  
-[ ] Create Folders then associate shares to them  
+
 
 #YK Main  
 
@@ -145,19 +144,28 @@ Ports 1433 49172 TCP
 [ ] Need script to open up firewall to correct ports for SQL  
 
 #DEV vAPP Rebuild  
+##Pre- vAPP Rebuild  
+[ ] shutdown remote pcs  
+[ ] Full Power off in VCD  
+
 ##Post Power-On/Rebuild checks  
 --RDP  
 --Server Manager (Servers are up)  
 --nmap [the subnet] –F -Pn  
-
-##prep-Rebuild  
-[ ] shutdown remote pcs  
 
 #General Features  
 [ ] Need to lookup powershell options for indexing servers auto matically from DSC  
 [ ] Cred check on buildS  
   -- Created Get-CredCheck function  
 [ ] Remotely configure from DC or Push updates to servers  
+
+#GPT HDD Failures  
+`[-]Set HDD to "LSI Logic SAS"`  
+`[-]Set HDD to "ParaVirtual"`  
+`[-]Set HDD to "SATA"`  
+`[-]converting GPT at installation`  
+`[?]converting to GPT after installation with two disks and moving pagesys file`  
+`[-]EFI Boot hass issues with select the virutal disk need to rebuild from scratch`  
 
 #Notes for VCloud ENV setup  
 [ ] DNS in Org VDC Networks  

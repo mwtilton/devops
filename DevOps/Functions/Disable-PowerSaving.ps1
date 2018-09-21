@@ -1,8 +1,4 @@
 #Requires -RunAsAdministrator
-
-Start-Transcript -Path ($MyInvocation.MyCommand.Definition -replace 'ps1','log') -Append | out-null
-
-
 #Inform user
 Write-Host -ForegroundColor White "Iterating through network adapters"
 $intNICid=0; do
@@ -17,8 +13,8 @@ $intNICid=0; do
 		# * only Ethernet adapters (ifType = ieee80211(71) - http://www.iana.org/assignments/ianaiftype-mib/ianaiftype-mib)
 		# * root devices are exclude (for instance "WAN Miniport*")
 		# * software defined network adapters are excluded (for instance "RAS Async Adapter")
-        #If ((<i>$objNICproperties."*ifType" -eq 6 -or $objNICproperties."*ifType" -eq 71</i>) -and
-        If (($objNICproperties."*ifType" -eq 71) -and
+        If (($objNICproperties."*ifType" -eq 6 -or $objNICproperties."*ifType" -eq 71) -and
+        #If (($objNICproperties."*ifType" -eq 71) -and
 		    ($objNICproperties.DeviceInstanceID -notlike "ROOT\*") -and
 			($objNICproperties.DeviceInstanceID -notlike "SW\*")
 			)
@@ -56,6 +52,3 @@ $intNICid=0; do
 Write-Host -NoNewLine -ForegroundColor White "Please "
 Write-Host -NoNewLine -ForegroundColor Yellow "reboot"
 Write-Host -ForegroundColor White " the machine for the changes to take effect."
-
-# Stop writing to log file
-Stop-Transcript | out-null

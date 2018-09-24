@@ -9,11 +9,11 @@ Specify the configuration to be applied to the server.  This section
 defines which configurations you're interested in managing.
 #>
 
-configuration configureServer
+configuration buildServer
 {
-    Import-DscResource -ModuleName PSDesiredStateConfiguration
     Import-DscResource -ModuleName xComputerManagement -ModuleVersion 3.2.0.0
     Import-DscResource -ModuleName xNetworking -ModuleVersion 5.4.0.0
+    Import-DscResource -ModuleName xPSDesiredStateConfiguration -ModuleVersion 8.4.0.0
 
     Node localhost
     {
@@ -86,10 +86,14 @@ compile the configuration, and then instruct the server to execute that
 configuration against the settings on this local server.
 #>
 
-$domainCred = Get-Credential -UserName company\Administrator -Message "Please enter a new password for Domain Administrator."
-$Cred = Get-Credential -UserName Administrator -Message "Please enter a new password for Local Administrator and other accounts."
+#$domainCred = Get-Credential -UserName company\Administrator -Message "Please enter a new password for Domain Administrator."
+#$Cred = Get-Credential -UserName Administrator -Message "Please enter a new password for Local Administrator and other accounts."
 
-configureServer -ConfigurationData $ConfigData
+Import-Module $env:USERPROFILE\Desktop\GitHub\DevOps\DevOps\DevOps.psm1 -Force -verbose
 
-Set-DSCLocalConfigurationManager -Path .\configureServer –Verbose
-Start-DscConfiguration -Wait -Force -Path .\configureServer -Verbose
+$credentials = Get-CredCheck
+
+buildServer -ConfigurationData $ConfigData -OutputPath $env:USERPROFILE\Desktop\buildServer
+
+Set-DSCLocalConfigurationManager -Path $env:USERPROFILE\Desktop\buildServer –Verbose
+Start-DscConfiguration -Wait -Force -Path $env:USERPROFILE\Desktop\buildServer -Verbose

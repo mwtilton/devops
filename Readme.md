@@ -7,7 +7,7 @@ Authored by mwtilton
 [ ] Alpha stages  
 1.2  
 [X] Fix server losing connectivity issues, no idea why that happens  
-[ ] Fix encoding issues  
+[X] Fix encoding issues  
 [ ] Fix Administrator credentials for all build scripts  
 1.3  
 --configure DSC for remote usage  

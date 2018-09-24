@@ -14,13 +14,14 @@
 --disk cleanup wizard  
 [ ] Run Windows Updates before sysprep (1 restart)  
 --Sysprep to shutdown  
+[ ] REBOOT  
+--Save Template  
 
---Enable-PSremoting  
+###DEV vAPP Template  
 [ ] Install Git  
 `Defaults v2.19.0`  
 `Windows CLI`  
-[ ] REBOOT  
---Save Template  
+--Enable-PSremoting  
 --Need to remove IE enhanced security  
 [-] IP changes do not hold after Rebuild power on  
 [-] Windows Search doesn't hold after rebuild  
@@ -28,7 +29,7 @@
 [ ] CHECK ALL SLEEP/POWER RELATED SETTINGS  
 --Run Disable Powersettings  
 --BOOT ALL VM's Pre-Rebuild  
---Enable RDP  
+[ ] Enable RDP  
 --DON'T POWER OFF THROUGH THE GUEST OS ANYMORE  
 
 ##DEV vAPP DC  
@@ -67,7 +68,8 @@ REBOOT
 [ ] Change reboot param on buildFS to not reboot auto  
 
 ##APP Servers  
-**ONLY AFTER YOU BUILD THE DC**  
+**ONLY AFTER YOU BUILD THE DC AND Fileserver**  
+--Enable RDP  
 --Run Prep server w/ update help –erroraction sil con  
 --RunConfigureserver w/ ip information  
 

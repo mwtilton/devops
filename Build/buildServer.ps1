@@ -46,14 +46,14 @@ configuration buildServer
         User Administrator {
             Ensure = "Present"
             UserName = "Administrator"
-            Password = $Cred
+            Password = $credentials
             DependsOn = "[xDnsServerAddress]PrimaryDNSClient"
         }
 
         xComputer ChangeNameAndJoinDomain {
             Name = $node.ThisComputerName
             DomainName    = $node.DomainName
-            Credential    = $domainCred
+            Credential    = $credentials
             DependsOn = "[User]Administrator"
         }
     }

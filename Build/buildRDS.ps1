@@ -29,7 +29,8 @@ Configuration RemoteDesktopSessionHost
         # Web Access Node Name
         [String]$webAccessServer
     )
-    Import-DscResource -Module xRemoteDesktopSessionHost
+    Import-DscResource -ModuleName xRemoteDesktopSessionHost -ModuleVersion 1.8.0.0
+    Import-DscResource -ModuleName xPSDesiredStateConfiguration -ModuleVersion 8.4.0.0
 
     if (!$connectionBroker) {$connectionBroker = $localhost}
     if (!$connectionWebAccessServer) {$webAccessServer = $localhost}
@@ -124,7 +125,7 @@ Configuration RemoteDesktopSessionHost
         xRDLicenseConfiguration License
         {
             ConnectionBroker = $localhost
-            LicenseMode = PerUser
+            LicenseMode = "PerUser"
         }
     }
 }

@@ -5,4 +5,5 @@ New-Item -ItemType Directory -Name RDSDSC -Path $RDSDSCFolder
 Update-Help -ErrorAction SilentlyContinue
 #Enable-PSRemoting -Force
 
-Install-Module -Name xRemoteDesktopSessionHost
+Install-Module -Name xRemoteDesktopSessionHost -RequiredVersion 1.8.0.0
+Install-Module xPSDesiredStateConfiguration -RequiredVersion 8.4.0.0 -Force

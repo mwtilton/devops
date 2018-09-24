@@ -15,7 +15,7 @@
 [ ] Run Windows Updates before sysprep (1 restart)  
 --Sysprep to shutdown  
 
---Enable-PSremoting
+--Enable-PSremoting  
 [ ] Install Git  
 `Defaults v2.19.0`  
 `Windows CLI`  

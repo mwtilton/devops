@@ -7,16 +7,17 @@ Authored by mwtilton
 [ ] Alpha stages  
 1.2  
 [X] Fix server losing connectivity issues, no idea why that happens  
-[X] Fix encoding issues  
+[ ] Fix encoding issues  
+[ ] Fix Administrator credentials for all build scripts  
 1.3  
---Fully remove extra comments/lines/misc extra stuff  
+--Remotely configure DSC  
 1.4  
 --Logging in general and script specific  
 1.5  
 --Server logs/win events and general server status information  
 --DSC Configuration Drift analysis  
 1.6  
---Remotely configure DSC  
+--Fully remove extra comments/lines/misc extra stuff  
 
 [ ] Beta stages  
 1.7  

@@ -77,6 +77,7 @@ REBOOT
 ##RDS Deployment  
 **After DC and all VM’s are booted up and running**  
 --prep RDS  
+[ ] Fix prompt for Collection information
 --Setup script for server locations to app01/02/fileserver locations  
 --UPD file location: \\fileserver01\Users$  
 --UserGroups: democloud\Domain Admins  

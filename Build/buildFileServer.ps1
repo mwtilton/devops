@@ -256,7 +256,7 @@ $ConfigData = @{
             IPAddressCIDR = "192.168.3.102/24"
             GatewayAddress = "192.168.3.2"
             DNSAddress = "192.168.3.10"
-            DomainName = "company.pri"
+            DomainName = "company.pri"
             PSDscAllowPlainTextPassword = $true
             PSDscAllowDomainUser = $true
         }
@@ -273,5 +273,5 @@ $credentials = Get-CredCheck
 
 buildFileServer -ConfigurationData $ConfigData -OutputPath $env:USERPROFILE\Desktop\buildFileServer\
 
-Set-DSCLocalConfigurationManager -Path $env:USERPROFILE\Desktop\buildFileServer –Verbose
+Set-DSCLocalConfigurationManager -Path $env:USERPROFILE\Desktop\buildFileServer -Verbose
 Start-DscConfiguration -Wait -Force -Path $env:USERPROFILE\Desktop\buildFileServer -Verbose

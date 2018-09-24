@@ -2,7 +2,7 @@
 
 configuration buildDomainController
 {
-    Import-DscResource -ModuleName PSDesiredStateConfiguration
+    Import-DscResource -ModuleName xPSDesiredStateConfiguration -ModuleVersion "8.4.0.0"
     Import-DscResource -ModuleName xComputerManagement -ModuleVersion "3.2.0.0"
     Import-DscResource -ModuleName xNetworking -ModuleVersion "5.4.0.0"
     Import-DscResource -ModuleName xDnsServer -ModuleVersion "1.9.0.0"
@@ -180,7 +180,8 @@ configuration against the settings on this local server.
 
 $credentials = Get-Credential -UserName Administrator -Message "Please enter a new password for Local Administrator and other accounts."
 
-BuildDomainController -ConfigurationData $ConfigData -OutPutPath $env:USERPROFILE\Desktop\buildDomainController
+$outputPath = "$env:USERPROFILE\Desktop\buildDomainController"
+BuildDomainController -ConfigurationData $ConfigData -OutPutPath $outputPath
 
-Set-DSCLocalConfigurationManager -Path $env:USERPROFILE\Desktop\buildDomainController –Verbose
-Start-DscConfiguration -Wait -Force -Path $env:USERPROFILE\Desktop\buildDomainController -Verbose
+Set-DSCLocalConfigurationManager -Path $outputPath –Verbose
+Start-DscConfiguration -Wait -Force -Path $outputPath -Verbose

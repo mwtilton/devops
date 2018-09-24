@@ -12,10 +12,13 @@ It is free for you to use and modify.
 #>
 Update-Help -ErrorAction SilentlyContinue
 
+Enable-PSRemoting -Force
+
 Get-PackageSource -Name PSGallery | Set-PackageSource -Trusted -Force -ForceBootstrap
 
 Install-PackageProvider -Name NuGet -Force
 
+Install-Module xPSDesiredStateConfiguration -RequiredVersion 8.4.0.0 -Force
 Install-Module xComputerManagement -RequiredVersion 3.2.0.0 -Force
 Install-Module xNetworking -RequiredVersion 5.4.0.0 -Force
 Install-Module xDnsServer -RequiredVersion 1.9.0.0 -Force

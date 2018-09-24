@@ -8,7 +8,6 @@ function Get-OpenFiles {
         [String]
         $search
     )
-    #openfiles /query /s fileserver01 /u matthewt | findstr /i /c:"LG-PST-BACKUPS"
 
     openfiles /query /s $DestServer /fo csv /V | Out-File -Force $env:TEMP\openfiles.csv
 

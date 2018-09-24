@@ -14,12 +14,14 @@
 --disk cleanup wizard  
 [ ] Run Windows Updates before sysprep (1 restart)  
 --Sysprep to shutdown  
+
+--Enable-PSremoting
 [ ] Install Git  
 `Defaults v2.19.0`  
 `Windows CLI`  
 [ ] REBOOT  
-
 --Save Template  
+--Need to remove IE enhanced security  
 [-] IP changes do not hold after Rebuild power on  
 [-] Windows Search doesn't hold after rebuild  
 [+] VMWare tools does hold after Rebuild  
@@ -37,7 +39,7 @@
 --RDP into the box  
 [-] CredSSIP Error  
 
--- Need to remove IE enhanced security  
+
 [X] File/Folder Options  
 [ ] Script to run this automatically -- add to prepRebuild  
 `Hidden Folders`  
@@ -57,6 +59,8 @@
 REBOOT  
 
 ##FileServer deployment  
+--Webconsole into fileserver01  
+--Enable RDP  
 --Run prepFileServer w/ update help –erroraction sil con  
 --Run buildFileServer w/ ip information  
 [ ] Create Folders then associate shares to them  

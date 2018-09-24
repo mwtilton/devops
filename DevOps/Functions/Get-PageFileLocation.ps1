@@ -1,19 +1,14 @@
 <#
 
 .SYNOPSIS
-
 Retrieves  page file location information from  local or remote computers.
 
 .DESCRIPTION
-
 The script uses .Net RegistryKey class and its OpenRemoteBaseKey method to retrieve the information.
-
 Each computer is contacted sequentially, not in parallel.
 
 .EXAMPLE
-
 Run it from the location where the script is stored.
-
 PS C:\Users\Administrator\Downloads> .\PageFileLocation.ps1
 
 ServerName                                                  PageFileLocation
@@ -21,9 +16,7 @@ ServerName                                                  PageFileLocation
 Server1                                                     C:\pagefile.sys
 
 .EXAMPLE
-
 Read computer names from a file (one name per line) and retrieve their page file loction.
-
 Get-PageFileLocation -serverlist (Get-Content C:\server.txt)
 
 ServerName                              PageFileLocation

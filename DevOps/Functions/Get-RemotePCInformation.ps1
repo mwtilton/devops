@@ -1,9 +1,3 @@
-#########################################################
-#           Powershell PC Info Script V1.0b             #
-#              Coded By:Trenton Ivey(kno)               #
-#                     hackyeah.com                      #
-#########################################################
-
 function Pause ($Message="Press any key to continue..."){
     ""
     Write-Host $Message

@@ -6,8 +6,8 @@ Authored by mwtilton
 #Release updates  
 [ ] Alpha stages  
 1.2  
---Fix server losing connectivity issues, no idea why that happens  
---Fix encoding issues  
+[X] Fix server losing connectivity issues, no idea why that happens  
+[X] Fix encoding issues  
 1.3  
 --Fully remove extra comments/lines/misc extra stuff  
 1.4  

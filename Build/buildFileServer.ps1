@@ -11,7 +11,6 @@ defines which configurations you're interested in managing.
 
 configuration buildFileServer
 {
-    Import-DscResource -ModuleName PSDesiredStateConfiguration
     Import-DscResource -ModuleName xComputerManagement -ModuleVersion 3.2.0.0
     Import-DscResource -ModuleName xNetworking -ModuleVersion 5.4.0.0
     Import-DscResource -ModuleName xSmbShare -ModuleVersion 2.1.0.0
@@ -25,6 +24,7 @@ configuration buildFileServer
         LocalConfigurationManager {
             ActionAfterReboot = "ContinueConfiguration"
             ConfigurationMode = "ApplyOnly"
+            DebugMode = "ForceModuleImport"
             RebootNodeIfNeeded = $true
         }
 
@@ -72,7 +72,6 @@ configuration buildFileServer
             Ensure = "Present"
             Name   = "E$"
             Path = "E:\"
-            FullAccess = "Domain Admins"
             Description = "This is the main drive share"
         }
 
@@ -81,8 +80,23 @@ configuration buildFileServer
             Ensure = "Present"
             Name   = "Data$"
             Path = "E:\CompanyData\Data"
-            FullAccess = "Domain Admins"
             Description = "This is the main Data share"
+        }
+        cNtfsPermissionEntry PermissionSet1
+        {
+            Ensure = 'Present'
+            Path = "E:\CompanyData\Data"
+            Principal = 'DEMOCLOUD\Domain Admins'
+            AccessControlInformation = @(
+                cNtfsAccessControlInformation
+                {
+                    AccessControlType = 'Allow'
+                    FileSystemRights = 'FullControl'
+                    Inheritance = 'ThisFolderSubfoldersAndFiles'
+                    NoPropagateInherit = $false
+                }
+            )
+            DependsOn = '[File]DataDirectory'
         }
         <#
         xSmbShare ExecShare
@@ -174,8 +188,16 @@ configuration buildFileServer
         }
         #>
     }
-}
+} #End Configuration
 <#
+    cAccessControlEntry UsersModifyFolder {
+        AceType = "AccessAllowed"
+        ObjectType = "Directory"
+        Path = "C:\powershell\dsc\test"
+        Principal = "Users"
+        AccessMask = [System.Security.AccessControl.FileSystemRights]::Modify
+        AppliesTo = "Object, ChildContainers"  # Apply to the folder and subfolders only
+    }
 Configuration FileResourceDemo
 {
     Node "localhost"
@@ -266,6 +288,9 @@ $ConfigData = @{
 Lastly, prompt for the necessary username and password combinations, then
 compile the configuration, and then instruct the server to execute that
 configuration against the settings on this local server.
+
+\\dc01\c$\Users\Administrator\Desktop\Github\devops\DevOps\DevOps.psm1
+
 #>
 Import-Module $env:USERPROFILE\Desktop\GitHub\DevOps\DevOps\DevOps.psm1 -Force -verbose
 

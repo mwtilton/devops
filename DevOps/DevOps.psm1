@@ -1,11 +1,11 @@
 $PSDefaultParameterValues=@{'Write-host:BackGroundColor'='Black';'Write-host:ForeGroundColor'='Green'}
 #requires -Version 5.1
-. "$PSScriptRoot\DevOps.Machine.Ps1"
+#. "$PSScriptRoot\DevOps.Machine.Ps1"
 Try{
     Import-Module $PSScriptRoot\DevOps.Machine.ps1 -Force -ErrorAction Stop
 }
 Catch {
-    Write-Warning "Machine file was not found and couldn't be loaded into the module"
+    Write-Warning "A valid Machine file was not found and couldn't be loaded into the module"
 }
 
 

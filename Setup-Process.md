@@ -64,7 +64,7 @@ REBOOT
 --Run prepFileServer w/ update help –erroraction sil con  
 --Run buildFileServer w/ ip information  
 [ ] Create Folders then associate shares to them  
-
+[ ] Change reboot param on buildFS to not reboot auto  
 
 ##APP Servers  
 **ONLY AFTER YOU BUILD THE DC**  

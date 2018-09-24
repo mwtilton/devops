@@ -10,7 +10,7 @@ Authored by mwtilton
 [ ] Fix encoding issues  
 [ ] Fix Administrator credentials for all build scripts  
 1.3  
---Remotely configure DSC  
+--configure DSC for remote usage  
 1.4  
 --Logging in general and script specific  
 1.5  

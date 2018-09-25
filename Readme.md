@@ -10,7 +10,7 @@ Authored by mwtilton
 [X] Fix encoding issues  
 [ ] Fix Administrator credentials for all build scripts  
 1.3  
---configure DSC for remote usage  
+--configure DSC for remote node usage  
 1.4  
 --Logging in general and script specific  
 1.5  

@@ -29,7 +29,7 @@ Configuration RemoteDesktopSessionHost
         # Web Access Node Name
         [String]$webAccessServer
     )
-    Import-DscResource -Module xRemoteDesktopSessionHost
+    Import-DscResource -Module xRemoteDesktopSessionHost -ModuleVersion 8.4.0.0
 
     if (!$connectionBroker) {$connectionBroker = $localhost}
     if (!$connectionWebAccessServer) {$webAccessServer = $localhost}
@@ -60,21 +60,18 @@ Configuration RemoteDesktopSessionHost
             IncludeAllSubFeature = $true
         }
 
-        if ($localhost -eq $connectionBroker) {
-            WindowsFeature RDS-Connection-Broker
-            {
-                Ensure = "absent"
-                Name = "RDS-Connection-Broker"
-            }
+        WindowsFeature RDS-Connection-Broker
+        {
+            Ensure = "absent"
+            Name = "RDS-Connection-Broker"
         }
 
-        if ($localhost -eq $webAccessServer) {
-            WindowsFeature RDS-Web-Access
-            {
-                Ensure = "absent"
-                Name = "RDS-Web-Access"
-            }
+        WindowsFeature RDS-Web-Access
+        {
+            Ensure = "absent"
+            Name = "RDS-Web-Access"
         }
+
 
         WindowsFeature RDS-Licensing
         {

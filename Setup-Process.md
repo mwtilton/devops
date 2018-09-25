@@ -4,17 +4,19 @@
 --Create VM in Vcloud  
 --Change ETH adapter to VMXnet 3  
 --Load with ISO (ex. Win 2016)  
+--PowerOn  
 --Run through `Datacenter 2016 (Desktop Experience)` installation process  
 --Create administrator account  
 --Login into new VM  
 --Install Wmware tools  
 `win + d:`  
 `enter`  
+--REBOOT  
 --Remove VMware tools CD  
+--Set Temp IP information  
+[X] Run Windows Updates before sysprep (1 restart)  
 --disk cleanup wizard  
-[ ] Run Windows Updates before sysprep (1 restart)  
 --Sysprep to shutdown  
-[ ] REBOOT  
 --Save Template  
 
 ###DEV vAPP Template  

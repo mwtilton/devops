@@ -296,7 +296,8 @@ Import-Module $env:USERPROFILE\Desktop\GitHub\DevOps\DevOps\DevOps.psm1 -Force -
 
 $credentials = Get-CredCheck
 
-buildFileServer -ConfigurationData $ConfigData -OutputPath $env:USERPROFILE\Desktop\buildFileServer\
+$outputPath = "$env:USERPROFILE\Desktop\buildFileServer\"
+buildFileServer -ConfigurationData $ConfigData -OutputPath $outputPath
 
-Set-DSCLocalConfigurationManager -Path $env:USERPROFILE\Desktop\buildFileServer -Verbose
-Start-DscConfiguration -Wait -Force -Path $env:USERPROFILE\Desktop\buildFileServer -Verbose
+Set-DSCLocalConfigurationManager -Path $outputPath -Verbose
+Start-DscConfiguration -Wait -Force -Path $outputPath -Verbose

@@ -23,4 +23,6 @@ Function Invoke-SetupGit {
     git config --get-regexp user
     git config --get-regexp core.editor
     git config --get-regexp credential
+    git config --get-regexp diff.tool
+    git config --get-regexp difftool
 }

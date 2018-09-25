@@ -1,4 +1,4 @@
-param (
+﻿param (
     [string]$brokerFQDN,
     [string]$webFQDN,
     [string]$collectionName = "DemoCloud",

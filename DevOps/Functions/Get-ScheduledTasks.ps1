@@ -1,4 +1,4 @@
-function Get-ScheduledTasks {
+﻿function Get-ScheduledTasks {
     Params(
         [string]$Path
     )

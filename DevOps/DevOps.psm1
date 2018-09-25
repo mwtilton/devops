@@ -1,4 +1,4 @@
-$PSDefaultParameterValues=@{'Write-host:BackGroundColor'='Black';'Write-host:ForeGroundColor'='Green'}
+﻿$PSDefaultParameterValues=@{'Write-host:BackGroundColor'='Black';'Write-host:ForeGroundColor'='Green'}
 #requires -Version 5.1
 #. "$PSScriptRoot\DevOps.Machine.Ps1"
 Try{

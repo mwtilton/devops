@@ -1,4 +1,4 @@
-Import-Module "$env:WORKINGFOLDER\DevOps\DevOps\Functions\Export-Ous.ps1" -Force -ErrorAction Stop
+﻿Import-Module "$env:WORKINGFOLDER\DevOps\DevOps\Functions\Export-Ous.ps1" -Force -ErrorAction Stop
 
 Describe "Export-Ous" -Tags "UNIT" {
     Setup -Dir "Desktop\WorkingFolder"

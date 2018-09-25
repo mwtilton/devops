@@ -1,4 +1,4 @@
-Import-Module "$env:WORKINGFOLDER\DevOps\DevOps\Functions\Export-Groups.ps1" -Force -ErrorAction Stop
+﻿Import-Module "$env:WORKINGFOLDER\DevOps\DevOps\Functions\Export-Groups.ps1" -Force -ErrorAction Stop
 
 Describe "Export-Groups" -Tags "UNIT" {
 

@@ -1,4 +1,4 @@
-Get-PackageSource -Name PSGallery | Set-PackageSource -Trusted -Force -ForceBootstrap
+﻿Get-PackageSource -Name PSGallery | Set-PackageSource -Trusted -Force -ForceBootstrap
 
 Update-Help -ErrorAction SilentlyContinue
 

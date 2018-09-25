@@ -1,4 +1,4 @@
-<# Notes:
+﻿<# Notes:
 Goal - Configure minimal post-installation settings for a server.
 This script must be run after prepServer.ps1
 Disclaimer - This example code is provided without copyright and AS IS.  It is free for you to use and modify.

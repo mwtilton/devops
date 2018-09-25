@@ -1,4 +1,4 @@
-
+﻿
 Function IsAdmin {
     [CmdletBinding()]
     [OutputType([System.Boolean])]

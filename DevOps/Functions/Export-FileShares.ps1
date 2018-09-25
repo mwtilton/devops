@@ -1,4 +1,4 @@
-Function Export-FileShares {
+﻿Function Export-FileShares {
     [CmdletBinding()]
     param (
         [parameter(Mandatory=$true)][string]$Path,

@@ -1,4 +1,4 @@
-<# Notes: This script must be run after prepDomainController.ps1. #>
+﻿<# Notes: This script must be run after prepDomainController.ps1. #>
 
 configuration buildDomainController
 {
@@ -183,5 +183,5 @@ $credentials = Get-Credential -UserName Administrator -Message "Please enter a n
 $outputPath = "$env:USERPROFILE\Desktop\buildDomainController"
 BuildDomainController -ConfigurationData $ConfigData -OutPutPath $outputPath
 
-Set-DSCLocalConfigurationManager -Path $outputPath �Verbose
+Set-DSCLocalConfigurationManager -Path $outputPath –Verbose
 Start-DscConfiguration -Wait -Force -Path $outputPath -Verbose

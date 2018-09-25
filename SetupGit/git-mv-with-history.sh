@@ -1,4 +1,4 @@
-#!/bin/bash
+﻿#!/bin/bash
 #
 # git-mv-with-history -- move/rename file or folder, with history.
 #

@@ -1,4 +1,4 @@
-Import-Module "$env:WORKINGFOLDER\DevOps\DevOps\Functions\Get-CredCheck.ps1" -Force -ErrorAction Stop
+﻿Import-Module "$env:WORKINGFOLDER\DevOps\DevOps\Functions\Get-CredCheck.ps1" -Force -ErrorAction Stop
 
 Describe "Get-CredCheck" -Tag "UNIT" {
     Context "Finds the Creds" {

@@ -1,4 +1,4 @@
-Function Get-CredCheck {
+﻿Function Get-CredCheck {
     [CmdletBinding()]
     Param (
 

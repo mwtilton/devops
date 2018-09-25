@@ -1,4 +1,4 @@
-Import-Module "$env:WORKINGFOLDER\DevOps\DevOps\Functions\Move-Modules.ps1" -Force -ErrorAction Stop
+﻿Import-Module "$env:WORKINGFOLDER\DevOps\DevOps\Functions\Move-Modules.ps1" -Force -ErrorAction Stop
 Describe "Move-Modules" {
     Context "Moving Modules Unit testing" {
         $testPath = "$testdrive\testfile.psm1","$testdrive\testfile.psm1"

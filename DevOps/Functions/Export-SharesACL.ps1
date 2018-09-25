@@ -1,4 +1,4 @@
-Function Export-SharesACL {
+﻿Function Export-SharesACL {
     [CmdletBinding()]
     param (
         [parameter(Mandatory=$true)][string]$csv,

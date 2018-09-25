@@ -1,4 +1,4 @@
-function Pause ($Message="Press any key to continue..."){
+﻿function Pause ($Message="Press any key to continue..."){
     ""
     Write-Host $Message
     $null = $Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")

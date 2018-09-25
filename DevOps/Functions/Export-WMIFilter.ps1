@@ -1,4 +1,4 @@
-Function Export-WMIFilter {
+﻿Function Export-WMIFilter {
     [CmdletBinding()]
     Param(
         [Parameter(Mandatory=$true)]

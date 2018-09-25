@@ -1,4 +1,4 @@
-<# Notes:
+﻿<# Notes:
 Goal - Prepare the server by connecting to the gallery,
 installing the package provider, and installing the modules
 required by the configuration.  Note that the modules to be installed

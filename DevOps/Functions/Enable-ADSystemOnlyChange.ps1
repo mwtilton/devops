@@ -1,4 +1,4 @@
-Function Enable-ADSystemOnlyChange {
+﻿Function Enable-ADSystemOnlyChange {
     [CmdletBinding()]
     Param (
         [switch]$Disable

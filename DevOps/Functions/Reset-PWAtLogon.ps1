@@ -1,4 +1,4 @@
-
+﻿
 Function Reset-PWAtLogon{
     [CmdletBinding()]
     Param (

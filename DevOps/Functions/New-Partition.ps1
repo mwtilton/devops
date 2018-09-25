@@ -1,4 +1,4 @@
-Function New-Partition {
+﻿Function New-Partition {
     [CmdletBinding()]
     Param (
         [Parameter(Mandatory=$true)]
@@ -9,8 +9,8 @@ Function New-Partition {
         [String]
         $csv # Path of the GPO GUID Folder under the main Backup Folder
     )
-    NEW-ITEM –name listdisk.txt –itemtype file –force | OUT-NULL
-    ADD-CONTENT –path listdisk.txt “LIST DISK”
+    NEW-ITEM â€“name listdisk.txt â€“itemtype file â€“force | OUT-NULL
+    ADD-CONTENT â€“path listdisk.txt â€œLIST DISKâ€
     $LISTDISK=(DISKPART /S LISTDISK.TXT)
     $DiskID=$LISTDISK[-1].substring(7,5)
     $DiskID=$LISTDISK[-1].substring(7,5).trim()
@@ -36,8 +36,8 @@ Function New-Partition {
     }
     $DISKTOTAL=([convert]::ToInt16($intsize,10))*$MULT
 <#
-    NEW-ITEM –name listdisk.txt –itemtype file –force | OUT-NULL
-    ADD-CONTENT –path listdisk.txt “LIST DISK”
+    NEW-ITEM â€“name listdisk.txt â€“itemtype file â€“force | OUT-NULL
+    ADD-CONTENT â€“path listdisk.txt â€œLIST DISKâ€
     $LISTDISK=(DISKPART /S LISTTDISK.TXT)
     $TOTALDISK=($LISTDISK.Count)-9
 

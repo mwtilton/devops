@@ -1,4 +1,4 @@
-<# Notes:
+ï»¿<# Notes:
 Goal - Configure minimal post-installation settings for a server.
 This script must be run after prepServer.ps1
 Disclaimer - This example code is provided without copyright and AS IS.  It is free for you to use and modify.
@@ -73,7 +73,7 @@ $ConfigData = @{
             IPAddressCIDR = "192.168.3.102/24"
             GatewayAddress = "192.168.3.2"
             DNSAddress = "192.168.3.10"
-            DomainName = "company.pri"
+Â Â Â Â Â Â Â Â Â Â Â Â DomainName = "company.pri"
             PSDscAllowPlainTextPassword = $true
             PSDscAllowDomainUser = $true
         }
@@ -95,5 +95,5 @@ $credentials = Get-CredCheck
 
 buildServer -ConfigurationData $ConfigData -OutputPath $env:USERPROFILE\Desktop\buildServer
 
-Set-DSCLocalConfigurationManager -Path $env:USERPROFILE\Desktop\buildServer –Verbose
+Set-DSCLocalConfigurationManager -Path $env:USERPROFILE\Desktop\buildServer â€“Verbose
 Start-DscConfiguration -Wait -Force -Path $env:USERPROFILE\Desktop\buildServer -Verbose

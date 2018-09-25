@@ -1,4 +1,4 @@
-#Fatal Error Handling
+﻿#Fatal Error Handling
 Try{
     If($_.Exception.ToString().Contains("something")){
         Write-Host " already exists. Skipping!" -ForegroundColor DarkGreen

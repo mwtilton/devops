@@ -1,4 +1,4 @@
-function Get-OpenFiles {
+﻿function Get-OpenFiles {
     [CmdletBinding()]
     Param(
         [Parameter(Mandatory=$true)]

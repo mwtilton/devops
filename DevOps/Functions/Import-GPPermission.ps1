@@ -1,4 +1,4 @@
-Function Import-GPPermission {
+﻿Function Import-GPPermission {
     [CmdletBinding()]
     Param (
         [Parameter(Mandatory=$true)]

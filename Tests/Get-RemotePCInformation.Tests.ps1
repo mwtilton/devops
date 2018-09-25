@@ -1,4 +1,4 @@
-Import-Module "$env:WORKINGFOLDER\DevOps\DevOps\Functions\Get-RemotePCInformation.ps1" -Force -ErrorAction Stop
+﻿Import-Module "$env:WORKINGFOLDER\DevOps\DevOps\Functions\Get-RemotePCInformation.ps1" -Force -ErrorAction Stop
 
 Describe "Get-RemotePCInformation" -Tags "UNIT" {
 

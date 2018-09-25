@@ -1,4 +1,4 @@
-Function Start-PrepRebuild {
+﻿Function Start-PrepRebuild {
     [CmdletBinding()]
     Param(
         #Branch Selection
@@ -14,6 +14,9 @@ Function Start-PrepRebuild {
         [string]
         $path = "$env:USERPROFILE\Desktop\Github"
     )
+
+    Get-Service "Windows Search" | Set-service -StartupType Automatic | Start-Service
+
     try{
         New-Item -ItemType Directory -Path $path -ErrorAction Stop
     }
@@ -31,8 +34,8 @@ Function Start-PrepRebuild {
     }
     Set-Location $path
 
-    #Start-Process "https://github.com/git-for-windows/git/releases/download/v2.18.0.windows.1/Git-2.18.0-64-bit.exe"
-    #Read-Host "Holding for installation of git"
+    Start-Process "https://git-scm.com/downloads"
+    Read-Host "Holding for installation of git"
     #Get-Process -Name git -ErrorAction stop
 
     Try{

@@ -1,4 +1,4 @@
-Get-DscConfigurationStatus -all | fl
+﻿Get-DscConfigurationStatus -all | fl
 
 #firewall rules
 Get-NetFirewallRule *winmgmt*|select name,enabled

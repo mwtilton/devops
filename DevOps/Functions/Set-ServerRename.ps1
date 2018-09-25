@@ -1,4 +1,4 @@
-Function Set-ServerRename{
+﻿Function Set-ServerRename{
     [CmdletBinding()]
     Param(
 

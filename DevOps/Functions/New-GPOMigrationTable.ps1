@@ -1,4 +1,4 @@
-Function New-GPOMigrationTable {
+﻿Function New-GPOMigrationTable {
     [CmdletBinding()]
     Param (
         [Parameter(Mandatory=$true)]

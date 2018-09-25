@@ -1,4 +1,4 @@
-Function Move-PageFileSys {
+﻿Function Move-PageFileSys {
     $computer = Get-WmiObject Win32_computersystem -EnableAllPrivileges
     $computer.AutomaticManagedPagefile = $false
     $computer.Put()

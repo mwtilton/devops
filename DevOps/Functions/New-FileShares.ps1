@@ -1,4 +1,4 @@
-Function New-FileShares {
+﻿Function New-FileShares {
     [CmdletBinding()]
     Param (
         [Parameter(Mandatory=$true)]
@@ -39,7 +39,7 @@ Function New-FileShares {
             }
         }
         Try{
-            New-SmbShare –Name $_.Name -Path $_.Path –Description $_.Description -ErrorAction Stop
+            New-SmbShare â€“Name $_.Name -Path $_.Path â€“Description $_.Description -ErrorAction Stop
             Write-host "  [+]" -NoNewline
             Write-host $_.Name -ForegroundColor White -NoNewline
             Write-host " is now being shared." -ForegroundColor DarkGreen

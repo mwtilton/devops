@@ -132,12 +132,13 @@ Configuration RemoteDesktopSessionHost
         }
     }
 }
-
+<#
 Write-Warning "Creating configuration with parameter values:"
 Write-Warning "Collection Name: $collectionName"
 Write-Warning "Collection Description: $collectionDescription"
 Write-Warning "Connection Broker: $brokerFQDN"
 Write-Warning "Web Access Server: $webFQDN"
+#>
 
 RemoteDesktopSessionHost -collectionName $collectionName -collectionDescription $collectionDescription -connectionBroker $brokerFQDN -webAccessServer $webFQDN -OutputPath $env:USERPROFILE\Desktop\RDSDSC\
 $outputPath = "$env:USERPROFILE\Desktop\RDSDSC\"

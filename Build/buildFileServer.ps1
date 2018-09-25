@@ -210,7 +210,9 @@ Configuration FileResourceDemo
             SourcePath = "C:\Users\Public\Documents\DSCDemo\DemoSource"
             DestinationPath = "C:\Users\Public\Documents\DSCDemo\DemoDestination"
         }
-
+        ###################################################################
+        #                       DSC LOGGING                               #
+        ###################################################################
         Log AfterDirectoryCopy
         {
             # The message below gets written to the Microsoft-Windows-Desired State Configuration/Analytic log

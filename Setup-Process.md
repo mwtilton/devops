@@ -15,11 +15,14 @@
 --Remove VMware tools CD  
 --Set Temp IP information  
 [X] Run Windows Updates before sysprep (1 restart)  
---disk cleanup wizard  
+--disk cleanup wizard with system files selected  
 --Sysprep to shutdown  
+`Set-Location C:\Windows\System32\Sysprep`  
+`.\sysprep.exe /generalize /oobe /shutdown`  
 --Save Template  
 
 ###DEV vAPP Template  
+[ ] Enable RDP  
 [ ] Install Git  
 `Defaults v2.19.0`  
 `Windows CLI`  
@@ -31,7 +34,6 @@
 [ ] CHECK ALL SLEEP/POWER RELATED SETTINGS  
 --Run Disable Powersettings  
 --BOOT ALL VM's Pre-Rebuild  
-[ ] Enable RDP  
 --DON'T POWER OFF THROUGH THE GUEST OS ANYMORE  
 
 ##DEV vAPP DC  

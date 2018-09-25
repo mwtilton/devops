@@ -1,3 +1,4 @@
+<#
 param (
     [string]$brokerFQDN,
     [string]$webFQDN,
@@ -9,9 +10,10 @@ $localhost = [System.Net.Dns]::GetHostByName((hostname)).HostName
 
 if (!$collectionName) {$collectionName = "DemoCloud"}
 if (!$collectionDescription) {$collectionDescription = "Remote Desktop instance for $collectionName"}
-
+#>
 Configuration RemoteDesktopSessionHost
 {
+    <#
     param
     (
 
@@ -29,11 +31,12 @@ Configuration RemoteDesktopSessionHost
         # Web Access Node Name
         [String]$webAccessServer
     )
+    #>
     Import-DscResource -ModuleName xRemoteDesktopSessionHost -ModuleVersion 1.8.0.0
     Import-DscResource -ModuleName xPSDesiredStateConfiguration -ModuleVersion 8.4.0.0
 
-    if (!$connectionBroker) {$connectionBroker = $localhost}
-    if (!$connectionWebAccessServer) {$webAccessServer = $localhost}
+    #if (!$connectionBroker) {$connectionBroker = $localhost}
+    #if (!$connectionWebAccessServer) {$webAccessServer = $localhost}
 
     Node "localhost"
     {
@@ -61,21 +64,21 @@ Configuration RemoteDesktopSessionHost
             IncludeAllSubFeature = $true
         }
 
-        if ($localhost -eq $connectionBroker) {
-            WindowsFeature RDS-Connection-Broker
-            {
-                Ensure = "Present"
-                Name = "RDS-Connection-Broker"
-            }
+        #if ($localhost -eq $connectionBroker) {
+        WindowsFeature RDS-Connection-Broker
+        {
+            Ensure = "Present"
+            Name = "RDS-Connection-Broker"
         }
+        #}
 
-        if ($localhost -eq $webAccessServer) {
-            WindowsFeature RDS-Web-Access
-            {
-                Ensure = "Present"
-                Name = "RDS-Web-Access"
-            }
+        #if ($localhost -eq $webAccessServer) {
+        WindowsFeature RDS-Web-Access
+        {
+            Ensure = "Present"
+            Name = "RDS-Web-Access"
         }
+        #}
 
         WindowsFeature RDS-Licensing
         {
@@ -86,8 +89,8 @@ Configuration RemoteDesktopSessionHost
         xRDSessionDeployment Deployment
         {
             SessionHost = "APP01.democloud.local"
-            ConnectionBroker = if ($ConnectionBroker) {$ConnectionBroker} else {$localhost}
-            WebAccessServer = if ($WebAccessServer) {$WebAccessServer} else {$localhost}
+            ConnectionBroker = $localhost #if ($ConnectionBroker) {$ConnectionBroker} else {$localhost}
+            WebAccessServer = $localhost #if ($WebAccessServer) {$WebAccessServer} else {$localhost}
             DependsOn = "[WindowsFeature]Remote-Desktop-Services", "[WindowsFeature]RDS-RD-Server"
         }
 
@@ -96,14 +99,14 @@ Configuration RemoteDesktopSessionHost
             CollectionName = $collectionName
             CollectionDescription = $collectionDescription
             SessionHost = "APP01.democloud.local"
-            ConnectionBroker = if ($ConnectionBroker) {$ConnectionBroker} else {$localhost}
+            ConnectionBroker = $localhost #if ($ConnectionBroker) {$ConnectionBroker} else {$localhost}
             DependsOn = "[xRDSessionDeployment]Deployment"
         }
         xRDSessionCollectionConfiguration CollectionConfiguration
         {
             CollectionName = $collectionName
             CollectionDescription = $collectionDescription
-            ConnectionBroker = if ($ConnectionBroker) {$ConnectionBroker} else {$localhost}
+            ConnectionBroker = $localhost #if ($ConnectionBroker) {$ConnectionBroker} else {$localhost}
             TemporaryFoldersDeletedOnExit = $false
             SecurityLayer = "SSL"
             <#

@@ -176,7 +176,6 @@ Lastly, prompt for the necessary username and password combinations, then
 compile the configuration, and then instruct the server to execute that
 configuration against the settings on this local server.
 #>
-Import-Module $env:USERPROFILE\Desktop\GitHub\DevOps\DevOps\DevOps.psm1 -Force -verbose
 
 
 $credentials = Get-Credential -UserName Administrator -Message "Please enter a new password for Local Administrator and other accounts."
@@ -184,5 +183,5 @@ $credentials = Get-Credential -UserName Administrator -Message "Please enter a n
 $outputPath = "$env:USERPROFILE\Desktop\buildDomainController"
 BuildDomainController -ConfigurationData $ConfigData -OutPutPath $outputPath
 
-Set-DSCLocalConfigurationManager -Path $outputPath -Verbose
+Set-DSCLocalConfigurationManager -Path $outputPath –Verbose
 Start-DscConfiguration -Wait -Force -Path $outputPath -Verbose

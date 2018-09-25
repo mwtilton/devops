@@ -49,8 +49,8 @@ REBOOT
 **Only after DC is done and built**  
 --Webconsole into fileserver01  
 --Enable RDP  
---Run prepFileServer w/ update help â€“erroraction sil con  
---Run buildFileServer w/ ip information  
+--Run prepFileServer  
+--Run buildFileServer  
 [ ] Create Folders then associate shares to them  
 [ ] Change reboot param on buildFS to not reboot auto  
 

@@ -46,14 +46,14 @@ configuration buildServer
         User Administrator {
             Ensure = "Present"
             UserName = "Administrator"
-            Password = $credentials
+            Password = $Cred
             DependsOn = "[xDnsServerAddress]PrimaryDNSClient"
         }
 
         xComputer ChangeNameAndJoinDomain {
             Name = $node.ThisComputerName
             DomainName    = $node.DomainName
-            Credential    = $credentials
+            Credential    = $domainCred
             DependsOn = "[User]Administrator"
         }
     }
@@ -86,14 +86,13 @@ compile the configuration, and then instruct the server to execute that
 configuration against the settings on this local server.
 #>
 
-#$domainCred = Get-Credential -UserName company\Administrator -Message "Please enter a new password for Domain Administrator."
-#$Cred = Get-Credential -UserName Administrator -Message "Please enter a new password for Local Administrator and other accounts."
+$domainCred = Get-Credential -UserName company\Administrator -Message "Please enter a new password for Domain Administrator."
+$Cred = Get-Credential -UserName Administrator -Message "Please enter a new password for Local Administrator and other accounts."
 
-Import-Module $env:USERPROFILE\Desktop\GitHub\DevOps\DevOps\DevOps.psm1 -Force -verbose
+#Import-Module $env:USERPROFILE\Desktop\GitHub\DevOps\DevOps\DevOps.psm1 -Force -verbose
+#$credentials = Get-CredCheck
+$outputPath = "$env:USERPROFILE\Desktop\buildServer"
+buildServer -ConfigurationData $ConfigData -OutputPath $outputPath
 
-$credentials = Get-CredCheck
-
-buildServer -ConfigurationData $ConfigData -OutputPath $env:USERPROFILE\Desktop\buildServer
-
-Set-DSCLocalConfigurationManager -Path $env:USERPROFILE\Desktop\buildServer –Verbose
-Start-DscConfiguration -Wait -Force -Path $env:USERPROFILE\Desktop\buildServer -Verbose
+Set-DSCLocalConfigurationManager -Path $outputPath –Verbose
+Start-DscConfiguration -Wait -Force -Path $outputPath -Verbose

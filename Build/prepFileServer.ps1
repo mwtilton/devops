@@ -22,7 +22,7 @@ Install-Module StorageDsc -RequiredVersion 4.1.0.0
 Install-Module cNtfsAccessControl -RequiredVersion 1.3.1
 Install-Module xPSDesiredStateConfiguration -RequiredVersion 8.4.0.0
 
-Get-Partition -DriveLetter 'C' | Resize-Partition -Size 20GB
+Get-Partition -DriveLetter 'C' | Resize-Partition -Size 22GB
 New-Partition -DiskNumber 0 -UseMaximumSize -DriveLetter 'E'
 $Edrive = Get-Partition -DriveLetter 'E'
 sleep 1

@@ -85,7 +85,7 @@ configuration buildFileServer
         cNtfsPermissionEntry PermissionSet1
         {
             Ensure = 'Present'
-            Path = "E:\CompanyData\Data"
+            Path = "E:\"
             Principal = 'DEMOCLOUD\Domain Admins'
             AccessControlInformation = @(
                 cNtfsAccessControlInformation
@@ -93,7 +93,7 @@ configuration buildFileServer
                     AccessControlType = 'Allow'
                     FileSystemRights = 'FullControl'
                     Inheritance = 'ThisFolderSubfoldersAndFiles'
-                    NoPropagateInherit = $false
+                    NoPropagateInherit = $true
                 }
             )
             DependsOn = '[File]DataDirectory'

@@ -21,6 +21,7 @@ Authored by mwtilton
 
 [ ] Beta stages  
 1.7  
+--Put all CSV's into one file
 --Finished with RDS/Fileshares/GPO/AD importing process  
 1.8  
 --Finished with plaster framework to build them out  

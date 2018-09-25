@@ -177,7 +177,6 @@ compile the configuration, and then instruct the server to execute that
 configuration against the settings on this local server.
 #>
 
-
 $credentials = Get-Credential -UserName Administrator -Message "Please enter a new password for Local Administrator and other accounts."
 
 $outputPath = "$env:USERPROFILE\Desktop\buildDomainController"

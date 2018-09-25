@@ -46,6 +46,7 @@ DO NOT RUN FROM ISE
 REBOOT  
 
 ##FileServer deployment  
+**Only after DC is done and built**  
 --Webconsole into fileserver01  
 --Enable RDP  
 --Run prepFileServer w/ update help â€“erroraction sil con  
@@ -54,12 +55,13 @@ REBOOT
 [ ] Change reboot param on buildFS to not reboot auto  
 
 ##APP Servers  
-**ONLY AFTER YOU BUILD THE DC AND Fileserver**  
---Change IP
+**ONLY AFTER YOU BUILD THE DC**  
+--Change IP  
 --Enable RDP  
 --Run prepServer  
 --Run buildServer  
 
+#SAVE DEV vAPP BEFORE RDS integration testing  
 
 ##RDS Deployment  
 **After DC and all VMâ€™s are booted up and running**  

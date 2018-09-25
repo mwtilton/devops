@@ -22,40 +22,22 @@
 --Save Template  
 
 ###DEV vAPP Template  
-[X]Setup Admin Account  
-[X]Temp IP  
+-- Change VCD to DNAT to new STATIC IP  
+[X] Setup Admin Account  
+[X] Temp IP  
 [X] Enable RDP  
 [X] Need to remove IE enhanced security  
+[X] BOOT ALL VM's Pre-Rebuild  
+--DON'T POWER OFF THROUGH THE GUEST OS ANYMORE  
+
+[ ] Add File/Folders to prepRebuild  
+[X] Add start-service for windows search to prepRebuild  
+
+##DEV vAPP DC  
 DO NOT RUN FROM ISE  
 --Run prepRebuild on DC  
 --REBOOT after GIT install  
 --Continue prepRebuild on DC  
-
-[ ] Add File/Folders to prepRebuild
-[X] Add start-service for windows search to prepRebuild  
-[X] BOOT ALL VM's Pre-Rebuild  
---DON'T POWER OFF THROUGH THE GUEST OS ANYMORE  
-
-##DEV vAPP DC  
--- Set IP with 8.8.8.8 for initial DNS server  
--- Change VCD to DNAT to new STATIC IP  
-[X] Enable RDP into BoX  
-[X] Enable RDP Firewall settings  
---RDP into the box  
-[-] CredSSIP Error  
-
-
-[X] File/Folder Options  
-[ ] Script to run this automatically -- add to prepRebuild  
-`Hidden Folders`  
-`File extensions`  
-[X] Windows Search  
-##DO NOT RUN FROM ISE  
---Run prepRebuild  
-
-[X] Need to install Firefox  
-[X] Set Firefox as default  
-[X] pin Firefox to taskbar  
 
 [?] Keeping DNS Zones to 3.168.192 but those are the same as the servers IP addresses...  
 

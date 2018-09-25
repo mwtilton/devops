@@ -7,9 +7,11 @@ This script must be run before configureServer.ps1.
 #.\sysprep.exe /generalize /oobe /shutdown
 Update-Help -ErrorAction SilentlyContinue
 
-Enable-PSRemoting -Force
+Get-Service "Windows Search" | Set-service -StartupType Automatic | Start-Service
 
 Get-PackageSource -Name PSGallery | Set-PackageSource -Trusted -Force -ForceBootstrap
+
+Enable-PSRemoting -Force
 
 Install-PackageProvider -Name NuGet -Force
 

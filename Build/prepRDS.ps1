@@ -1,6 +1,8 @@
-﻿Get-PackageSource -Name PSGallery | Set-PackageSource -Trusted -Force -ForceBootstrap
+﻿Update-Help -ErrorAction SilentlyContinue
 
-Update-Help -ErrorAction SilentlyContinue
+Get-Service "Windows Search" | Set-service -StartupType Automatic | Start-Service
+
+Get-PackageSource -Name PSGallery | Set-PackageSource -Trusted -Force -ForceBootstrap
 
 Enable-PSRemoting -Force
 

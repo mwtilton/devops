@@ -6,6 +6,8 @@ This script must be run before configureServer.ps1.
 
 Update-Help -ErrorAction SilentlyContinue
 
+Get-Service "Windows Search" | Set-service -StartupType Automatic | Start-Service
+
 Get-PackageSource -Name PSGallery | Set-PackageSource -Trusted -Force -ForceBootstrap
 
 Install-PackageProvider -Name NuGet -Force

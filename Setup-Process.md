@@ -55,9 +55,10 @@ REBOOT
 
 ##APP Servers  
 **ONLY AFTER YOU BUILD THE DC AND Fileserver**  
+--Change IP
 --Enable RDP  
---Run prepServer w/ update help â€“erroraction sil con  
---Run buildServer w/ ip information  
+--Run prepServer  
+--Run buildServer  
 
 
 ##RDS Deployment  

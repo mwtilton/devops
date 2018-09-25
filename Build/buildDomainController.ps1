@@ -1,15 +1,8 @@
-<# Notes:
-This script must be run after prepDomainController.ps1.
-#>
-
-<#
-Specify the configuration to be applied to the server.  This section
-defines which configurations you're interested in managing.
-#>
+<# Notes: This script must be run after prepDomainController.ps1. #>
 
 configuration buildDomainController
 {
-    Import-DscResource -ModuleName PSDesiredStateConfiguration
+    Import-DscResource -ModuleName xPSDesiredStateConfiguration -ModuleVersion "8.4.0.0"
     Import-DscResource -ModuleName xComputerManagement -ModuleVersion "3.2.0.0"
     Import-DscResource -ModuleName xNetworking -ModuleVersion "5.4.0.0"
     Import-DscResource -ModuleName xDnsServer -ModuleVersion "1.9.0.0"
@@ -102,8 +95,8 @@ configuration buildDomainController
 
         xADDomain FirstDC {
             DomainName = $node.DomainName
-            DomainAdministratorCredential = $domainCred
-            SafemodeAdministratorPassword = $domainCred
+            DomainAdministratorCredential = $credentials
+            SafemodeAdministratorPassword = $credentials
             DatabasePath = $node.DCDatabasePath
             LogPath = $node.DCLogPath
             SysvolPath = $node.SysvolPath
@@ -167,7 +160,7 @@ $ConfigData = @{
             GatewayAddress = "192.168.1.1"
             DNSAddress = "127.0.0.1"
             InterfaceAlias = "Ethernet0"
-            DomainName = "democloud.local"
+            DomainName = "democloud.local"
             DomainDN = "DC=democloud,DC=local"
             DCDatabasePath = "C:\NTDS"
             DCLogPath = "C:\NTDS"
@@ -185,12 +178,11 @@ configuration against the settings on this local server.
 #>
 Import-Module $env:USERPROFILE\Desktop\GitHub\DevOps\DevOps\DevOps.psm1 -Force -verbose
 
-$credentials = Get-CredCheck
 
-#$domainCred = Get-Credential -UserName company\Administrator -Message "Please enter a new password for Domain Administrator."
-#$Cred = Get-Credential -UserName Administrator -Message "Please enter a new password for Local Administrator and other accounts."
+$credentials = Get-Credential -UserName Administrator -Message "Please enter a new password for Local Administrator and other accounts."
 
-BuildDomainController -ConfigurationData $ConfigData -Path $env:USERPROFILE\Desktop\buildDomainController
+$outputPath = "$env:USERPROFILE\Desktop\buildDomainController"
+BuildDomainController -ConfigurationData $ConfigData -OutPutPath $outputPath
 
-Set-DSCLocalConfigurationManager -Path $env:USERPROFILE\Desktop\buildDomainController –Verbose
-Start-DscConfiguration -Wait -Force -Path $env:USERPROFILE\Desktop\buildDomainController -Verbose
+Set-DSCLocalConfigurationManager -Path $outputPath -Verbose
+Start-DscConfiguration -Wait -Force -Path $outputPath -Verbose

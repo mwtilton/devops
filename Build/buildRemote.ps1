@@ -29,3 +29,82 @@ Set-DscLocalConfigurationManager -CimSession $cim -Path .\rebootMofs -Verbose
 
 # read the config settings back to confirm
 Get-DscLocalConfigurationManager -CimSession $cim
+
+
+<#
+<# Notes:
+Goal - Configure minimal post-installation settings for a server.
+This script must be run after prepServer.ps1
+Disclaimer - This example code is provided without copyright and AS IS.  It is free for you to use and modify.
+
+<#
+Specify the configuration to be applied to the server.  This section
+defines which configurations you're interested in managing.
+
+
+configuration buildFileServer
+{
+    Import-DscResource -ModuleName xSmbShare -ModuleVersion 2.1.0.0
+
+    Node $ConfigData.AllNodes.NodeName
+    {
+
+        LocalConfigurationManager {
+            ActionAfterReboot = "ContinueConfiguration"
+            ConfigurationMode = "ApplyOnly"
+            DebugMode = "ForceModuleImport"
+            RebootNodeIfNeeded = $true
+        }
+
+        ForEach ($Folder in $Node.FolderStructure) {
+
+
+        }
+
+    }
+}
+<#
+Specify values for the configurations you're interested in managing.
+See in the configuration above how variables are used to reference values listed here.
+
+$ConfigData = @{
+    AllNodes = @(
+        @{
+
+            Nodename = "FileServer01"
+
+            FolderStructure = @(
+
+                @{
+                    Path =   "E:\Testing"
+                    Ensure = "Present"
+                }
+                @{
+                    Path =   "E:\CompanyData"
+                    Ensure = "Present"
+                }
+
+
+            )
+        }
+    )
+}
+<#
+Lastly, prompt for the necessary username and password combinations, then
+compile the configuration, and then instruct the server to execute that
+configuration against the settings on this local server.
+
+
+#$outputPath = "\\$($ConfigData.AllNodes.Nodename)\c$\users\administrator\Desktop\buildFileServer\"
+$outputPath = "$env:USERPROFILE\Desktop\buildFileServer"
+
+buildFileServer -ConfigurationData $ConfigData -OutputPath $outputPath
+
+$Domain = $(($env:USERDNSDOMAIN).Split(".")[0])
+
+$Session = New-CimSession -ComputerName $ConfigData.AllNodes.Nodename -Credential "$Domain\$env:USERNAME"
+
+Set-DSCLocalConfigurationManager -CimSession $Session -Path $outputPath -Verbose
+Start-DscConfiguration -CimSession $Session -Path $outputPath -Wait -Verbose -Force
+
+#>

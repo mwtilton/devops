@@ -56,10 +56,44 @@ configuration buildFileServer
             RebootNodeIfNeeded = $true
         }
 
-        ForEach ($Folder in $Node.FolderStructure) {
+        ForEach ($config in $Node.configs) {
+            xIPAddress NewIPAddress {
+                IPAddress = $node.IPAddressCIDR
+                InterfaceAlias = $node.InterfaceAlias
+                AddressFamily = "IPV4"
+            }
+
+            xDefaultGatewayAddress NewIPGateway {
+                Address = $node.GatewayAddress
+                InterfaceAlias = $node.InterfaceAlias
+                AddressFamily = "IPV4"
+                DependsOn = "[xIPAddress]NewIPAddress"
+            }
+
+            xDnsServerAddress PrimaryDNSClient {
+                Address        = $node.DNSAddress
+                InterfaceAlias = $node.InterfaceAlias
+                AddressFamily = "IPV4"
+                DependsOn = "[xDefaultGatewayAddress]NewIPGateway"
+            }
+
+            User Administrator {
+                Ensure = "Present"
+                UserName = "Administrator"
+                Password = $credentials
+                DependsOn = "[xDnsServerAddress]PrimaryDNSClient"
+            }
+
+            xComputer ChangeNameAndJoinDomain {
+                Name = $node.ThisComputerName
+                DomainName    = $node.DomainName
+                Credential    = $credentials
+                DependsOn = "[User]Administrator"
+            }
 
 
         }
+
 
     }
 }
@@ -73,14 +107,22 @@ $ConfigData = @{
 
             Nodename = "FileServer01"
 
-            FolderStructure = @(
+            configs = @(
 
                 @{
                     Path =   "E:\Testing"
                     Ensure = "Present"
                 }
+
+
+            )
+        }
+        @{
+            NodeName = "APP01"
+            configs = @(
+
                 @{
-                    Path =   "E:\CompanyData"
+                    Path =   "E:\Testing"
                     Ensure = "Present"
                 }
 

@@ -1,4 +1,4 @@
-Configuration ConfigureRebootOnNode
+﻿Configuration ConfigureRebootOnNode
 {
     param (
         [Parameter(Mandatory=$true)]

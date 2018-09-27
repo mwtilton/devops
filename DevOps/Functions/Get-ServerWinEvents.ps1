@@ -1,4 +1,4 @@
-function Get-ServerWinEvents {
+﻿function Get-ServerWinEvents {
     [CmdletBinding()]
     param (
         [string]$logname

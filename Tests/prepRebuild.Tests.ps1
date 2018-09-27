@@ -1,4 +1,4 @@
-Import-Module "$env:WORKINGFOLDER\DevOps\Build\prepRebuild.ps1" -Force -ErrorAction Stop
+﻿Import-Module "$env:WORKINGFOLDER\DevOps\Build\prepRebuild.ps1" -Force -ErrorAction Stop
 Describe "prepGit" -Tags "GIT" {
     Context "Folder Location Prep" {
         Mock New-Item {return "$env:USERPROFILE\Documents\Github"}

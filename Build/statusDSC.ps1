@@ -1,4 +1,4 @@
-Get-DscConfigurationStatus -all | fl
+﻿Get-DscConfigurationStatus -all | fl
 
 #firewall rules
 Get-NetFirewallRule *winmgmt*|select name,enabled
@@ -23,7 +23,7 @@ $PSVersionTable > C:\logs\PSVersionTable.txt
 Compress-Archive -Path C:\logs\*.evtx,C:\logs\*.config,C:\logs\*.txt `
     -DestinationPath "C:\logs\$($env:COMPUTERNAME)_DSC_Logs.zip" -Update
 #>
-
+Get-Module -Name * -ListAvailable | Select Name, Version, ModuleBase
 function Get-DSCConfig{
     Param($computer=$env:COMPUTERNAME)
 

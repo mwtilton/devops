@@ -1,4 +1,4 @@
-Function Disable-PowerSaving {
+﻿Function Disable-PowerSaving {
 
 	#Requires -RunAsAdministrator
 	#Inform user

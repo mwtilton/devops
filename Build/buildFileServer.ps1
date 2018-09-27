@@ -1,4 +1,4 @@
-<# Notes:
+﻿<# Notes:
 Goal - Configure minimal post-installation settings for a server.
 This script must be run after prepServer.ps1
 Disclaimer - This example code is provided without copyright and AS IS.  It is free for you to use and modify.
@@ -85,7 +85,7 @@ configuration buildFileServer
         cNtfsPermissionEntry PermissionSet1
         {
             Ensure = 'Present'
-            Path = "E:\CompanyData\Data"
+            Path = "E:\"
             Principal = 'DEMOCLOUD\Domain Admins'
             AccessControlInformation = @(
                 cNtfsAccessControlInformation
@@ -93,7 +93,7 @@ configuration buildFileServer
                     AccessControlType = 'Allow'
                     FileSystemRights = 'FullControl'
                     Inheritance = 'ThisFolderSubfoldersAndFiles'
-                    NoPropagateInherit = $false
+                    NoPropagateInherit = $true
                 }
             )
             DependsOn = '[File]DataDirectory'

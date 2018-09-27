@@ -1,4 +1,4 @@
-<#
+﻿<#
 Notes:
 The modules to be installed are versioned to protect against future breaking changes.
 This script must be run before configureServer.ps1.
@@ -6,13 +6,15 @@ This script must be run before configureServer.ps1.
 
 Update-Help -ErrorAction SilentlyContinue
 
+Get-Service "Windows Search" | Set-service -StartupType Automatic | Start-Service
+
 Get-PackageSource -Name PSGallery | Set-PackageSource -Trusted -Force -ForceBootstrap
 
 Install-PackageProvider -Name NuGet -Force
 
-Install-Module xComputerManagement -RequiredVersion 3.2.0.0 -Force
-Install-Module xNetworking -RequiredVersion 5.4.0.0 -Force
-Install-Module xPSDesiredStateConfiguration -RequiredVersion 8.4.0.0 -Force
+Install-Module xComputerManagement -RequiredVersion 3.2.0.0 -Scope CurrentUser -Force
+Install-Module xNetworking -RequiredVersion 5.4.0.0 -Scope CurrentUser -Force
+Install-Module xPSDesiredStateConfiguration -RequiredVersion 8.4.0.0 -Scope CurrentUser -Force
 
 Enable-PSRemoting -Force
 

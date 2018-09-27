@@ -1,4 +1,4 @@
-Function Invoke-ImportGPO {
+﻿Function Invoke-ImportGPO {
     [CmdletBinding()]
     Param (
         [Parameter(Mandatory=$true)]

@@ -1,4 +1,4 @@
-Function Start-GPOImport {
+﻿Function Start-GPOImport {
     [CmdletBinding()]
     Param (
         [Parameter(Mandatory=$true,HelpMessage="Must be FQDN.")]

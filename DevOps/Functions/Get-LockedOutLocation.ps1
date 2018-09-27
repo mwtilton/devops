@@ -1,4 +1,4 @@
-Function Get-LockedOutLocation {
+﻿Function Get-LockedOutLocation {
     <#
     .SYNOPSIS
         This function will locate the computer that processed a failed user logon attempt which caused the user account to become locked out.

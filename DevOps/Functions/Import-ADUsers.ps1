@@ -1,4 +1,4 @@
-Function Import-ADUsers {
+﻿Function Import-ADUsers {
     [CmdletBinding()]
     Param(
 

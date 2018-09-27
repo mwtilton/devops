@@ -1,4 +1,4 @@
-
+﻿
 function Test-FileLock {
     [CmdletBinding()]
     param (

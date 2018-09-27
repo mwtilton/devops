@@ -1,4 +1,4 @@
-Function Export-Groups {
+﻿Function Export-Groups {
     [CmdletBinding()]
     Param (
         [Parameter(Mandatory=$true)]

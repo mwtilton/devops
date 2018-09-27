@@ -1,4 +1,4 @@
-Import-Module "$env:WORKINGFOLDER\DevOps\DevOps\Functions\Get-ServerWinEvents.ps1" -Force -ErrorAction Stop
+﻿Import-Module "$env:WORKINGFOLDER\DevOps\DevOps\Functions\Get-ServerWinEvents.ps1" -Force -ErrorAction Stop
 
 Describe "Unit Testing for Get-ServerWinEvents" -tags "UNIT" {
     $logname = "network"

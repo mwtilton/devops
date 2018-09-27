@@ -1,4 +1,4 @@
-#Fatal Error Handling
+﻿#Fatal Error Handling
 Try{
     If($_.Exception.ToString().Contains("something")){
         Write-Host " already exists. Skipping!" -ForegroundColor DarkGreen
@@ -19,3 +19,7 @@ if ($?) {throw}
 
 #runAs Admin stuffs
 #R equires -RunAsAdministrator
+
+#DSC
+Get-DscResource * | Select -ExpandProperty Properties | ft -AutoSize
+Get-DscResource * -Syntax

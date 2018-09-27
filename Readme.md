@@ -1,4 +1,4 @@
-# What is DevOps  
+﻿# What is DevOps  
 Holder of all things DevOps related  
 Authored by mwtilton  
 
@@ -8,12 +8,13 @@ Authored by mwtilton
 1.2  
 [X] Fix server losing connectivity issues, no idea why that happens  
 [X] Fix encoding issues  
-[ ] Fix Administrator credentials for all build scripts  
+[X] Fix Administrator credentials for all build scripts  
 1.3  
---configure DSC for remote node usage  
+--Finished with plaster framework to build them out  
 1.4  
---Logging in general and script specific  
+--configure DSC for remote node usage  
 1.5  
+--Logging in general and script specific  
 --Server logs/win events and general server status information  
 --DSC Configuration Drift analysis  
 1.6  
@@ -21,9 +22,9 @@ Authored by mwtilton
 
 [ ] Beta stages  
 1.7  
---Finished with RDS/Fileshares/GPO/AD importing process  
+--Put all CSV's into one file
 1.8  
---Finished with plaster framework to build them out  
+--Finished with RDS/Fileshares/GPO/AD importing process  
 
 [ ] Release v1 stage  
 1.9  

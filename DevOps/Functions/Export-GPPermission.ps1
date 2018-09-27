@@ -1,4 +1,4 @@
-function Export-GPPermission {
+﻿function Export-GPPermission {
     [CmdletBinding()]
     Param(
         [Parameter(Mandatory=$true,

@@ -1,4 +1,4 @@
-Function Import-WMIFilter {
+﻿Function Import-WMIFilter {
     [CmdletBinding()]
     Param (
         [Parameter(Mandatory=$true)]

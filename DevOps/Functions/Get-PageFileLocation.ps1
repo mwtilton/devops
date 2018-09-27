@@ -1,4 +1,4 @@
-<#
+﻿<#
 
 .SYNOPSIS
 Retrieves  page file location information from  local or remote computers.

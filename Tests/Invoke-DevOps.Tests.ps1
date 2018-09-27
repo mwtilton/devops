@@ -1,4 +1,4 @@
-$parent = (get-item $PSScriptRoot).parent.FullName
+﻿$parent = (get-item $PSScriptRoot).parent.FullName
 #Import-Module $parent\DevOps\DevOps.Machine.ps1 -Force -ErrorAction Stop
 Import-Module "$parent\DevOps\Functions\Invoke-DevOps.ps1" -Force -ErrorAction Stop
 Import-Module "$parent\DevOps\DevOps.psm1" -Force -ErrorAction Stop

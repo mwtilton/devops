@@ -1,4 +1,4 @@
-#DEV vAPP  
+﻿#DEV vAPP  
 
 ##Fresh Template Install  
 --Create VM in Vcloud  
@@ -22,40 +22,22 @@
 --Save Template  
 
 ###DEV vAPP Template  
-[ ] Enable RDP  
-[ ] Install Git  
-`Defaults v2.19.0`  
-`Windows CLI`  
---Enable-PSremoting  
---Need to remove IE enhanced security  
-[-] IP changes do not hold after Rebuild power on  
-[-] Windows Search doesn't hold after rebuild  
-[+] VMWare tools does hold after Rebuild  
-[ ] CHECK ALL SLEEP/POWER RELATED SETTINGS  
---Run Disable Powersettings  
---BOOT ALL VM's Pre-Rebuild  
+-- Change VCD to DNAT to new STATIC IP  
+[X] Setup Admin Account  
+[X] Temp IP  
+[X] Enable RDP  
+[X] Need to remove IE enhanced security  
+[X] BOOT ALL VM's Pre-Rebuild  
 --DON'T POWER OFF THROUGH THE GUEST OS ANYMORE  
 
+[ ] Add File/Folders to prepRebuild  
+[X] Add start-service for windows search to prepRebuild  
+
 ##DEV vAPP DC  
--- Set IP with 8.8.8.8 for initial DNS server  
--- Change VCD to DNAT to new STATIC IP  
-[X] Enable RDP into BoX  
-[X] Enable RDP Firewall settings  
---RDP into the box  
-[-] CredSSIP Error  
-
-
-[X] File/Folder Options  
-[ ] Script to run this automatically -- add to prepRebuild  
-`Hidden Folders`  
-`File extensions`  
-[X] Windows Search  
-##DO NOT RUN FROM ISE  
---Run prepRebuild  
-
-[X] Need to install Firefox  
-[X] Set Firefox as default  
-[X] pin Firefox to taskbar  
+DO NOT RUN FROM ISE  
+--Run prepRebuild on DC  
+--REBOOT after GIT install  
+--Continue prepRebuild on DC  
 
 [?] Keeping DNS Zones to 3.168.192 but those are the same as the servers IP addresses...  
 
@@ -64,22 +46,26 @@
 REBOOT  
 
 ##FileServer deployment  
+**Only after DC is done and built**  
 --Webconsole into fileserver01  
 --Enable RDP  
---Run prepFileServer w/ update help –erroraction sil con  
---Run buildFileServer w/ ip information  
+--Run prepFileServer  
+--Run buildFileServer  
 [ ] Create Folders then associate shares to them  
 [ ] Change reboot param on buildFS to not reboot auto  
 
 ##APP Servers  
-**ONLY AFTER YOU BUILD THE DC AND Fileserver**  
+**ONLY AFTER YOU BUILD THE DC**  
+--Change IP  
 --Enable RDP  
---Run prepServer w/ update help –erroraction sil con  
---Run buildServer w/ ip information  
+--Run prepServer  
+--Run buildServer  
 
+#SAVE DEV vAPP BEFORE RDS integration testing  
+--DEV Saved 9/25/18  
 
 ##RDS Deployment  
-**After DC and all VM’s are booted up and running**  
+**After DC and all VMâ€™s are booted up and running**  
 --prep RDS  
 [ ] Fix prompt for Collection information  
 --Setup script for server locations to app01/02/fileserver locations  
@@ -108,7 +94,7 @@ https://social.technet.microsoft.com/wiki/contents/articles/10755.windows-server
 
 #YK Main  
 
-##YK-DC01 – Template  
+##YK-DC01 â€“ Template  
 Normal RDP  
 Vmware Tools  
 Updates as of Aug 2018  
@@ -163,7 +149,7 @@ Ports 1433 49172 TCP
 ##Post Power-On/Rebuild checks  
 --RDP  
 --Server Manager (Servers are up)  
---nmap [the subnet] –F -Pn  
+--nmap [the subnet] â€“F -Pn  
 
 #General Features  
 [ ] Need to lookup powershell options for indexing servers auto matically from DSC  

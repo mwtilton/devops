@@ -1,4 +1,4 @@
-<# Notes:
+﻿<# Notes:
 Disclaimers
 !!!!!!!!!!
 This script is provided primarily as an example series of cmdlets and

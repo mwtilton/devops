@@ -1,4 +1,4 @@
-Get-Module DevOps | Remove-Module -Force
+﻿Get-Module DevOps | Remove-Module -Force
 
 $parent = (get-item $PSScriptRoot).parent.FullName
 Import-Module $parent\DevOps -Force -ErrorAction Stop

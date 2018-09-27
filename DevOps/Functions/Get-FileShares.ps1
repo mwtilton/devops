@@ -1,4 +1,4 @@
-Function Get-FileShares {
+﻿Function Get-FileShares {
     [CmdletBinding()]
     Param (
         [Parameter(Mandatory=$true)]

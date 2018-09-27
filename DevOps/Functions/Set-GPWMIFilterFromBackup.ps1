@@ -1,4 +1,4 @@
-Function Set-GPWMIFilterFromBackup {
+﻿Function Set-GPWMIFilterFromBackup {
     [CmdletBinding()]
     Param (
         [Parameter(Mandatory=$true)]

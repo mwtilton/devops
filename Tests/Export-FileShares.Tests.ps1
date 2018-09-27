@@ -1,4 +1,4 @@
-Import-Module "$env:WORKINGFOLDER\DevOps\DevOps\Functions\Export-FileShares.ps1" -Force -ErrorAction Stop
+﻿Import-Module "$env:WORKINGFOLDER\DevOps\DevOps\Functions\Export-FileShares.ps1" -Force -ErrorAction Stop
 Describe "Export-FileShares" -Tags "UNIT" {
     Mock Get-WmiObject {}
     Mock Export-CSV {}

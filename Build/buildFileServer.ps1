@@ -27,7 +27,7 @@ configuration buildFileServer
             DebugMode = "ForceModuleImport"
             RebootNodeIfNeeded = $true
         }
-
+        <#
         xIPAddress NewIPAddress {
             IPAddress = $node.IPAddressCIDR
             InterfaceAlias = $node.InterfaceAlias
@@ -61,12 +61,15 @@ configuration buildFileServer
             Credential    = $credentials
             DependsOn = "[User]Administrator"
         }
+        #>
+        <#
         File DataDirectory
         {
             Ensure = 'Present'
             DestinationPath = "E:\CompanyData\Data"
             Type = 'Directory'
         }
+
         xSmbShare MainDriveShare
         {
             Ensure = "Present"
@@ -74,7 +77,6 @@ configuration buildFileServer
             Path = "E:\"
             Description = "This is the main drive share"
         }
-
         xSmbShare DataShare
         {
             Ensure = "Present"
@@ -98,6 +100,18 @@ configuration buildFileServer
             )
             DependsOn = '[File]DataDirectory'
         }
+        #>
+        ForEach ($Folder in $Node.FolderStructure) {
+
+            # Each of our 'file' resources will be named after the path, but...
+            #   we have to replace : with __ as colons aren't allowed in resource names
+            File $Folder.Path.Replace(':','__') {
+              DestinationPath = $Folder.Path
+              Ensure = $Folder.Ensure
+              Type = $folder.Type
+            }
+
+          }
         <#
         xSmbShare ExecShare
         {
@@ -274,6 +288,7 @@ See in the configuration above how variables are used to reference values listed
 $ConfigData = @{
     AllNodes = @(
         @{
+            <#
             Nodename = "localhost"
             ThisComputerName = "servercore2"
             InterfaceAlias = "Ethernet0"
@@ -283,6 +298,22 @@ $ConfigData = @{
             DomainName = "company.pri"
             PSDscAllowPlainTextPassword = $true
             PSDscAllowDomainUser = $true
+            #>
+            FolderStructure = @(
+
+                @{
+                    Path =   "E:\Management\Packages"
+                    Ensure = "Present"
+                    Type = "Directory"
+                }
+
+                @{
+                    Path =   "E:\Management\Wallpaper"
+                    Ensure = "Present"
+                    Type = "Directory"
+                }
+
+            )
         }
     )
 }

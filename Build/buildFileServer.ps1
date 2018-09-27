@@ -53,6 +53,7 @@ configuration buildFileServer
                         NoPropagateInherit = $AccessControlInformation.NoPropagateInherit
                     }
                 )
+                DependsOn = @("[File]" + "$($Folder.Path.Replace(':','__'))")
             }
 
             <#

@@ -30,7 +30,7 @@ configuration buildFileServer
             Ensure = "Present"
             Type = "Directory"
         }
-        <#
+
         ForEach ($Folder in $Node.FolderStructure) {
 
             # Each of our 'file' resources will be named after the path, but...
@@ -40,6 +40,22 @@ configuration buildFileServer
               Ensure = $Folder.Ensure
               Type = $folder.Type
             }
+            cNtfsPermissionEntry $Folder.Path.Replace(':','__') {
+                Ensure = $Folder.Ensure
+                Path = $Folder.Path
+                Principal = $Folder.Principal
+                AccessControlInformation = @(
+                    cNtfsAccessControlInformation
+                    {
+                        AccessControlType = $AccessControlInformation.AccessControlType
+                        FileSystemRights = $AccessControlInformation.FileSystemRights
+                        Inheritance = $AccessControlInformation.Inheritance
+                        NoPropagateInherit = $AccessControlInformation.NoPropagateInherit
+                    }
+                )
+            }
+
+            <#
             cNtfsPermissionEntry $Folder.Path.Replace(':','__')
             {
                 Ensure = 'Present'
@@ -56,6 +72,7 @@ configuration buildFileServer
                 )
                 DependsOn = @("[File]" + "$($Folder.Path.Replace(':','__'))")
             }
+
             xSmbShare $(($folders.path).Split("\")[-1])
             {
                 Ensure = "Present"
@@ -64,9 +81,10 @@ configuration buildFileServer
                 FullAccess = "Domain Admins"
                 Description = "This is the main $(($folders.path).Split("\")[-1]) Share"
             }
+            #>
 
         }
-        #>
+
     }
 }
 <#
@@ -85,12 +103,23 @@ $ConfigData = @{
                     Path =   "E:\Management\Packages"
                     Ensure = "Present"
                     Type = "Directory"
+                    Principal = "DemoCloud\Domain Admins"
+                    AccessControlInformation = @(
+
+                        @{
+                            AccessControlType = 'Allow'
+                            FileSystemRights = 'FullControl'
+                            Inheritance = 'ThisFolderSubfoldersAndFiles'
+                            NoPropagateInherit = $true
+                        }
+                    )
                 }
 
                 @{
                     Path =   "E:\Management\Wallpaper"
                     Ensure = "Present"
                     Type = "Directory"
+                    Principal = "DemoCloud\Domain Admins"
                 }
 
             )
@@ -112,5 +141,3 @@ $Session = New-CimSession -ComputerName $ConfigData.AllNodes.Nodename -Credentia
 
 Set-DSCLocalConfigurationManager -CimSession $Session -Path $outputPath -Verbose
 Start-DscConfiguration -CimSession $Session -Path $outputPath -Wait -Verbose -Force
-
-

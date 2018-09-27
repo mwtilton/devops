@@ -25,11 +25,6 @@ configuration buildFileServer
             DebugMode = "ForceModuleImport"
             RebootNodeIfNeeded = $true
         }
-        File Testing {
-            DestinationPath = "E:\testing"
-            Ensure = "Present"
-            Type = "Directory"
-        }
 
         ForEach ($Folder in $Node.FolderStructure) {
 
@@ -39,6 +34,7 @@ configuration buildFileServer
               DestinationPath = $Folder.Path
               Ensure = $Folder.Ensure
               Type = $folder.Type
+
             }
             cNtfsPermissionEntry $Folder.Path.Replace(':','__') {
                 Ensure = $Folder.Ensure
@@ -76,14 +72,13 @@ configuration buildFileServer
 
             xSmbShare $(($folders.path).Split("\")[-1])
             {
-                Ensure = "Present"
+                Ensure = $folders.Ensure
                 Name   = @(($folders.path).Split("\")[-1] + "$")
-                Path = $Folder.Path
+                Path = $folders.Path
                 FullAccess = "Domain Admins"
                 Description = "This is the main $(($folders.path).Split("\")[-1]) Share"
             }
             #>
-
         }
 
     }
@@ -101,10 +96,17 @@ $ConfigData = @{
             FolderStructure = @(
 
                 @{
-                    Path =   "E:\Management\Packages"
+                    Path =   "E:\"
                     Ensure = "Present"
                     Type = "Directory"
-                    Principal = "DemoCloud\Domain Admins"
+                    Principal = "$env:USERDNSDOMAIN\Domain Admins"
+
+                }
+                @{
+                    Path =   "E:\CompanyData"
+                    Ensure = "Present"
+                    Type = "Directory"
+                    Principal = "$env:USERDNSDOMAIN\Domain Admins"
                     AccessControlInformation = @(
 
                         @{
@@ -116,12 +118,6 @@ $ConfigData = @{
                     )
                 }
 
-                @{
-                    Path =   "E:\Management\Wallpaper"
-                    Ensure = "Present"
-                    Type = "Directory"
-                    Principal = "DemoCloud\Domain Admins"
-                }
 
             )
         }
@@ -138,7 +134,9 @@ $outputPath = "$env:USERPROFILE\Desktop\buildFileServer"
 
 buildFileServer -ConfigurationData $ConfigData -OutputPath $outputPath
 
-$Session = New-CimSession -ComputerName $ConfigData.AllNodes.Nodename -Credential DemoCloud\Administrator
+$Domain = $(($env:USERDNSDOMAIN).Split(".")[0])
+
+$Session = New-CimSession -ComputerName $ConfigData.AllNodes.Nodename -Credential "$Domain\$env:USERNAME"
 
 Set-DSCLocalConfigurationManager -CimSession $Session -Path $outputPath -Verbose
 Start-DscConfiguration -CimSession $Session -Path $outputPath -Wait -Verbose -Force

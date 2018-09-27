@@ -52,33 +52,16 @@ configuration buildFileServer
                 DependsOn = @("[File]" + "$($Folder.Path.Replace(':','__'))")
             }
 
-            <#
-            cNtfsPermissionEntry $Folder.Path.Replace(':','__')
+
+            xSmbShare $(($Folder.path).Split("\")[-1])
             {
-                Ensure = 'Present'
-                Path = $Folder.Path
-                Principal = 'DEMOCLOUD\Domain Admins'
-                AccessControlInformation = @(
-                    cNtfsAccessControlInformation
-                    {
-                        AccessControlType = 'Allow'
-                        FileSystemRights = 'FullControl'
-                        Inheritance = 'ThisFolderSubfoldersAndFiles'
-                        NoPropagateInherit = $true
-                    }
-                )
-                DependsOn = @("[File]" + "$($Folder.Path.Replace(':','__'))")
+                Ensure = $Folder.Ensure
+                Name   = ($Folder.path).Split("\")[-1] + "$"
+                Path = $Folder.path
+                FullAccess = "$Domain\Domain Admins"
+                Description = "This is the $Domain main $(($Folder.path).Split("\")[-1]) Share"
             }
 
-            xSmbShare $(($folders.path).Split("\")[-1])
-            {
-                Ensure = $folders.Ensure
-                Name   = @(($folders.path).Split("\")[-1] + "$")
-                Path = $folders.Path
-                FullAccess = "Domain Admins"
-                Description = "This is the main $(($folders.path).Split("\")[-1]) Share"
-            }
-            #>
         }
 
     }
@@ -96,17 +79,17 @@ $ConfigData = @{
             FolderStructure = @(
 
                 @{
-                    Path =   "E:\"
+                    Path =   "E:\Testing"
                     Ensure = "Present"
                     Type = "Directory"
-                    Principal = "$env:USERDNSDOMAIN\Domain Admins"
+                    Principal = "$Domain\Domain Admins"
 
                 }
                 @{
                     Path =   "E:\CompanyData"
                     Ensure = "Present"
                     Type = "Directory"
-                    Principal = "$env:USERDNSDOMAIN\Domain Admins"
+                    Principal = "$Domain\Domain Admins"
                     AccessControlInformation = @(
 
                         @{

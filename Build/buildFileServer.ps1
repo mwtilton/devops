@@ -16,7 +16,7 @@ configuration buildFileServer
     Import-DscResource -ModuleName cNtfsAccessControl -ModuleVersion 1.3.1
     Import-DscResource -ModuleName xPSDesiredStateConfiguration -ModuleVersion 8.4.0.0
 
-    Node $ConfigData.AllNodes.Nodename
+    Node $ConfigData.AllNodes.NodeName
     {
 
         LocalConfigurationManager {
@@ -24,6 +24,11 @@ configuration buildFileServer
             ConfigurationMode = "ApplyOnly"
             DebugMode = "ForceModuleImport"
             RebootNodeIfNeeded = $true
+        }
+        File Testing {
+            DestinationPath = "E:\testing"
+            Ensure = "Present"
+            Type = "Directory"
         }
         <#
         ForEach ($Folder in $Node.FolderStructure) {
@@ -98,26 +103,14 @@ compile the configuration, and then instruct the server to execute that
 configuration against the settings on this local server.
 #>
 
-$outputPath = "\\$($ConfigData.AllNodes.Nodename)\c$\users\administrator\Desktop\buildFileServer\"
+#$outputPath = "\\$($ConfigData.AllNodes.Nodename)\c$\users\administrator\Desktop\buildFileServer\"
+$outputPath = "$env:USERPROFILE\Desktop\buildFileServer"
 
 buildFileServer -ConfigurationData $ConfigData -OutputPath $outputPath
 
 $Session = New-CimSession -ComputerName $ConfigData.AllNodes.Nodename -Credential DemoCloud\Administrator
 
-Set-DSCLocalConfigurationManager -Path $outputPath -Verbose
+Set-DSCLocalConfigurationManager -CimSession $Session -Path $outputPath -Verbose
 Start-DscConfiguration -CimSession $Session -Path $outputPath -Wait -Verbose -Force
 
 
-
-<#
-$ConfigData = @{
-    AllNodes = @(
-        @{
-
-            Nodename = "FileServer01"
-
-        }
-    )
-}
-
-#>

@@ -1,26 +1,43 @@
-﻿#Useful Git CLI commands  
+﻿# Useful Git CLI commands  
 
-###git mv tests Tests  
+### git mv tests Tests  
 fatal: source directory is empty, source=tests, destination=tmp  
 Checking rename of 'tests' to 'tmp'  
-####git ls-files  
+#### git ls-files  
 Tests/DevOps.Tests.ps1  
-####tree . /a /f  
+#### tree . /a /f  
 \---tests  
         DevOps.Tests.ps1  
-###Solution is to just rename the folder as git is already tracking it as Tests  
+### Solution is to just rename the folder as git is already tracking it as Tests  
 
-###git mv tests tmp  
-###git mv tests Tests  
-###git commit -a -m "the message"  
-###git push  
+## git mv
+#### This moves things within git. Doesn't necessarily keep commits  
+### git mv tests tmp  
+### git mv tests Tests  
 
-###git push origin --tag  
+## git commit  
+### git commit -a -m "the message"  
 
-####git log â€” all â€” grep=â€™commit messageâ€™
-####git config --global alias.prum "pull --rebase upstream master"
-####git status --ignored
+## git push  
+### git push origin --tag  
 
-##Forget PW
-####git config --unset-all credential.helper
-####git config --global --unset-all credential.helper
+## git log  
+### git log â€” all â€” grep=â€™commit messageâ€™  
+
+## git config  
+### git config --get remote.origin.fetch  
+### ``git config --global alias.prum "pull --rebase upstream master"``  
+### ``git config remote.origin.fetch "+refs/heads/*:refs/remotes/origin/*"``  
+## git status  
+### git status --ignored  
+
+## Forget PW  
+#### git config --unset-all credential.helper  
+#### git config --global --unset-all credential.helper  
+
+## git fetch  
+###git fetch origin <remote branch>  
+
+## git branch  
+### git branch -a  
+#### shows all branches, local and remote  

@@ -30,7 +30,7 @@
 [X] BOOT ALL VM's Pre-Rebuild  
 --DON'T POWER OFF THROUGH THE GUEST OS ANYMORE  
 
-[ ] Add File/Folders to prepRebuild  
+[ ] Add `Hidden` and `Extension` options from File/Folders to prepRebuild  
 [X] Add start-service for windows search to prepRebuild  
 
 ##DEV vAPP DC  
@@ -38,7 +38,7 @@ DO NOT RUN FROM ISE
 --Run prepRebuild on DC  
 --REBOOT after GIT install  
 --Continue prepRebuild on DC  
-
+--Install Nmap  
 [?] Keeping DNS Zones to 3.168.192 but those are the same as the servers IP addresses...  
 
 --Run prepDC  

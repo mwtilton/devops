@@ -10,9 +10,10 @@ Authored by mwtilton
 [X] Fix encoding issues  
 [X] Fix Administrator credentials for all build scripts  
 1.3  
---Finished with plaster framework to build them out  
+[ ] configure DSC for remote node usage  
+[ ] Updating module versions to latest  
 1.4  
---configure DSC for remote node usage  
+--Finished with plaster framework to build them out  
 1.5  
 --Logging in general and script specific  
 --Server logs/win events and general server status information  

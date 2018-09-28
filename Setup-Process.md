@@ -74,8 +74,9 @@ REBOOT
 Democloud\RD Users  
 
 ####Setting up IIS/RDWeb  
---Need to setup password resets  
+--Need to setup password resets on RDweb  
 https://social.technet.microsoft.com/wiki/contents/articles/10755.windows-server-2012-rds-enabling-the-rd-webaccess-expired-password-reset-option.aspx  
+--Need to setup redirect to main RDweb page on https://democloud.website.com entry  
 
 ####DSC Force Removal - For INTEGRATION TESTING  
 --absent to all options  
@@ -83,14 +84,8 @@ https://social.technet.microsoft.com/wiki/contents/articles/10755.windows-server
 ###Features  
 [ ] Need DSC for Volume activation Tools  
 
-
 ###Setup still needed for template  
 [?] install O365 stuff here??? Or file server???  
-[ ] Allowing indexing from files and contents on APP01  
-[ ] Need to rebuild APP01 to fix IP address issues  
-[ ] Rebuild/Check App01 for IP issues  
-
-
 
 #YK Main  
 
@@ -152,7 +147,7 @@ Ports 1433 49172 TCP
 --nmap [the subnet] â€“F -Pn  
 
 #General Features  
-[ ] Need to lookup powershell options for indexing servers auto matically from DSC  
+[X] Need to lookup powershell options for indexing servers auto matically from DSC  
 [ ] Cred check on buildS  
   -- Created Get-CredCheck function  
 [ ] Remotely configure from DC or Push updates to servers  
@@ -166,8 +161,10 @@ Ports 1433 49172 TCP
 `[-]EFI Boot hass issues with select the virutal disk need to rebuild from scratch`  
 
 #Notes for VCloud ENV setup  
-[ ] DNS in Org VDC Networks  
+[X] DNS in Org VDC Networks  
 [X] Use static IP Pool and not manual  
 [X] RDP gateway 3391 UDP  
-[ ] Add vscode default to setupGit and enforcing it as editor  
+[X] Add vscode default to setupGit and enforcing it as editor  
 [X] Change prepGit to prep rebuild  
+[ ] Upgrade all Modules to latest working versions  
+[ ] Find Latest Versions for modules  

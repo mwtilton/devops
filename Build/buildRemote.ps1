@@ -5,15 +5,6 @@ Install-Module -Name ComputerManagementDsc -RequiredVersion 5.2.0.0
 Get-DscResource -Module ComputerManagementDsc
 Get-DscResource -Name Computer -Syntax
 #>
-<#
-Get-PackageSource -Name PSGallery | Set-PackageSource -Trusted -Force -ForceBootstrap
-
-Install-PackageProvider -Name NuGet -Force
-
-Install-Module ComputerManagementDSC -RequiredVersion 5.2.0.0 -Force
-Install-Module NetworkingDSC -RequiredVersion 6.1.0.0 -Force
-Install-Module xPSDesiredStateConfiguration -RequiredVersion 8.4.0.0 -Force
-#>
 
 #Simple DSC Configuration
 Configuration buildAPPServer {
@@ -21,6 +12,9 @@ Configuration buildAPPServer {
     Import-DscResource -ModuleName ComputerManagementDsc -ModuleVersion 5.2.0.0
     Import-DscResource -ModuleName NetworkingDSC -ModuleVersion 6.1.0.0
     Import-DscResource -ModuleName xPSDesiredStateConfiguration -ModuleVersion 8.4.0.0
+    Import-DSCResource -ModuleName StorageDsc -ModuleVersion 4.1.0.0
+    Import-DscResource -ModuleName xSmbShare -ModuleVersion 2.1.0.0
+    Import-DscResource -ModuleName cNtfsAccessControl -ModuleVersion 1.3.1
 
     Node $ConfigData.AllNodes.Nodename {
         LocalConfigurationManager {
@@ -62,20 +56,122 @@ Configuration buildAPPServer {
         }
     } #end node block
 
+    Node $ConfigData.AllNodes.Nodename.IndexOf(0) {
+        WaitForDisk Disk0
+        {
+             DiskId = 0
+             RetryIntervalSec = 10
+             RetryCount = 10
+        }
+
+        Disk CVolume
+        {
+             DiskId = 0
+             DriveLetter = 'C'
+             Size = 22GB
+        }
+
+        Disk EVolume
+        {
+             DiskId = 0
+             DriveLetter = 'E'
+             FSLabel = 'Data'
+             DependsOn = '[Disk]CVolume'
+        }
+        ForEach ($Folder in $Node.FolderStructure) {
+
+            # Each of our 'file' resources will be named after the path, but...
+            #   we have to replace : with __ as colons aren't allowed in resource names
+            File $Folder.Path.Replace(':','__') {
+              DestinationPath = $Folder.Path
+              Ensure = $Folder.Ensure
+              Type = $folder.Type
+
+            }
+            cNtfsPermissionEntry $Folder.Path.Replace(':','__') {
+                Ensure = $Folder.Ensure
+                Path = $Folder.Path
+                Principal = $Folder.Principal
+                AccessControlInformation = @(
+                    cNtfsAccessControlInformation
+                    {
+                        AccessControlType = $AccessControlInformation.AccessControlType
+                        FileSystemRights = $AccessControlInformation.FileSystemRights
+                        Inheritance = $AccessControlInformation.Inheritance
+                        NoPropagateInherit = $AccessControlInformation.NoPropagateInherit
+                    }
+                )
+                DependsOn = @("[File]" + "$($Folder.Path.Replace(':','__'))")
+            }
+
+
+            xSmbShare $(($Folder.path).Split("\")[-1])
+            {
+                Ensure = $Folder.Ensure
+                Name   = ($Folder.path).Split("\")[-1] + "$"
+                Path = $Folder.path
+                FullAccess = "$Domain\Domain Admins"
+                Description = "This is the $Domain main $(($Folder.path).Split("\")[-1]) Share"
+            }
+
+        }
+    }
+
 } #end configuration
 
 $ConfigData = @{
     AllNodes = @(
         @{
+            Nodename = '*'
+            PSDscAllowPlainTextPassword = $true
+            PSDscAllowDomainUser = $true
+        }
+        @{
             NodeName = "pc"
-            ThisComputerName = "APP03"
+
+            ThisComputerName = "FileServer01"
             InterfaceAlias = "Ethernet0"
-            IPAddressCIDR = "192.168.1.2/24"
+            IPAddressCIDR = "192.168.1.3/24"
             GatewayAddress = "192.168.1.1"
             DNSAddress = "192.168.1.6"
 Â Â Â Â Â Â Â Â Â Â Â Â DomainName = "democloud.local"
-            PSDscAllowPlainTextPassword = $true
-            PSDscAllowDomainUser = $true
+
+            FolderStructure = @(
+
+                @{
+                    Path =   "E:\Testing"
+                    Ensure = "Present"
+                    Type = "Directory"
+                    Principal = "$Domain\Domain Admins"
+
+                }
+                @{
+                    Path =   "E:\CompanyData"
+                    Ensure = "Present"
+                    Type = "Directory"
+                    Principal = "$Domain\Domain Admins"
+                    AccessControlInformation = @(
+
+                        @{
+                            AccessControlType = 'Allow'
+                            FileSystemRights = 'FullControl'
+                            Inheritance = 'ThisFolderSubfoldersAndFiles'
+                            NoPropagateInherit = $true
+                        }
+                    )
+                }
+
+
+            )
+        }
+        @{
+            NodeName = "pc"
+            ThisComputerName = "APP01"
+            InterfaceAlias = "Ethernet0"
+            IPAddressCIDR = "192.168.1.4/24"
+            GatewayAddress = "192.168.1.1"
+            DNSAddress = "192.168.1.6"
+Â Â Â Â Â Â Â Â Â Â Â Â DomainName = "democloud.local"
         }
     )
 }
@@ -100,12 +196,29 @@ Start-DscConfiguration -cimsession $cim -Path $outputPath -Wait -Verbose -Force
 #Copying DSC resource module to remote node
 $Session = New-PSSession -ComputerName $ConfigData.AllNodes.Nodename -Credential $credentials
 
-$Params =@{
-    Path = 'C:\Program Files\WindowsPowerShell\Modules\*'
-    Destination = 'C:\Program Files\WindowsPowerShell\Modules'
-    ToSession = $Session
-}
 
-Copy-Item @Params -Recurse
+Try{
+    $Params =@{
+        Path = 'C:\Program Files\WindowsPowerShell\Modules\*'
+        Destination = 'C:\Program Files\WindowsPowerShell\Modules'
+        ToSession = $Session
+        ErrorAction = "Stop"
+        Recurse = $true
+    }
+
+    Copy-Item @Params
+
+}
+Catch{
+    If($_.Exception.ToString().Contains("An item with the specified name  already exists.")){
+        Write-Host "already exists. Skipping!" -ForegroundColor DarkGreen
+    }
+    Else{
+        $_ | fl * -force
+        $_.InvocationInfo.BoundParameters | fl * -force
+        $_.Exception
+    }
+
+}
 
 Invoke-Command -Session $Session -ScriptBlock {Get-Module ComputerManagementDsc -ListAvailable}

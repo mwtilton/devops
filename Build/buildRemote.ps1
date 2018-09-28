@@ -134,14 +134,46 @@ Set-DSCLocalConfigurationManager -CimSession $Session -Path $outputPath -Verbose
 Start-DscConfiguration -CimSession $Session -Path $outputPath -Wait -Verbose -Force
 #>
 
+#Discover & Download resources
+<#
+Find-Module -Name *computer*
+Install-Module -Name ComputerManagementDsc -RequiredVersion 5.2.0.0
+Get-DscResource -Module ComputerManagementDsc
+Get-DscResource -Name Computer -Syntax
+#>
+
+
+#Discover & Download resources
+<#
+Find-Module -Name *computer*
+Install-Module -Name ComputerManagementDsc -RequiredVersion 5.2.0.0
+Get-DscResource -Module ComputerManagementDsc
+Get-DscResource -Name Computer -Syntax
+#>
+<#
+Get-PackageSource -Name PSGallery | Set-PackageSource -Trusted -Force -ForceBootstrap
+
+Install-PackageProvider -Name NuGet -Force
+
+Install-Module ComputerManagementDSC -RequiredVersion 5.2.0.0 -Force
+Install-Module NetworkingDSC -RequiredVersion 6.1.0.0 -Force
+Install-Module xPSDesiredStateConfiguration -RequiredVersion 8.4.0.0 -Force
+#>
+
 #Simple DSC Configuration
-Configuration RenameComputer {
+Configuration buildAPPServer {
     param(
         [string]$NodeName,
         [string]$NewName
     )
-
+    LocalConfigurationManager {
+        ActionAfterReboot = "ContinueConfiguration"
+        ConfigurationMode = "ApplyOnly"
+        RebootNodeIfNeeded = $true
+    }
     Import-DscResource -ModuleName ComputerManagementDsc -ModuleVersion 5.2.0.0
+    Import-DscResource -ModuleName NetworkingDSC -ModuleVersion 6.1.0.0
+    Import-DscResource -ModuleName xPSDesiredStateConfiguration -ModuleVersion 8.4.0.0
 
     Node $NodeName {
 
@@ -153,18 +185,41 @@ Configuration RenameComputer {
 
 } #end configuration
 
-RenameComputer -NodeName 'WIN-99CCLDAKOU2' -NewName 'APP03' -OutputPath c:\dsc\push
+$ConfigData = @{
+    AllNodes = @(
+        @{
+            NodeName = "WIN-R93H26B18EP"
+            ThisComputerName = "APP03"
+            InterfaceAlias = "Ethernet0"
+            IPAddressCIDR = "192.168.1.2/24"
+            GatewayAddress = "192.168.1.1"
+            DNSAddress = "192.168.1.6"
+Â Â Â Â Â Â Â Â Â Â Â Â DomainName = "democloud.local"
+            PSDscAllowPlainTextPassword = $true
+            PSDscAllowDomainUser = $true
+        }
+    )
+}
+
+#RenameComputer -NodeName $ConfigData.AllNodes.NodeName -NewName 'APP03' -OutputPath c:\dsc\push
+$outputPath = "$env:USERPROFILE\Desktop\buildAPPServer"
+buildAPPServer -ConfigurationData $ConfigData -OutputPath $outputPath
+
+Add-Content -Value "`n$(($ConfigData.AllNodes.IPAddressCIDR).Split("/")[0])      $($ConfigData.AllNodes.Nodename)" -Path "C:\Windows\System32\drivers\etc\hosts"
+
+Get-Item WSMan:\localhost\Client\TrustedHosts | Set-Item -Value $($ConfigData.AllNodes.Nodename) -Force -Confirm:$false
 
 $credentials = Get-Credential -UserName administrator -Message "Local Admin"
-$cim = New-CimSession -ComputerName 'WIN-99CCLDAKOU2' -Credential $credentials
+$cim = New-CimSession -ComputerName $ConfigData.AllNodes.Nodename -Credential $credentials
 
-Start-DscConfiguration -cimsession $cim -Path C:\dsc\push -Wait -Verbose -Force
+Set-DSCLocalConfigurationManager -Path $outputPath â€“Verbose
+Start-DscConfiguration -cimsession $cim -Path $outputPath -Wait -Verbose -Force
 
 #Copying DSC resource module to remote node
-$Session = New-PSSession -ComputerName 'WIN-99CCLDAKOU2' -Credential $credentials
+$Session = New-PSSession -ComputerName $ConfigData.AllNodes.Nodename -Credential $credentials
 
 $Params =@{
-    Path = 'C:\Program Files\WindowsPowerShell\Modules\ComputerManagementDsc'
+    Path = 'C:\Program Files\WindowsPowerShell\Modules\*'
     Destination = 'C:\Program Files\WindowsPowerShell\Modules'
     ToSession = $Session
 }

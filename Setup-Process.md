@@ -61,6 +61,18 @@ REBOOT
 --Run prepServer  
 --Run buildServer  
 
+**From DC**  
+--Add New Server name to hosts
+`C:\Windows\System32\Drivers\Etc\HOSTS`
+`WINRM set winrm/config/client â€˜@{TrustedHosts="EOT-WEB"}â€™`  
+--Enable WinRM on remote server  
+`COM+ Network Access (DCOM-In)`  
+`remote Event Log Management (NP-In)`  
+`remote Event Log Management (RPC)`  
+`remote Event Log Management (RPC-EPMAP)`  
+
+
+
 #SAVE DEV vAPP BEFORE RDS integration testing  
 --DEV Saved 9/25/18  
 
@@ -169,3 +181,4 @@ Ports 1433 49172 TCP
 [ ] Upgrade all Modules to latest working versions  
 [ ] Find Latest Versions for modules  
 [ ] Firewall Rules for WinRM  
+[ ] Disabled firewall rules after installation  

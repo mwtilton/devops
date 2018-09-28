@@ -1,149 +1,4 @@
-﻿<#
-Configuration ConfigureRebootOnNode
-{
-    param (
-        [Parameter(Mandatory=$true)]
-        [ValidateNotNullOrEmpty()]
-        [String]
-        $NodeName
-    )
-
-    Node $NodeName
-    {
-        LocalConfigurationManager
-        {
-            RebootNodeIfNeeded = $true
-        }
-    }
-}
-
-Write-Host "Creating mofs"
-ConfigureRebootOnNode -NodeName fabfiberserver -OutputPath .\rebootMofs
-
-Write-Host "Starting CimSession"
-$pass = ConvertTo-SecureString "P2ssw0rd" -AsPlainText -Force
-$cred = New-Object System.Management.Automation.PSCredential ("administrator", $pass)
-$cim = New-CimSession -ComputerName fabfiberserver -Credential $cred
-
-Write-Host "Writing config"
-Set-DscLocalConfigurationManager -CimSession $cim -Path .\rebootMofs -Verbose
-
-# read the config settings back to confirm
-Get-DscLocalConfigurationManager -CimSession $cim
-#>
-
-<#
-<# Notes:
-Goal - Configure minimal post-installation settings for a server.
-This script must be run after prepServer.ps1
-Disclaimer - This example code is provided without copyright and AS IS.  It is free for you to use and modify.
-
-<#
-Specify the configuration to be applied to the server.  This section
-defines which configurations you're interested in managing.
-
-
-configuration buildAPPServer
-{
-    Import-DscResource -ModuleName xComputerManagement -ModuleVersion 4.1.0.0
-    Import-DscResource -ModuleName xNetworking -ModuleVersion 5.4.0.0
-    Import-DscResource -ModuleName xPSDesiredStateConfiguration -ModuleVersion 8.4.0.0
-
-    Node $ConfigData.AllNodes.NodeName
-    {
-
-        LocalConfigurationManager {
-            ActionAfterReboot = "ContinueConfiguration"
-            ConfigurationMode = "ApplyOnly"
-            DebugMode = "ForceModuleImport"
-            RebootNodeIfNeeded = $true
-        }
-
-        xIPAddress NewIPAddress {
-            IPAddress = $node.IPAddressCIDR
-            InterfaceAlias = $node.InterfaceAlias
-            AddressFamily = "IPV4"
-        }
-
-        xDefaultGatewayAddress NewIPGateway {
-            Address = $node.GatewayAddress
-            InterfaceAlias = $node.InterfaceAlias
-            AddressFamily = "IPV4"
-            DependsOn = "[xIPAddress]NewIPAddress"
-        }
-
-        xDnsServerAddress PrimaryDNSClient {
-            Address        = $node.DNSAddress
-            InterfaceAlias = $node.InterfaceAlias
-            AddressFamily = "IPV4"
-            DependsOn = "[xDefaultGatewayAddress]NewIPGateway"
-        }
-
-        User Administrator {
-            Ensure = "Present"
-            UserName = "Administrator"
-            Password = $credentials
-            DependsOn = "[xDnsServerAddress]PrimaryDNSClient"
-        }
-
-        xComputer ChangeNameAndJoinDomain {
-            Name = $node.ThisComputerName
-            DomainName    = $node.DomainName
-            Credential    = $domaincredentials
-            DependsOn = "[User]Administrator"
-        }
-    }
-}
-<#
-Specify values for the configurations you're interested in managing.
-See in the configuration above how variables are used to reference values listed here.
-
-$ConfigData = @{
-    AllNodes = @(
-        @{
-            NodeName = ""
-            ThisComputerName = "APP03"
-            InterfaceAlias = "Ethernet0"
-            IPAddressCIDR = "192.168.1.7/24"
-            GatewayAddress = "192.168.1.1"
-            DNSAddress = "192.168.1.6"
-Â Â Â Â Â Â Â Â Â Â Â Â DomainName = "democloud.local"
-            PSDscAllowPlainTextPassword = $true
-            PSDscAllowDomainUser = $true
-        }
-    )
-}
-<#
-Lastly, prompt for the necessary username and password combinations, then
-compile the configuration, and then instruct the server to execute that
-configuration against the settings on this local server.
-#>
-<#
-#$outputPath = "\\$($ConfigData.AllNodes.Nodename)\c$\users\administrator\Desktop\buildFileServer\"
-$outputPath = "$env:USERPROFILE\Desktop\buildAPPServer"
-
-buildAPPServer -ConfigurationData $ConfigData -OutputPath $outputPath
-
-$Domain = $(($env:USERDNSDOMAIN).Split(".")[0])
-[PScredential]$domaincredentials = Get-Credential -UserName $Domain\$env:USERNAME -Message "Please enter your Domain credentials"
-[PScredential]$credentials = Get-Credential -UserName $env:USERNAME -Message "Please enter your Local Admin credentials"
-
-$Session = New-CimSession -ComputerName $ConfigData.AllNodes.Nodename -Credential $domaincredentials
-
-Set-DSCLocalConfigurationManager -CimSession $Session -Path $outputPath -Verbose
-Start-DscConfiguration -CimSession $Session -Path $outputPath -Wait -Verbose -Force
-#>
-
-#Discover & Download resources
-<#
-Find-Module -Name *computer*
-Install-Module -Name ComputerManagementDsc -RequiredVersion 5.2.0.0
-Get-DscResource -Module ComputerManagementDsc
-Get-DscResource -Name Computer -Syntax
-#>
-
-
-#Discover & Download resources
+﻿#Discover & Download resources
 <#
 Find-Module -Name *computer*
 Install-Module -Name ComputerManagementDsc -RequiredVersion 5.2.0.0
@@ -162,24 +17,48 @@ Install-Module xPSDesiredStateConfiguration -RequiredVersion 8.4.0.0 -Force
 
 #Simple DSC Configuration
 Configuration buildAPPServer {
-    param(
-        [string]$NodeName,
-        [string]$NewName
-    )
-    LocalConfigurationManager {
-        ActionAfterReboot = "ContinueConfiguration"
-        ConfigurationMode = "ApplyOnly"
-        RebootNodeIfNeeded = $true
-    }
+
     Import-DscResource -ModuleName ComputerManagementDsc -ModuleVersion 5.2.0.0
     Import-DscResource -ModuleName NetworkingDSC -ModuleVersion 6.1.0.0
     Import-DscResource -ModuleName xPSDesiredStateConfiguration -ModuleVersion 8.4.0.0
 
-    Node $NodeName {
-
-        Computer RenameComputer
+    Node $ConfigData.AllNodes.Nodename {
+        LocalConfigurationManager {
+            ActionAfterReboot = "ContinueConfiguration"
+            ConfigurationMode = "ApplyOnly"
+            RebootNodeIfNeeded = $true
+        }
+        Computer $("Rename-" + $ConfigData.AllNodes.Nodename)
         {
-            Name = $NewName
+            Name = $node.ThisComputerName
+            DomainName    = $node.DomainName
+            Credential    = $domaincredentials
+            DependsOn = $("[User]Administrator-" + $ConfigData.AllNodes.Nodename)
+        }
+        IPAddress $("NewIPAddress-" + $ConfigData.AllNodes.Nodename) {
+            IPAddress = $node.IPAddressCIDR
+            InterfaceAlias = $node.InterfaceAlias
+            AddressFamily = "IPV4"
+        }
+        DefaultGatewayAddress $("NewIPGateway-" + $ConfigData.AllNodes.Nodename) {
+            Address = $node.GatewayAddress
+            InterfaceAlias = $node.InterfaceAlias
+            AddressFamily = "IPV4"
+            DependsOn = $("[IPAddress]NewIPAddress-" + $ConfigData.AllNodes.Nodename)
+        }
+
+        DnsServerAddress $("PrimaryDNSClient-" + $ConfigData.AllNodes.Nodename) {
+            Address        = $node.DNSAddress
+            InterfaceAlias = $node.InterfaceAlias
+            AddressFamily = "IPV4"
+            DependsOn = $("[DefaultGatewayAddress]NewIPGateway-" + $ConfigData.AllNodes.Nodename)
+        }
+
+        User $("Administrator-" + $ConfigData.AllNodes.Nodename) {
+            Ensure = "Present"
+            UserName = "Administrator"
+            Password = $credentials
+            DependsOn = $("[DnsServerAddress]PrimaryDNSClient-" + $ConfigData.AllNodes.Nodename)
         }
     } #end node block
 
@@ -188,7 +67,7 @@ Configuration buildAPPServer {
 $ConfigData = @{
     AllNodes = @(
         @{
-            NodeName = "WIN-R93H26B18EP"
+            NodeName = "pc"
             ThisComputerName = "APP03"
             InterfaceAlias = "Ethernet0"
             IPAddressCIDR = "192.168.1.2/24"
@@ -209,7 +88,10 @@ Add-Content -Value "`n$(($ConfigData.AllNodes.IPAddressCIDR).Split("/")[0])     
 
 Get-Item WSMan:\localhost\Client\TrustedHosts | Set-Item -Value $($ConfigData.AllNodes.Nodename) -Force -Confirm:$false
 
-$credentials = Get-Credential -UserName administrator -Message "Local Admin"
+$Domain = $(($env:USERDNSDOMAIN).Split(".")[0])
+$domaincredentials = Get-Credential -UserName "$Domain\$env:USERNAME" -Message "Please enter your $Domain credentials"
+$credentials = Get-Credential -UserName administrator -Message "Local Admin for $($ConfigData.AllNodes.Nodename)"
+
 $cim = New-CimSession -ComputerName $ConfigData.AllNodes.Nodename -Credential $credentials
 
 Set-DSCLocalConfigurationManager -Path $outputPath â€“Verbose

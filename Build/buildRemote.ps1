@@ -42,7 +42,7 @@ Disclaimer - This example code is provided without copyright and AS IS.  It is f
 Specify the configuration to be applied to the server.  This section
 defines which configurations you're interested in managing.
 
-#>
+
 configuration buildAPPServer
 {
     Import-DscResource -ModuleName xComputerManagement -ModuleVersion 4.1.0.0
@@ -97,7 +97,7 @@ configuration buildAPPServer
 <#
 Specify values for the configurations you're interested in managing.
 See in the configuration above how variables are used to reference values listed here.
-#>
+
 $ConfigData = @{
     AllNodes = @(
         @{
@@ -118,7 +118,7 @@ Lastly, prompt for the necessary username and password combinations, then
 compile the configuration, and then instruct the server to execute that
 configuration against the settings on this local server.
 #>
-
+<#
 #$outputPath = "\\$($ConfigData.AllNodes.Nodename)\c$\users\administrator\Desktop\buildFileServer\"
 $outputPath = "$env:USERPROFILE\Desktop\buildAPPServer"
 
@@ -132,3 +132,43 @@ $Session = New-CimSession -ComputerName $ConfigData.AllNodes.Nodename -Credentia
 
 Set-DSCLocalConfigurationManager -CimSession $Session -Path $outputPath -Verbose
 Start-DscConfiguration -CimSession $Session -Path $outputPath -Wait -Verbose -Force
+#>
+
+#Simple DSC Configuration
+Configuration RenameComputer {
+    param(
+        [string]$NodeName,
+        [string]$NewName
+    )
+
+    Import-DscResource -ModuleName ComputerManagementDsc -ModuleVersion 5.2.0.0
+
+    Node $NodeName {
+
+        Computer RenameComputer
+        {
+            Name = $NewName
+        }
+    } #end node block
+
+} #end configuration
+
+RenameComputer -NodeName 'WIN-99CCLDAKOU2' -NewName 'APP03' -OutputPath c:\dsc\push
+
+$credentials = Get-Credential -UserName administrator -Message "Local Admin"
+$cim = New-CimSession -ComputerName 'WIN-99CCLDAKOU2' -Credential $credentials
+
+Start-DscConfiguration -cimsession $cim -Path C:\dsc\push -Wait -Verbose -Force
+
+#Copying DSC resource module to remote node
+$Session = New-PSSession -ComputerName 'WIN-99CCLDAKOU2' -Credential $credentials
+
+$Params =@{
+    Path = 'C:\Program Files\WindowsPowerShell\Modules\ComputerManagementDsc'
+    Destination = 'C:\Program Files\WindowsPowerShell\Modules'
+    ToSession = $Session
+}
+
+Copy-Item @Params -Recurse
+
+Invoke-Command -Session $Session -ScriptBlock {Get-Module ComputerManagementDsc -ListAvailable}

@@ -168,3 +168,4 @@ Ports 1433 49172 TCP
 [X] Change prepGit to prep rebuild  
 [ ] Upgrade all Modules to latest working versions  
 [ ] Find Latest Versions for modules  
+[ ] Firewall Rules for WinRM  

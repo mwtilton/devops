@@ -73,10 +73,10 @@ REBOOT
 
 
 
-#SAVE DEV vAPP BEFORE RDS integration testing  
+# SAVE DEV vAPP BEFORE RDS integration testing  
 --DEV Saved 9/25/18  
 
-##RDS Deployment  
+## RDS Deployment  
 **After DC and all VMâ€™s are booted up and running**  
 --prep RDS  
 [ ] Fix prompt for Collection information  
@@ -85,23 +85,23 @@ REBOOT
 --UserGroups: democloud\Domain Admins  
 Democloud\RD Users  
 
-####Setting up IIS/RDWeb  
+#### Setting up IIS/RDWeb  
 --Need to setup password resets on RDweb  
 https://social.technet.microsoft.com/wiki/contents/articles/10755.windows-server-2012-rds-enabling-the-rd-webaccess-expired-password-reset-option.aspx  
 --Need to setup redirect to main RDweb page on https://democloud.website.com entry  
 
-####DSC Force Removal - For INTEGRATION TESTING  
+#### DSC Force Removal - For INTEGRATION TESTING  
 --absent to all options  
 
-###Features  
+### Features  
 [ ] Need DSC for Volume activation Tools  
 
-###Setup still needed for template  
+### Setup still needed for template  
 [?] install O365 stuff here??? Or file server???  
 
-#YK Main  
+# YK Main  
 
-##YK-DC01 â€“ Template  
+## YK-DC01 - Template  
 Normal RDP  
 Vmware Tools  
 Updates as of Aug 2018  
@@ -123,8 +123,8 @@ Updates as of Aug 2018
 [ ] Requires Rebuild  
 
 
-##YK-SqlServer  
-###SQL Install  
+## YK-SqlServer  
+### SQL Install  
 1.	Install SQL Server Express Edition 2017  
 2.	Install media to folder %downloads%  
     a.	Select New SQL install  
@@ -138,33 +138,39 @@ Updates as of Aug 2018
 3.	Install SQL SMS 17.8.1  
 4.	Download setup file from internet redirect  
 
-###SQL setup for Firewall  
+### SQL setup for Firewall  
 Ports 1433 49172 TCP  
 1434 UDP  
 
 ```$cred = get-credential```  
 ```Invoke-Sqlcmd -ServerInstance 10.1.1.5\sqlexpress -Database Tickets -Query "Select * from Tickets" -credential $cred```  
 
-###Setup  
+### Setup  
 [ ] Need script to open up firewall to correct ports for SQL  
 
-#DEV vAPP Rebuild  
-##Pre- vAPP Rebuild  
+# DEV vAPP Rebuild  
+## Pre- vAPP Rebuild  
 [ ] shutdown remote pcs  
 [ ] Full Power off in VCD  
 
-##Post Power-On/Rebuild checks  
+## Post Power-On/Rebuild checks  
 --RDP  
 --Server Manager (Servers are up)  
 --nmap [the subnet] â€“F -Pn  
 
-#General Features  
+# General Features  
 [X] Need to lookup powershell options for indexing servers auto matically from DSC  
 [ ] Cred check on buildS  
   -- Created Get-CredCheck function  
 [ ] Remotely configure from DC or Push updates to servers  
+[X] Add vscode default to setupGit and enforcing it as editor  
+[X] Change prepGit to prep rebuild  
+[ ] Upgrade all Modules to latest working versions  
+[ ] Find Latest Versions for modules  
+[ ] Firewall Rules for WinRM  
+[ ] Disabled firewall rules after installation  
 
-#GPT HDD Failures  
+# GPT HDD Failures  
 `[-]Set HDD to "LSI Logic SAS"`  
 `[-]Set HDD to "ParaVirtual"`  
 `[-]Set HDD to "SATA"`  
@@ -172,13 +178,7 @@ Ports 1433 49172 TCP
 `[?]converting to GPT after installation with two disks and moving pagesys file`  
 `[-]EFI Boot hass issues with select the virutal disk need to rebuild from scratch`  
 
-#Notes for VCloud ENV setup  
+# Notes for VCloud ENV setup  
 [X] DNS in Org VDC Networks  
 [X] Use static IP Pool and not manual  
 [X] RDP gateway 3391 UDP  
-[X] Add vscode default to setupGit and enforcing it as editor  
-[X] Change prepGit to prep rebuild  
-[ ] Upgrade all Modules to latest working versions  
-[ ] Find Latest Versions for modules  
-[ ] Firewall Rules for WinRM  
-[ ] Disabled firewall rules after installation  

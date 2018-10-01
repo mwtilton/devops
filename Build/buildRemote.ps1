@@ -7,6 +7,7 @@ Get-DscResource -Name Computer -Syntax
 #>
 
 #Simple DSC Configuration
+
 Configuration buildAPPServer {
 
     Import-DscResource -ModuleName ComputerManagementDsc -ModuleVersion 5.2.0.0
@@ -121,20 +122,19 @@ Configuration buildAPPServer {
 
 $ConfigData = @{
     AllNodes = @(
+
         @{
-            Nodename = '*'
-            PSDscAllowPlainTextPassword = $true
-            PSDscAllowDomainUser = $true
-        }
-        @{
-            NodeName = "pc"
+            NodeName = "WIN-T3UA5K7JVFJ"
 
             ThisComputerName = "FileServer01"
             InterfaceAlias = "Ethernet0"
-            IPAddressCIDR = "192.168.1.3/24"
+            IPAddressCIDR = "192.168.1.2/24"
             GatewayAddress = "192.168.1.1"
             DNSAddress = "192.168.1.6"
 Â Â Â Â Â Â Â Â Â Â Â Â DomainName = "democloud.local"
+
+            PSDscAllowPlainTextPassword = $true
+            PSDscAllowDomainUser = $true
 
             FolderStructure = @(
 
@@ -165,21 +165,73 @@ $ConfigData = @{
             )
         }
         @{
-            NodeName = "pc"
+            NodeName = "WIN-95S1GT7IMSM"
+
             ThisComputerName = "APP01"
             InterfaceAlias = "Ethernet0"
-            IPAddressCIDR = "192.168.1.4/24"
+            IPAddressCIDR = "192.168.1.3/24"
             GatewayAddress = "192.168.1.1"
             DNSAddress = "192.168.1.6"
 Â Â Â Â Â Â Â Â Â Â Â Â DomainName = "democloud.local"
+
+            PSDscAllowPlainTextPassword = $true
+            PSDscAllowDomainUser = $true
         }
     )
 }
 
 #RenameComputer -NodeName $ConfigData.AllNodes.NodeName -NewName 'APP03' -OutputPath c:\dsc\push
+<#
 $outputPath = "$env:USERPROFILE\Desktop\buildAPPServer"
 buildAPPServer -ConfigurationData $ConfigData -OutputPath $outputPath
+#>
 
+$($ConfigData.AllNodes) | ForEach-Object {
+    Write-Host "$(($_.IPAddressCIDR).Split('/')[0])      $($_.Nodename)"
+    Add-Content -Value "`n$(($_.IPAddressCIDR).Split("/")[0])      $($_.Nodename)" -Path "C:\Windows\System32\drivers\etc\hosts"
+    Get-Item WSMan:\localhost\Client\TrustedHosts | Set-Item -Value $($_.Nodename) -Force -Confirm:$false
+    $Domain = $(($env:USERDNSDOMAIN).Split(".")[0])
+    $domaincredentials = Get-Credential -UserName "$Domain\$env:USERNAME" -Message "Please enter your $Domain credentials"
+    $credentials = Get-Credential -UserName administrator -Message "Local Admin for $($_.Nodename)"
+    $cim = New-CimSession -ComputerName $_.Nodename -Credential $credentials
+
+    Set-DSCLocalConfigurationManager -Path $outputPath â€“Verbose
+    Start-DscConfiguration -cimsession $cim -Path $outputPath -Wait -Verbose -Force
+
+    #Copying DSC resource module to remote node
+    $Session = New-PSSession -ComputerName $_.Nodename -Credential $credentials
+
+
+    Try{
+        $Params =@{
+            Path = 'C:\Program Files\WindowsPowerShell\Modules\*'
+            Destination = 'C:\Program Files\WindowsPowerShell\Modules'
+            ToSession = $Session
+            ErrorAction = "Stop"
+            Recurse = $true
+        }
+
+        Copy-Item @Params
+
+    }
+    Catch{
+        If($_.Exception.ToString().Contains("An item with the specified name  already exists.")){
+            Write-Host "Files for $($_.Nodename) already exists. Skipping!" -ForegroundColor DarkGreen
+        }
+        Else{
+            $_ | fl * -force
+            $_.InvocationInfo.BoundParameters | fl * -force
+            $_.Exception
+        }
+
+    }
+
+    Invoke-Command -Session $Session -ScriptBlock {Get-Module ComputerManagementDsc -ListAvailable}
+
+}
+
+
+<#
 Add-Content -Value "`n$(($ConfigData.AllNodes.IPAddressCIDR).Split("/")[0])      $($ConfigData.AllNodes.Nodename)" -Path "C:\Windows\System32\drivers\etc\hosts"
 
 Get-Item WSMan:\localhost\Client\TrustedHosts | Set-Item -Value $($ConfigData.AllNodes.Nodename) -Force -Confirm:$false
@@ -222,3 +274,4 @@ Catch{
 }
 
 Invoke-Command -Session $Session -ScriptBlock {Get-Module ComputerManagementDsc -ListAvailable}
+#>

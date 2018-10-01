@@ -58,6 +58,7 @@ REBOOT
 **ONLY AFTER YOU BUILD THE DC**  
 --Change IP  
 --Enable RDP  
+--Set Firewall Settings  
 --Run prepServer  
 --Run buildServer  
 

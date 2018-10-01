@@ -52,9 +52,9 @@ configuration buildDomainController
         WindowsFeature DNSInstall {
             Ensure = "Present"
             Name = "DNS"
-            DependsOn = "[Computer]$($node.thiscomputername)"
+            DependsOn = $("[Computer]" + $($node.ThisComputerName))
         }
-        xDnsServerPrimaryZone $("addForwardZone" + $($node.DomainName)) {
+        xDnsServerPrimaryZone $("addForwardZone" + $($node.DomainName).split(".")[0]) {
             Ensure = "Present"
             Name = $($node.DomainName)
             DynamicUpdate = "NonsecureAndSecure"
@@ -64,7 +64,7 @@ configuration buildDomainController
         WindowsFeature ADDSInstall {
             Ensure = "Present"
             Name = "AD-Domain-Services"
-            DependsOn = "[xDnsServerPrimaryZone]$("addForwardZone" + $($node.DomainName))"
+            DependsOn = $("[xDnsServerPrimaryZone]" + $("addForwardZone" + $($node.DomainName).split(".")[0]))
         }
 
         WindowsFeature ADDSTools {

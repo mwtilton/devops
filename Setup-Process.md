@@ -36,7 +36,7 @@
 # DEV vAPP Template  
 [X] Change VCD to DNAT to new STATIC IP  
 [X] BOOT ALL VM's Pre-Rebuild  
---DON'T POWER OFF THROUGH THE GUEST OS ANYMORE  
+--**DON'T POWER OFF THROUGH THE GUEST OS ANYMORE**  
 
 ## DEV vAPP DC  
 **DO NOT RUN FROM ISE**  
@@ -58,7 +58,7 @@ REBOOT
 **From DC**  
 [ ] nmap [slow comprehensive scan] [the subnet]  
 [ ] run buildRemote  
-`C:\Windows\System32\Drivers\Etc\HOSTS`
+`C:\Windows\System32\Drivers\Etc\HOSTS`  
 `WINRM set winrm/config/client â€˜@{TrustedHosts="EOT-WEB"}â€™`  
 
 ## FileServer deployment  
@@ -76,8 +76,6 @@ REBOOT
 --Enable RDP  
 --Set Firewall Settings  
 --`Enable-PSremoting -Force` until new template is built out  
-
-
 
 # SAVE DEV vAPP BEFORE RDS integration testing  
 --DEV Saved 9/25/18  

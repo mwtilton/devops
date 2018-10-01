@@ -1,4 +1,4 @@
-﻿Function Start-PrepRebuild {
+﻿Function Start-PrepRebuildInstallation {
     [CmdletBinding()]
     Param(
         #Path Selection
@@ -33,7 +33,8 @@
 
     Read-Host "Holding for installation of Nmap/git"
     #Get-Process -Name git -ErrorAction stop
-
+    }
+Function Start-PrepReBuild{
     Try{
         git --version
     }
@@ -75,7 +76,7 @@
         Read-Host "Bout to pull is that right?"
         #git branch -u origin/$branch
         #git checkout $branch
-        git pull
+        git pull --all
     }
     Catch{
         "couldn't properly setup the branch information"

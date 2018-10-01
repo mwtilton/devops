@@ -6,35 +6,38 @@
             Mandatory=$false
         )]
         [string]
-        $path = "$env:USERPROFILE\Desktop\Github"
+        $path = "$env:USERPROFILE\Desktop"
     )
 
     Get-Service "Windows Search" | Set-service -StartupType Automatic | Start-Service
 
-    try{
-        New-Item -ItemType Directory -Path $path -ErrorAction Stop
-    }
-    Catch{
-        If($_.Exception.ToString().Contains("An item with the specified name")){
-            Write-Host "Folder Exists. Skipping!" -ForegroundColor DarkGreen
-        }
-        Else{
-            $_ | fl * -force
-            $_.InvocationInfo.BoundParameters | fl * -force
-            $_.Exception
-            break
-        }
-
-    }
-    Set-Location $path
-
     Start-Process "https://nmap.org/download.html"
+    Sleep 1
     Start-Process "https://git-scm.com/downloads"
+    Sleep 1
+    Start-Process "https://www.mozilla.org/en-US/firefox/download/thanks/"
 
-    Read-Host "Holding for installation of Nmap/git"
+    Read-Host "Holding for installation completion"
     #Get-Process -Name git -ErrorAction stop
-    }
+    Restart-Computer -Force -Confirm
+}
 Function Start-PrepReBuild{
+    [CmdletBinding()]
+    Param(
+        #Branch Selection
+        [Parameter(
+            Mandatory=$true
+        )]
+        [string]
+        $branch,
+        #Path Selection
+        [Parameter(
+            Mandatory=$false
+        )]
+        [string]
+        $path = "$env:USERPROFILE\Desktop"
+    )
+
     Try{
         git --version
     }
@@ -47,15 +50,12 @@ Function Start-PrepReBuild{
     }
 
     Read-host "We good fam???"
-
-    Start-Process "https://www.mozilla.org/en-US/firefox/download/thanks/"
-    Read-Host "Holding for installation of FireFox"
-
     Write-Host $pwd.Path
+
     Read-Host "Ready to clone DevOps Repo?"
     #git clone --single-branch -b branch host:/dir.git
     Try{
-        git clone "https://mwtilton@bitbucket.org/mwtilton/devops.git"
+        git clone --single-branch -b $branch "https://mwtilton@bitbucket.org/mwtilton/devops.git"
         #if ($LASTEXITCODE) { Throw "git clone failure (exit code $LASTEXITCODE" }
     }
     Catch{
@@ -68,13 +68,17 @@ Function Start-PrepReBuild{
 
     . $path\DevOps\SetupGit\SetupGit.ps1
     Invoke-SetupGit
-    git fetch --all
+
+    #git fetch --all
+    <#
     Read-Host "Ready to set the branch information?"
     Try {
-        git branch
+        git branch -a
         #git branch $branch
+        git branch $branch
+        git checkout $branch
+        git branch -u origin/$branch
         Read-Host "Bout to pull is that right?"
-        #git branch -u origin/$branch
         #git checkout $branch
         git pull --all
     }
@@ -82,7 +86,7 @@ Function Start-PrepReBuild{
         "couldn't properly setup the branch information"
         break
     }
-
+    #>
     Start-Process powershell_ise -ArgumentList "$path\Devops\Build\prepDomainController.ps1" -verb RunAs
     Start-Process powershell_ise -ArgumentList "$path\Devops\Build\buildDomainController.ps1" -verb RunAs
 }

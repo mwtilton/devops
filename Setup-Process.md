@@ -46,8 +46,9 @@ DO NOT RUN FROM ISE
 --Enable RDP  
 --Run prepRebuild on DC  
 [ ] Add Nmap installation  
+[X] Need sleep timer or something to open both pages at once, with ";"??  
 --Install Nmap  
---REBOOT after GIT from prepRebuild install  
+--REBOOT after prepRebuild installation  
 --Continue prepRebuild on DC  
 [?] Need to lookup how to set DNS Zones, current are set fpr 3.168.192  
 --Run prepDC  

@@ -52,6 +52,7 @@ configuration buildDomainController
         WindowsFeature DNSInstall {
             Ensure = "Present"
             Name = "DNS"
+            IncludeAllSubFeature = $true
             DependsOn = $("[Computer]" + $($node.ThisComputerName))
         }
         xDnsServerPrimaryZone $("addForwardZone" + $($node.DomainName).split(".")[0]) {
@@ -61,9 +62,16 @@ configuration buildDomainController
             DependsOn = "[WindowsFeature]DNSInstall"
         }
 
-        xDnsServerPrimaryZone $("addReverse" + $($node.DomainName).split(".")[0]) {
+        xDnsServerPrimaryZone $("addReverse1" + $($node.DomainName).split(".")[0]) {
             Ensure = "Present"
             Name = "3.168.192.in-addr.arpa"
+            DynamicUpdate = "NonsecureAndSecure"
+            DependsOn = "[WindowsFeature]DNSInstall"
+        }
+
+        xDnsServerPrimaryZone $("addReverse2" + $($node.DomainName).split(".")[0]) {
+            Ensure = "Present"
+            Name = "4.168.192.in-addr.arpa"
             DynamicUpdate = "NonsecureAndSecure"
             DependsOn = "[WindowsFeature]DNSInstall"
         }

@@ -19,7 +19,8 @@
 [ ] Add start-service for windows search to prepRebuild  
 [ ] Add `Hidden` and `Extension` options from File/Folders to prepRebuild  
 [ ] `Enable-PSremoting -force`  
-[ ] Enable WinRM on server  
+[ ] Enable/Allow RDP  
+[ ] Enable WinRM on server with firewall rules  
 `COM+ Network Access (DCOM-In)`  
 `remote Event Log Management (NP-In)`  
 `remote Event Log Management (RPC)`  
@@ -33,52 +34,50 @@
 --Save Template  
 
 # DEV vAPP Template  
---Change VCD to DNAT to new STATIC IP  
---Setup Admin Account  
---Set Temp IP  
---Enable RDP  
---BOOT ALL VM's Pre-Rebuild  
+[X] Change VCD to DNAT to new STATIC IP  
+[X] BOOT ALL VM's Pre-Rebuild  
 --DON'T POWER OFF THROUGH THE GUEST OS ANYMORE  
 
 ## DEV vAPP DC  
-DO NOT RUN FROM ISE  
---Set Temp IP  
---Enable RDP  
---Run prepRebuild on DC  
-[ ] Add Nmap installation  
+**DO NOT RUN FROM ISE**  
+[X] Set Temp IP  
+[X] Enable RDP  
+[X] Run prepRebuild on DC  
+[X] Add Nmap installation  
 [X] Need sleep timer or something to open both pages at once, with ";"??  
---Install Nmap  
---REBOOT after prepRebuild installation  
---Continue prepRebuild on DC  
-[?] Need to lookup how to set DNS Zones, current are set fpr 3.168.192  
---Run prepDC  
-[ ] Needs to pull in all DSC modules  
-[ ] With corrected versions  
---Run BuildDC  
+[X] Install Nmap  
+[X] REBOOT after prepRebuild installation  
+[X] Continue prepRebuild on DC  
+[X] Run prepDC  
+[X] Needs to pull in all DSC modules  
+[X] With corrected versions  
+[X] Run BuildDC  
 REBOOT  
+
+## Run buildRemote  
+**From DC**  
+[ ] nmap [slow comprehensive scan] [the subnet]  
+[ ] run buildRemote  
+`C:\Windows\System32\Drivers\Etc\HOSTS`
+`WINRM set winrm/config/client â€˜@{TrustedHosts="EOT-WEB"}â€™`  
 
 ## FileServer deployment  
 **Only after DC is done and built**  
---Webconsole into fileserver01  
+--Set Temp IP  
 --Enable RDP  
 --Set Firewall Settings  
---Run prepFileServer  
---Run buildFileServer  
+--`Enable-PSremoting -Force` until new template is built out  
 [ ] Create Folders then associate shares to them  
 [ ] Change reboot param on buildFS to not reboot auto  
 
 ## APP Servers  
 **ONLY AFTER YOU BUILD THE DC**  
---Change IP  
+--Set Temp IP  
 --Enable RDP  
 --Set Firewall Settings  
---Run prepServer  
---Run buildServer  
+--`Enable-PSremoting -Force` until new template is built out  
 
-**From DC**  
---Add New Server name to hosts
-`C:\Windows\System32\Drivers\Etc\HOSTS`
-`WINRM set winrm/config/client â€˜@{TrustedHosts="EOT-WEB"}â€™`  
+
 
 # SAVE DEV vAPP BEFORE RDS integration testing  
 --DEV Saved 9/25/18  

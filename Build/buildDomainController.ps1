@@ -34,7 +34,6 @@ configuration buildDomainController
             Address        = $node.DNSAddress
             InterfaceAlias = $node.InterfaceAlias
             AddressFamily = "IPV4"
-            Validate = $true
             DependsOn = "[DefaultGatewayAddress]NewIPGateway"
         }
 

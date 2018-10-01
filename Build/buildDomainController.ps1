@@ -61,6 +61,13 @@ configuration buildDomainController
             DependsOn = "[WindowsFeature]DNSInstall"
         }
 
+        xDnsServerPrimaryZone $("addReverse" + $($node.DomainName).split(".")[0]) {
+            Ensure = "Present"
+            Name = "3.168.192.in-addr.arpa"
+            DynamicUpdate = "NonsecureAndSecure"
+            DependsOn = "[WindowsFeature]DNSInstall"
+        }
+
         WindowsFeature ADDSInstall {
             Ensure = "Present"
             Name = "AD-Domain-Services"

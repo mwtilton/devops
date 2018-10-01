@@ -103,7 +103,7 @@ Configuration buildAPPServer {
                         NoPropagateInherit = $AccessControlInformation.NoPropagateInherit
                     }
                 )
-                DependsOn = @("[File]" + "$($Folder.Path.Replace(':','__'))")
+                DependsOn = @("[File]" + $($Folder.Path.Replace(':','__')))
             }
 
 
@@ -132,7 +132,7 @@ $ConfigData = @{
             IPAddressCIDR = "192.168.1.2/24"
             GatewayAddress = "192.168.1.1"
             DNSAddress = "192.168.1.6"
-Â Â Â Â Â Â Â Â Â Â Â Â DomainName = "democloud.local"
+            DomainName = "democloud.local"
 
             PSDscAllowPlainTextPassword = $true
             PSDscAllowDomainUser = $true
@@ -173,8 +173,7 @@ $ConfigData = @{
             IPAddressCIDR = "192.168.1.3/24"
             GatewayAddress = "192.168.1.1"
             DNSAddress = "192.168.1.6"
-Â Â Â Â Â Â Â Â Â Â Â Â DomainName = "democloud.local"
-
+            DomainName = "democloud.local"
             PSDscAllowPlainTextPassword = $true
             PSDscAllowDomainUser = $true
         }
@@ -194,14 +193,14 @@ $($ConfigData.AllNodes) | ForEach-Object {
     Add-Content -Value "`n$(($_.IPAddressCIDR).Split("/")[0])      $($_.Nodename)" -Path "C:\Windows\System32\drivers\etc\hosts"
     Get-Item WSMan:\localhost\Client\TrustedHosts | Set-Item -Value $($_.Nodename) -Force -Confirm:$false
 
-    $Domain = $(($env:USERDNSDOMAIN).Split(".")[0])
-    $domaincredentials = Get-Credential -UserName "$Domain\$env:USERNAME" -Message "Please enter your $Domain credentials"
+    #$Domain = $(($env:USERDNSDOMAIN).Split(".")[0])
+    #$domaincredentials = Get-Credential -UserName "$Domain\$env:USERNAME" -Message "Please enter your $Domain credentials"
 
     $credentials = Get-Credential -UserName administrator -Message "Local Admin for $($_.Nodename)"
 
     $cim = New-CimSession -ComputerName $_.Nodename -Credential $credentials
 
-    Set-DSCLocalConfigurationManager -Path $outputPath â€“Verbose
+    Set-DSCLocalConfigurationManager -Path $outputPath -Verbose
     Start-DscConfiguration -cimsession $cim -Path $outputPath -Wait -Verbose -Force
 
     #Copying DSC resource module to remote node

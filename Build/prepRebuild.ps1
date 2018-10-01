@@ -1,12 +1,6 @@
 ﻿Function Start-PrepRebuild {
     [CmdletBinding()]
     Param(
-        #Branch Selection
-        [Parameter(
-            Mandatory=$true
-        )]
-        [string]
-        $branch,
         #Path Selection
         [Parameter(
             Mandatory=$false
@@ -34,8 +28,10 @@
     }
     Set-Location $path
 
+    Start-Process "https://nmap.org/download.html"
     Start-Process "https://git-scm.com/downloads"
-    Read-Host "Holding for installation of git"
+
+    Read-Host "Holding for installation of Nmap/git"
     #Get-Process -Name git -ErrorAction stop
 
     Try{
@@ -58,7 +54,7 @@
     Read-Host "Ready to clone DevOps Repo?"
     #git clone --single-branch -b branch host:/dir.git
     Try{
-        git clone --single-branch -b $branch "https://mwtilton@bitbucket.org/mwtilton/devops.git"
+        git clone "https://mwtilton@bitbucket.org/mwtilton/devops.git"
         #if ($LASTEXITCODE) { Throw "git clone failure (exit code $LASTEXITCODE" }
     }
     Catch{
@@ -76,7 +72,8 @@
     Try {
         git branch
         #git branch $branch
-        git branch -u origin/$branch
+        Read-Host "Bout to pull is that right?"
+        #git branch -u origin/$branch
         #git checkout $branch
         git pull
     }

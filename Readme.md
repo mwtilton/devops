@@ -9,8 +9,9 @@ Authored by mwtilton
 [X] Fix server losing connectivity issues, no idea why that happens  
 [X] Fix encoding issues  
 [X] Fix Administrator credentials for all build scripts  
-1.3  
+1.3.1  
 [ ] configure DSC for remote node usage  
+1.3.2  
 [ ] Updating module versions to latest  
 1.4  
 --Finished with plaster framework to build them out  
@@ -20,6 +21,7 @@ Authored by mwtilton
 --DSC Configuration Drift analysis  
 1.6  
 --Fully remove extra comments/lines/misc extra stuff  
+--General Clean-up pre-beta build  
 
 [ ] Beta stages  
 1.7  

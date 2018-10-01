@@ -1,6 +1,6 @@
-﻿#DEV vAPP  
+﻿# DEV vAPP  
 
-##Fresh Template Install  
+## Fresh Template Install  
 --Create VM in Vcloud  
 --Change ETH adapter to VMXnet 3  
 --Load with ISO (ex. Win 2016)  
@@ -13,48 +13,60 @@
 `enter`  
 --REBOOT  
 --Remove VMware tools CD  
+--Remove IE enhanced security  
 --Set Temp IP information  
-[X] Run Windows Updates before sysprep (1 restart)  
+
+[ ] Add start-service for windows search to prepRebuild  
+[ ] Add `Hidden` and `Extension` options from File/Folders to prepRebuild  
+[ ] `Enable-PSremoting -force`  
+[ ] Enable WinRM on server  
+`COM+ Network Access (DCOM-In)`  
+`remote Event Log Management (NP-In)`  
+`remote Event Log Management (RPC)`  
+`remote Event Log Management (RPC-EPMAP)`  
+
+--Run Windows Updates before sysprep (1 restart)  
 --disk cleanup wizard with system files selected  
 --Sysprep to shutdown  
 `Set-Location C:\Windows\System32\Sysprep`  
 `.\sysprep.exe /generalize /oobe /shutdown`  
 --Save Template  
 
-###DEV vAPP Template  
--- Change VCD to DNAT to new STATIC IP  
-[X] Setup Admin Account  
-[X] Temp IP  
-[X] Enable RDP  
-[X] Need to remove IE enhanced security  
-[X] BOOT ALL VM's Pre-Rebuild  
+# DEV vAPP Template  
+--Change VCD to DNAT to new STATIC IP  
+--Setup Admin Account  
+--Set Temp IP  
+--Enable RDP  
+--BOOT ALL VM's Pre-Rebuild  
 --DON'T POWER OFF THROUGH THE GUEST OS ANYMORE  
 
-[ ] Add `Hidden` and `Extension` options from File/Folders to prepRebuild  
-[X] Add start-service for windows search to prepRebuild  
-
-##DEV vAPP DC  
+## DEV vAPP DC  
 DO NOT RUN FROM ISE  
+--Set Temp IP  
+--Enable RDP  
 --Run prepRebuild on DC  
---REBOOT after GIT install  
---Continue prepRebuild on DC  
+[ ] Add Nmap installation  
 --Install Nmap  
-[?] Keeping DNS Zones to 3.168.192 but those are the same as the servers IP addresses...  
-
+--REBOOT after GIT from prepRebuild install  
+--Continue prepRebuild on DC  
+[?] Need to lookup how to set DNS Zones, current are set fpr 3.168.192  
 --Run prepDC  
+[ ] Needs to pull in all DSC modules  
+[ ] With corrected versions  
 --Run BuildDC  
 REBOOT  
 
-##FileServer deployment  
+## FileServer deployment  
 **Only after DC is done and built**  
 --Webconsole into fileserver01  
 --Enable RDP  
+--Set Firewall Settings  
 --Run prepFileServer  
 --Run buildFileServer  
 [ ] Create Folders then associate shares to them  
 [ ] Change reboot param on buildFS to not reboot auto  
 
-##APP Servers  
+## APP Servers  
 **ONLY AFTER YOU BUILD THE DC**  
 --Change IP  
 --Enable RDP  
@@ -66,13 +78,6 @@ REBOOT
 --Add New Server name to hosts
 `C:\Windows\System32\Drivers\Etc\HOSTS`
 `WINRM set winrm/config/client â€˜@{TrustedHosts="EOT-WEB"}â€™`  
---Enable WinRM on remote server  
-`COM+ Network Access (DCOM-In)`  
-`remote Event Log Management (NP-In)`  
-`remote Event Log Management (RPC)`  
-`remote Event Log Management (RPC-EPMAP)`  
-
-
 
 # SAVE DEV vAPP BEFORE RDS integration testing  
 --DEV Saved 9/25/18  
@@ -151,8 +156,8 @@ Ports 1433 49172 TCP
 
 # DEV vAPP Rebuild  
 ## Pre- vAPP Rebuild  
-[ ] shutdown remote pcs  
-[ ] Full Power off in VCD  
+--shutdown remote pcs  
+--Full Power off in VCD  
 
 ## Post Power-On/Rebuild checks  
 --RDP  

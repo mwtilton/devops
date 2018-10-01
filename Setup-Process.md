@@ -176,6 +176,7 @@ Ports 1433 49172 TCP
 [ ] Find Latest Versions for modules  
 [ ] Firewall Rules for WinRM  
 [ ] Disabled firewall rules after installation  
+[ ] Add force module import to all  
 
 # GPT HDD Failures  
 `[-]Set HDD to "LSI Logic SAS"`  

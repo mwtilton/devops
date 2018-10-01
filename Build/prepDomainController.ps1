@@ -16,14 +16,17 @@ Get-Service "Windows Search" | Set-service -StartupType Automatic | Start-Servic
 
 Get-PackageSource -Name PSGallery | Set-PackageSource -Trusted -Force -ForceBootstrap
 
-Enable-PSRemoting -Force
+#Enable-PSRemoting -Force
 
 Install-PackageProvider -Name NuGet -Force
 
-Install-Module xPSDesiredStateConfiguration -RequiredVersion 8.4.0.0 -Scope CurrentUser -Force
-Install-Module xComputerManagement -RequiredVersion 3.2.0.0 -Scope CurrentUser -Force
-Install-Module xNetworking -RequiredVersion 5.4.0.0 -Scope CurrentUser -Force
-Install-Module xDnsServer -RequiredVersion 1.9.0.0 -Scope CurrentUser -Force
-Install-Module xActiveDirectory -RequiredVersion 2.16.0.0 -Scope CurrentUser -Force
+Install-Module ComputerManagementDsc -RequiredVersion 5.2.0.0
+Install-Module NetworkingDSC -RequiredVersion 6.1.0.0
+Install-Module xPSDesiredStateConfiguration -RequiredVersion 8.4.0.0
+Install-Module StorageDsc -RequiredVersion 4.1.0.0
+Install-Module xSmbShare -RequiredVersion 2.1.0.0
+Install-Module cNtfsAccessControl -RequiredVersion 1.3.1
+Install-Module xActiveDirectory -RequiredVersion 2.21.0.0
+Install-Module xDnsServer -RequiredVersion 1.11.0.0
 
 Write-Host "You may now execute '.\buildDomainController.ps1'"

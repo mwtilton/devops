@@ -2,48 +2,50 @@
 
 configuration buildDomainController
 {
-    Import-DscResource -ModuleName xPSDesiredStateConfiguration -ModuleVersion "8.4.0.0"
-    Import-DscResource -ModuleName xComputerManagement -ModuleVersion "3.2.0.0"
-    Import-DscResource -ModuleName xNetworking -ModuleVersion "5.4.0.0"
-    Import-DscResource -ModuleName xDnsServer -ModuleVersion "1.9.0.0"
-    Import-DscResource -ModuleName xActiveDirectory -ModuleVersion "2.16.0.0"
+    Import-DscResource -ModuleName xPSDesiredStateConfiguration -ModuleVersion 8.4.0.0
+    Import-DscResource -ModuleName ComputerManagementDSC -ModuleVersion 5.2.0.0
+    Import-DscResource -ModuleName NetworkingDSC -ModuleVersion 6.1.0.0
+    Import-DscResource -ModuleName xActiveDirectory -ModuleVersion 2.21.0.0
+    Import-DscResource -ModuleName xDnsServer -ModuleVersion 1.11.0.0
 
-    Node localhost
+    Node $ConfigData.Allnodes.Nodename
     {
         LocalConfigurationManager {
             ActionAfterReboot = "ContinueConfiguration"
             ConfigurationMode = "ApplyOnly"
+            DebugMode = "ForceModuleImport"
             RebootNodeIfNeeded = $true
         }
 
-        xIPAddress NewIPAddress {
+        IPAddress NewIPAddress {
             IPAddress = $node.IPAddressCIDR
             InterfaceAlias = $node.InterfaceAlias
             AddressFamily = "IPV4"
         }
 
-        xDefaultGatewayAddress NewIPGateway {
+        DefaultGatewayAddress NewIPGateway {
             Address = $node.GatewayAddress
             InterfaceAlias = $node.InterfaceAlias
             AddressFamily = "IPV4"
-            DependsOn = "[xIPAddress]NewIPAddress"
+            DependsOn = "[IPAddress]NewIPAddress"
         }
 
-        xDnsServerAddress PrimaryDNSClient {
+        DnsServerAddress PrimaryDNSClient {
             Address        = $node.DNSAddress
             InterfaceAlias = $node.InterfaceAlias
             AddressFamily = "IPV4"
-            DependsOn = "[xDefaultGatewayAddress]NewIPGateway"
+            Validate = $true
+            DependsOn = "[DefaultGatewayAddress]NewIPGateway"
         }
 
         User Administrator {
             Ensure = "Present"
             UserName = "Administrator"
             Password = $credentials
-            DependsOn = "[xDnsServerAddress]PrimaryDNSClient"
+            DependsOn = "[DnsServerAddress]PrimaryDNSClient"
         }
 
-        xComputer NewComputerName {
+        Computer $($node.ThisComputerName) {
             Name = $node.ThisComputerName
             DependsOn = "[User]Administrator"
         }
@@ -51,33 +53,11 @@ configuration buildDomainController
         WindowsFeature DNSInstall {
             Ensure = "Present"
             Name = "DNS"
-            DependsOn = "[xComputer]NewComputerName"
+            DependsOn = "[Computer]$($node.thiscomputername)"
         }
-
-        xDnsServerPrimaryZone addForwardZoneCompanyPri {
+        xDnsServerPrimaryZone $("addForwardZone" + $($node.DomainName)) {
             Ensure = "Present"
-            Name = "democloud.local"
-            DynamicUpdate = "NonsecureAndSecure"
-            DependsOn = "[WindowsFeature]DNSInstall"
-        }
-
-        xDnsServerPrimaryZone addReverseADZone3Net {
-            Ensure = "Present"
-            Name = "3.168.192.in-addr.arpa"
-            DynamicUpdate = "NonsecureAndSecure"
-            DependsOn = "[WindowsFeature]DNSInstall"
-        }
-
-        xDnsServerPrimaryZone addReverseADZone4Net {
-            Ensure = "Present"
-            Name = "4.168.192.in-addr.arpa"
-            DynamicUpdate = "NonsecureAndSecure"
-            DependsOn = "[WindowsFeature]DNSInstall"
-        }
-
-        xDnsServerPrimaryZone addReverseADZone5Net {
-            Ensure = "Present"
-            Name = "5.168.192.in-addr.arpa"
+            Name = $($node.DomainName)
             DynamicUpdate = "NonsecureAndSecure"
             DependsOn = "[WindowsFeature]DNSInstall"
         }
@@ -85,7 +65,7 @@ configuration buildDomainController
         WindowsFeature ADDSInstall {
             Ensure = "Present"
             Name = "AD-Domain-Services"
-            DependsOn = "[xDnsServerPrimaryZone]addForwardZoneCompanyPri"
+            DependsOn = "[xDnsServerPrimaryZone]$("addForwardZone" + $($node.DomainName))"
         }
 
         WindowsFeature ADDSTools {
@@ -156,7 +136,7 @@ $ConfigData = @{
         @{
             Nodename = "localhost"
             ThisComputerName = "DC01"
-            IPAddressCIDR = "192.168.1.5/24"
+            IPAddressCIDR = "192.168.1.2/24"
             GatewayAddress = "192.168.1.1"
             DNSAddress = "127.0.0.1"
             InterfaceAlias = "Ethernet0"

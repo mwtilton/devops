@@ -21,6 +21,7 @@ Configuration buildAPPServer {
         LocalConfigurationManager {
             ActionAfterReboot = "ContinueConfiguration"
             ConfigurationMode = "ApplyOnly"
+            DebugMode = "ForceModuleImport"
             RebootNodeIfNeeded = $true
         }
         Computer $("Rename-" + $ConfigData.AllNodes.Nodename)

@@ -4,9 +4,10 @@
         [Parameter(Mandatory)]
         [System.Object]$object
     )
-    $string = @()
+    [array]$string = @()
     $object | ForEach-Object {
         $string += $_
     }
-    return [string]$string
+    $path = Get-Item "WSMan:\localhost\Client\TrustedHosts"
+    Set-Item -Path $path -Value $string -Force -Confirm:$false
 }

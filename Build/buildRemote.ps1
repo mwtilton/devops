@@ -125,13 +125,13 @@ $ConfigData = @{
     AllNodes = @(
 
         @{
-            NodeName = "pc"
+            NodeName = "WIN-IJEVNIGDBQ4"
 
             ThisComputerName = "FileServer01"
             InterfaceAlias = "Ethernet0"
-            IPAddressCIDR = "192.168.1.2/24"
+            IPAddressCIDR = "192.168.1.4/24"
             GatewayAddress = "192.168.1.1"
-            DNSAddress = "192.168.1.6"
+            DNSAddress = "192.168.1.2"
             DomainName = "democloud.local"
 
             PSDscAllowPlainTextPassword = $true
@@ -166,13 +166,13 @@ $ConfigData = @{
             )
         }
         @{
-            NodeName = "pc"
+            NodeName = "WIN-F59K035SMS1"
 
             ThisComputerName = "APP01"
             InterfaceAlias = "Ethernet0"
             IPAddressCIDR = "192.168.1.3/24"
             GatewayAddress = "192.168.1.1"
-            DNSAddress = "192.168.1.6"
+            DNSAddress = "192.168.1.2"
             DomainName = "democloud.local"
             PSDscAllowPlainTextPassword = $true
             PSDscAllowDomainUser = $true
@@ -187,50 +187,55 @@ buildAPPServer -ConfigurationData $ConfigData -OutputPath $outputPath
 
 Get-Item WSMan:\localhost\Client\TrustedHosts | Clear-Item -Force
 
+$credentials = Get-Credential -UserName administrator -Message "Local Admin"
+
 $($ConfigData.AllNodes) | ForEach-Object {
     Write-Host "$(($_.IPAddressCIDR).Split('/')[0])      $($_.Nodename)"
 
     Add-Content -Value "`n$(($_.IPAddressCIDR).Split("/")[0])      $($_.Nodename)" -Path "C:\Windows\System32\drivers\etc\hosts"
-    Get-Item WSMan:\localhost\Client\TrustedHosts | Set-Item -Value $($_.Nodename) -Force -Confirm:$false
 
     #$Domain = $(($env:USERDNSDOMAIN).Split(".")[0])
     #$domaincredentials = Get-Credential -UserName "$Domain\$env:USERNAME" -Message "Please enter your $Domain credentials"
-
-    $credentials = Get-Credential -UserName administrator -Message "Local Admin for $($_.Nodename)"
-
-    $cim = New-CimSession -ComputerName $_.Nodename -Credential $credentials
-
-    Set-DSCLocalConfigurationManager -Path $outputPath -Verbose
-    Start-DscConfiguration -cimsession $cim -Path $outputPath -Wait -Verbose -Force
-
-    #Copying DSC resource module to remote node
-    $Session = New-PSSession -ComputerName $_.Nodename -Credential $credentials
+}
 
 
-    Try{
-        $Params =@{
-            Path = 'C:\Program Files\WindowsPowerShell\Modules'
-            Destination = 'C:\Program Files\WindowsPowerShell'
-            ToSession = $Session
-            ErrorAction = "SilentlyContinue"
-            Recurse = $true
-        }
+#$nodenames = Convert-HashToString -Hash $ConfigData.AllNodes.Nodename
 
-        Copy-Item @Params
+Get-Item WSMan:\localhost\Client\TrustedHosts | Set-Item -Value @($($ConfigData.AllNodes.Nodename)) -Force -Confirm:$false
 
-    }
-    Catch{
-        If($_.Exception.ToString().Contains("An item with the specified name  already exists.")){
-            Write-Host "Files for $($_.Nodename) already exists. Skipping!" -ForegroundColor DarkGreen
-        }
-        Else{
-            $_ | fl * -force
-            $_.InvocationInfo.BoundParameters | fl * -force
-            $_.Exception
-        }
+$cim = New-CimSession -ComputerName $($ConfigData.AllNodes.Nodename) -Credential $credentials
 
+<#
+Set-DSCLocalConfigurationManager -Path $outputPath -Verbose
+Start-DscConfiguration -cimsession $cim -Path $outputPath -Wait -Verbose -Force
+
+#Copying DSC resource module to remote node
+$Session = New-PSSession -ComputerName $ConfigData.AllNodes.Nodename -Credential $credentials
+
+
+Try{
+    $Params =@{
+        Path = 'C:\Program Files\WindowsPowerShell\Modules'
+        Destination = 'C:\Program Files\WindowsPowerShell'
+        ToSession = $Session
+        ErrorAction = "SilentlyContinue"
+        Recurse = $true
     }
 
-    Invoke-Command -Session $Session -ScriptBlock {Get-Module ComputerManagementDsc -ListAvailable}
+    Copy-Item @Params
 
 }
+Catch{
+    If($_.Exception.ToString().Contains("An item with the specified name  already exists.")){
+        Write-Host "Files for $($_.Nodename) already exists. Skipping!" -ForegroundColor DarkGreen
+    }
+    Else{
+        $_ | fl * -force
+        $_.InvocationInfo.BoundParameters | fl * -force
+        $_.Exception
+    }
+
+}
+
+Invoke-Command -Session $Session -ScriptBlock {Get-Module ComputerManagementDsc -ListAvailable}
+#>

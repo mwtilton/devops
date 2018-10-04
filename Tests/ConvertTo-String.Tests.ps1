@@ -17,7 +17,7 @@ Describe "ConvertTo-String" -Tag Unit {
             }
         )
     }
-    Context "Hashtable Conversion" {
+    Context "General Unit testing components" {
         It "Configdata is a hashtable" {
             $ConfigData | Should beoftype [Hashtable]
         }
@@ -32,6 +32,10 @@ Describe "ConvertTo-String" -Tag Unit {
         }
         It "The $($ConfigData.AllNodes.NodeName[0]) server name is accurate" {
             $ConfigData.AllNodes.NodeName[0] | Should BeLike "pc01"
+        }
+        It "shows the type returned from a get-item" {
+            Mock Get-Item {return [System.Object]}
+            Get-Item "WSMan:\localhost\Client\TrustedHosts" | Should beoftype [System.Object]
         }
     }
     Context "Unit testing function" {
@@ -57,12 +61,12 @@ Describe "ConvertTo-String" -Tag Unit {
         }
     }
     Context "Throwing tests with Mocking" {
-        Mock Get-Item {return $null}
-        Mock Set-Item {}
+        #Mock Get-Item {return $null}
+        #Mock Set-Item {return $true}
 
-        $result = ConvertTo-String -Object $ConfigData.AllNodes.NodeName
+        #$result = (Get-Item "WSMan:\localhost\Client\TrustedHosts" | Set-Item -Value "$($ConfigData.AllNodes.NodeName)" -Force -Confirm:$false)
         It "Set-item Doesn't throw with the returned result" {
-            {$result} | Should -Not throw
+            {Set-Item -Path "WSMan:\localhost\Client\TrustedHosts" -Value $ConfigData.AllNodes.NodeName -Force -Confirm:$false} | Should -Not throw
         }
     }
 }

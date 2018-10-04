@@ -8,6 +8,5 @@
     $object | ForEach-Object {
         $string += $_
     }
-    $path = Get-Item "WSMan:\localhost\Client\TrustedHosts"
-    Set-Item -Path $path -Value $string -Force -Confirm:$false
+    #Get-Item "WSMan:\localhost\Client\TrustedHosts" | Set-Item -Value $string -Force -Confirm:$false
 }

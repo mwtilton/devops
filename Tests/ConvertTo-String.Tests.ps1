@@ -61,12 +61,57 @@ Describe "ConvertTo-String" -Tag Unit {
         }
     }
     Context "Throwing tests with Mocking" {
-        #Mock Get-Item {return $null}
-        #Mock Set-Item {return $true}
 
-        #$result = (Get-Item "WSMan:\localhost\Client\TrustedHosts" | Set-Item -Value "$($ConfigData.AllNodes.NodeName)" -Force -Confirm:$false)
-        It "Set-item Doesn't throw with the returned result" {
-            {Set-Item -Path "WSMan:\localhost\Client\TrustedHosts" -Value $ConfigData.AllNodes.NodeName -Force -Confirm:$false} | Should -Not throw
+        $ConfigData.AllNodes | ForEach-Object {
+            Mock Get-Credential { return @{username = "$($($_.NodeName) + "\Administrator")"}} -MockWith {$username -eq $($_.nodename + "\Administrator")}
+            New-Variable -Name $_.NodeName -Value $($_.Nodename)
+            It "Has a server name: $($_.Nodename)" {
+                $_.NodeName | Should -Not -BeNullOrEmpty
+            }
+            It "$($_.Nodename)" {
+                Get-Variable -Name $_.NodeName | Should -Not -BeNullOrEmpty
+            }
+            It "should get the credentials" {
+                Set-Variable -Name $_.NodeName -Value (Get-Credential -UserName $($($_.NodeName) + "\Administrator") -Message "Hello")
+                $creds | Should -Not -BeNullOrEmpty
+            }
+        }
+    }
+    Context "Copying files" {
+        Setup -Dir "Modules"
+        Setup -Dir "Modules\WindowsPowerShell"
+        Setup -File "Modules\file.txt" "word"
+
+        $Params =@{
+            Path = "$testdrive\Modules\*"
+            Destination = "$testdrive\Modules\WindowsPowerShell"
+            ErrorAction = "SilentlyContinue"
+            Recurse = $true
+        }
+
+        Copy-Item @Params #-Path "$testdrive\Modules\*" -Destination "$testdrive\Modules\WindowsPowershell\"
+
+        $file = Get-ChildItem "$testdrive\Modules" | ? {!$_.psiscontainer}
+        $file2 = Get-ChildItem "$testdrive\Modules\WindowsPowershell" | ? {!$_.psiscontainer}
+
+        It "made the required files folders" {
+            "$testdrive\Modules" | Should Exist
+            "$testdrive\Modules\WindowsPowerShell" | Should Exist
+            "$testdrive\Modules\file.txt" | Should Exist
+        }
+        It "Should have one file in the modules folder"{
+            $file.Count | Should be 1
+            $file.Name | Should be "file.txt"
+        }
+        It "Should have one file in the windows powershell folder"{
+            $file2.Count | Should be 1
+            $file2.Name | Should be "file.txt"
+        }
+        It "has contents" {
+            Get-Content "$testdrive\Modules\file.txt" | Should Be "word"
+        }
+        It "copies stuff" {
+            "$testdrive\Modules\WindowsPowerShell\file.txt" | Should Exist
         }
     }
 }

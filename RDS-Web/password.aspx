@@ -184,7 +184,7 @@ words";
 
             <tr>
             <td>
-                <table width="350" border="0" cellpadding="10" cellspacing="0">
+                <table class="passwordRequirements" width="350" border="0" cellpadding="10" cellspacing="0">
                     <tr>
                         <td width="180" align="left">
                             <%=L_PasswordRequirementsList_Text%>

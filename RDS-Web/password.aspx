@@ -17,6 +17,8 @@
     //
     // Localizable Text
     //
+    const string L_PasswordRequirements_Text = "Password Requirements:";
+    const string L_PasswordRequirementsList_Text = "Password Requirements List";
     const string L_DomainUserNameLabel_Text = "Domain\\user name:";
     const string L_OldPasswordLabel_Text = "Current password:";
     const string L_NewPasswordLabel_Text = "New password:";
@@ -177,13 +179,20 @@
             <tr>
             <td>
                 <table width="350" border="0" cellpadding="0" cellspacing="0">
-                <tr>
-                    <td width="180" align="right"><%=L_DomainUserNameLabel_Text%></td>
-                    <td width="7"></td>
-                    <td align="right">
-                    <input id="DomainUserName" name="DomainUserName" type="text" class="textInputField" runat="server" size="25" autocomplete="off" />
-                    </td>
-                </tr>
+                    <tr>
+                        <td width="180" align="right"><%=L_PasswordRequirements_Text%></td>
+                        <td width="7"></td>
+                        <td align="right">
+                            <%=L_PasswordRequirementsList_Text%>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td width="180" align="right"><%=L_DomainUserNameLabel_Text%></td>
+                        <td width="7"></td>
+                        <td align="right">
+                        <input id="DomainUserName" name="DomainUserName" type="text" class="textInputField" runat="server" size="25" autocomplete="off" />
+                        </td>
+                    </tr>
                 </table>
             </td>
             </tr>

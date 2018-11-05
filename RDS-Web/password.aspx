@@ -21,6 +21,7 @@
     const string L_PasswordRequirementsList_Text = "1.) Password cannot contain user’s first name, last name or login name, or more than 3 characters in a row matching any of these" + "<br />" +
 "2.) Must be at least 7 characters long" + "<br />" +
 "3.) Must contain 3 of the 4 following items:" + "<br />" +
+"4.) Must be one or more characters different from previously used password(s)" + "<br />" +
 "- Upper-case letter (A-Z)" + "<br />" +
 "- Lower-case letter (a-z)" + "<br />" +
 "- Number (0-9)" + "<br />" +

@@ -1,3 +1,3 @@
 ﻿$parent = (get-item $PSScriptRoot).FullName
-$select = "*Set-HostsFile*"
+$select = "*New-PasswordNotification*"
 Invoke-Pester "$parent\Tests\$select" -CodeCoverage $parent\DevOps\Functions\$select -tags "UNIT"

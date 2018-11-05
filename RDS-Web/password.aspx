@@ -17,14 +17,14 @@
     //
     // Localizable Text
     //
-    const string L_PasswordRequirements_Text = "Password Requirements:";
-    const string L_PasswordRequirementsList_Text = "1.) Password cannot contain user’s actual name or login name,\n\n or more than 3 characters in a row matching either of these \n\n\n" + "<br />" +
-"2.) Must be at least 7 characters long \r\n" + "<br />" +
-"3.) Must contain 3 of the 4 following items: \n\n" + "<br />" +
-"- Upper-case letter (A-Z) \n\n" + "<br />" +
-"- Lower-case letter (a-z) \n\n" + "<br />" +
-"- Number (0-9) \n" + "<br />" +
-"- Special character \n\n" + "<br />";
+    const string L_PasswordRequirements_Text = "<b>" + "Password Requirements:" + "</b>";
+    const string L_PasswordRequirementsList_Text = "1.) Password cannot contain user’s first name, last name or login name, or more than 3 characters in a row matching any of these" + "<br />" +
+"2.) Must be at least 7 characters long" + "<br />" +
+"3.) Must contain 3 of the 4 following items:" + "<br />" +
+"- Upper-case letter (A-Z)" + "<br />" +
+"- Lower-case letter (a-z)" + "<br />" +
+"- Number (0-9)" + "<br />" +
+"- Special character "+ "(" + "!@#$%*"+ ")"+ "<br />"; // !@#$%&*
     const string L_DomainUserNameLabel_Text = "Domain\\user name:";
     const string L_OldPasswordLabel_Text = "Current password:";
     const string L_NewPasswordLabel_Text = "New password:";

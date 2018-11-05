@@ -18,13 +18,13 @@
     // Localizable Text
     //
     const string L_PasswordRequirements_Text = "Password Requirements:";
-    const string L_PasswordRequirementsList_Text = @"
-Password cannot have things
-
-contain
-some
-more
-words";
+    const string L_PasswordRequirementsList_Text = "1.) Password cannot contain user’s actual name or login name,\n\n or more than 3 characters in a row matching either of these \n\n\n" + "<br />" +
+"2.) Must be at least 7 characters long \r\n" + "<br />" +
+"3.) Must contain 3 of the 4 following items: \n\n" + "<br />" +
+"- Upper-case letter (A-Z) \n\n" + "<br />" +
+"- Lower-case letter (a-z) \n\n" + "<br />" +
+"- Number (0-9) \n" + "<br />" +
+"- Special character \n\n" + "<br />";
     const string L_DomainUserNameLabel_Text = "Domain\\user name:";
     const string L_OldPasswordLabel_Text = "Current password:";
     const string L_NewPasswordLabel_Text = "New password:";
@@ -184,12 +184,16 @@ words";
 
             <tr>
             <td>
-                <table class="passwordRequirements" width="350" border="0" cellpadding="10" cellspacing="0">
+                <table width="350" border="0" cellpadding="10" cellspacing="0">
                     <tr>
-                        <td width="180" align="left">
+                        <td width="7">
+                            <%=L_PasswordRequirements_Text%>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="passwordRequirements" width="180" align="left">
                             <%=L_PasswordRequirementsList_Text%>
                         </td>
-                        <td width="7"></td>
                     </tr>
                 </table>
                 <table width="350" border="0" cellpadding="0" cellspacing="0">

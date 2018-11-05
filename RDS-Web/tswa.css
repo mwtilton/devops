@@ -42,6 +42,11 @@ body,td,th,select
   color: #000000;
 }
 
+.passwordRequirements
+{
+  color: #C00000
+}
+
 .pageBorder
 {
   border: 1px solid #444444;

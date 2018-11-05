@@ -21,6 +21,61 @@ Function New-PasswordNotification {
     Interval is used, and emails will be sent to people whose password expires in less than 21 days if the script is run, with 15, 10, 5, 2 or 1 days remaining untill password expires.
 
     #>
+    try{
+        Import-Module ActiveDirectory -ErrorAction Stop
+    }
+    catch{
+        break
+    }
+
+    $users = get-aduser -filter {(Enabled -eq $true) -and (PasswordNeverExpires -eq $false)} -properties Name, PasswordNeverExpires, PasswordExpired, PasswordLastSet, EmailAddress | where { $_.passwordexpired -eq $false }
+    $colUsers = @()
+
+    $users | ForEach-Object {
+
+        # Store User information
+        $Name = $_.Name
+        $emailaddress = $_.emailaddress
+        $passwordSetDate = $_.PasswordLastSet
+        $samAccountName = $_.SamAccountName
+        $pwdLastSet = $_.PasswordLastSet
+        # Check for Fine Grained Password
+        $maxPasswordAge = $defaultMaxPasswordAge
+        $PasswordPol = (Get-AduserResultantPasswordPolicy $_)
+        if (($PasswordPol) -ne $null)
+        {
+            $maxPasswordAge = ($PasswordPol).MaxPasswordAge.Days
+        }
+        # Create User Object
+        $userObj = New-Object System.Object
+        $expireson = $pwdLastSet.AddDays($maxPasswordAge)
+        $daysToExpire = New-TimeSpan -Start $today -End $Expireson
+        # Round Expiry Date Up or Down
+        if(($daysToExpire.Days -eq "0") -and ($daysToExpire.TotalHours -le $timeToMidnight.TotalHours))
+        {
+            $userObj | Add-Member -Type NoteProperty -Name UserMessage -Value "today."
+        }
+        if(($daysToExpire.Days -eq "0") -and ($daysToExpire.TotalHours -gt $timeToMidnight.TotalHours) -or ($daysToExpire.Days -eq "1") -and ($daysToExpire.TotalHours -le $timeToMidnight2.TotalHours))
+        {
+            $userObj | Add-Member -Type NoteProperty -Name UserMessage -Value "tomorrow."
+        }
+        if(($daysToExpire.Days -ge "1") -and ($daysToExpire.TotalHours -gt $timeToMidnight2.TotalHours))
+        {
+            $days = $daysToExpire.TotalDays
+            $days = [math]::Round($days)
+            $userObj | Add-Member -Type NoteProperty -Name UserMessage -Value "in $days days."
+        }
+        $daysToExpire = [math]::Round($daysToExpire.TotalDays)
+        $userObj | Add-Member -Type NoteProperty -Name UserName -Value $samAccountName
+        $userObj | Add-Member -Type NoteProperty -Name Name -Value $Name
+        $userObj | Add-Member -Type NoteProperty -Name EmailAddress -Value $emailAddress
+        $userObj | Add-Member -Type NoteProperty -Name PasswordSet -Value $pwdLastSet
+        $userObj | Add-Member -Type NoteProperty -Name DaysToExpire -Value $daysToExpire
+        $userObj | Add-Member -Type NoteProperty -Name ExpiresOn -Value $expiresOn
+        # Add userObj to colusers array
+        $colUsers += $userObj
+    }
+    <#
     param(
         # $smtpServer Enter Your SMTP Server Hostname or IP Address
         [Parameter(Mandatory=$True,Position=0)]
@@ -119,7 +174,9 @@ Function New-PasswordNotification {
     # To target a specific OU - use the -searchBase Parameter -https://docs.microsoft.com/en-us/powershell/module/addsadministration/get-aduser
     # You can target specific group members using Get-AdGroupMember, explained here https://www.youtube.com/watch?v=4CX9qMcECVQ
     # based on earlier version but method still works here.
+
     $users = get-aduser -filter {(Enabled -eq $true) -and (PasswordNeverExpires -eq $false)} -properties Name, PasswordNeverExpires, PasswordExpired, PasswordLastSet, EmailAddress | where { $_.passwordexpired -eq $false }
+
     # Count Users
     $usersCount = ($users | Measure-Object).Count
     Write-Output "Found $usersCount User Objects"
@@ -306,6 +363,5 @@ Function New-PasswordNotification {
     $runTime = New-TimeSpan $start $stop
     Write-Output "Script Runtime: $runtime"
     # End
+    #>
 }
-
-New-PasswordNotification -smtpServer mail.scalematrix.com -expireInDays 5 -from "IT Support <tilt1@scalematrix.com>" -Logging -LogPath "$env:USERPROFILE\Desktop" -testing -testRecipient "tilt1@scalematrix.com"

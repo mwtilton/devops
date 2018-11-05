@@ -24,7 +24,8 @@
 "- Upper-case letter (A-Z)" + "<br />" +
 "- Lower-case letter (a-z)" + "<br />" +
 "- Number (0-9)" + "<br />" +
-"- Special character "+ "(" + "!@#$%*"+ ")"+ "<br />"; // !@#$%&*
+// !@#$%&* the & is a particular character in the code and should not be placed into string values
+"- Special character "+ "(" + "!@#$%*"+ ")"+ "<br />";
     const string L_DomainUserNameLabel_Text = "Domain\\user name:";
     const string L_OldPasswordLabel_Text = "Current password:";
     const string L_NewPasswordLabel_Text = "New password:";

@@ -34,7 +34,7 @@ Describe "New-PasswordNotification" -Tag "UNIT"{
 
         Mock Get-ADuser -MockWith {return $demouser}
         Mock Get-Aduser {return $demouser} -ParameterFilter {
-            $properties -eq "Name" -and $filter -like "{(Enabled -eq $true) -and (PasswordNeverExpires -eq $false)}"
+            $properties -eq "Name" -and $filter -like "hello"
         }
         New-PasswordNotification
 
@@ -50,13 +50,10 @@ Describe "New-PasswordNotification" -Tag "UNIT"{
         }
         It "mock the parameter" {
             Mock Get-Aduser {return $demouser} -ParameterFilter {
-                $properties -eq "Name" -and $filter -like "*"
+                $properties -eq "Name" -and $filter -like "hello"
             }
             $user = Get-Aduser -filter * -Properties Name, SamAccountName | where {$_.Name -eq "John Smith"}
             $user.SamAccountName | Should Be "jsmith"
-        }
-        It "mock the parameterfilter in the function" {
-            Assert-MockCalled -CommandName Get-ADuser -Exactly 1
         }
     }
     Context "Creating the Hashtable" {

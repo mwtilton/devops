@@ -4,7 +4,7 @@ Describe "New-PasswordNotification" -Tag "UNIT"{
         Name = "John Smith"
         Emailaddress = "jsmith@place.com"
         PasswordLastSet = "10/10/18 12:00 PM"
-        SamaccountName = "jsmith"
+        SamAccountName = "jsmith"
         Count = 1
     }
 
@@ -33,36 +33,46 @@ Describe "New-PasswordNotification" -Tag "UNIT"{
     Context "User Information" {
 
         Mock Get-ADuser -MockWith {return $demouser}
-
+        Mock Get-Aduser {return $demouser} -ParameterFilter {
+            $properties -eq "Name" -and $filter -like "{(Enabled -eq $true) -and (PasswordNeverExpires -eq $false)}"
+        }
         New-PasswordNotification
 
         It "should have the correct user information" {
             $demouser.Name | Should -Be "John Smith"
             $demouser.Emailaddress | Should -Be "jsmith@place.com"
             $demouser.PasswordLastSet | Should -Be "10/10/18 12:00 PM"
-            $demouser.SamaccountName | Should -Be "jsmith"
+            $demouser.SamAccountName | Should -Be "jsmith"
         }
         It "should have an accurate count of 0 users when mocked" {
             Mock Get-ADuser {}
             (Get-Aduser -Filter *).Count | Should Be 0
         }
-
-
+        It "mock the parameter" {
+            Mock Get-Aduser {return $demouser} -ParameterFilter {
+                $properties -eq "Name" -and $filter -like "*"
+            }
+            $user = Get-Aduser -filter * -Properties Name, SamAccountName | where {$_.Name -eq "John Smith"}
+            $user.SamAccountName | Should Be "jsmith"
+        }
+        It "mock the parameterfilter in the function" {
+            Assert-MockCalled -CommandName Get-ADuser -Exactly 1
+        }
     }
     Context "Creating the Hashtable" {
 
         Mock New-Object {
             return @{
                 Name = $demouser.Name
-                UserName = $demouser.SamaccountName
+                UserName = $demouser.SamAccountName
             }
         }
-        $columns = @()
+
         $users = $demouser
         $users | ForEach-Object {
             $userObj = New-Object System.Object
             It "should add 1 username and name" {
-                $userObj | Add-Member -Type NoteProperty -Name UserName -Value $demouser.SamaccountName
+                $userObj | Add-Member -Type NoteProperty -Name UserName -Value $demouser.SamAccountName
                 $userObj | Add-Member -Type NoteProperty -Name Name -Value $demouser.Name
 
                 $userObj.UserName | Should Be "jsmith"
@@ -72,18 +82,43 @@ Describe "New-PasswordNotification" -Tag "UNIT"{
             It "should not be null or empty" {
                 $userObj | Should -Not -BeNullOrEmpty
             }
-            It "should have added it to the column array" {
-                $columns += $userObj
-                $columns | Should -Not -BeNullOrEmpty
-            }
+        }
 
+    }
+    Context "Generating Email" {
+        $messageDays = 1
+        $subject = "Your password will expire in $messageDays days"
+
+        $body = "
+<font face=""verdana"">
+Dear $($demouser.Name),
+<p>$subject<br>
+To change your password on a PC press CTRL ALT Delete and choose Change Password <br>
+<p> If you are using a MAC you can now change your password via Web Mail. <br>
+Login to <a href=""https://mail.domain.com/owa"">Web Mail</a> click on Options, then Change Password.
+<p> Don't forget to Update the password on your Mobile Devices as well!
+<p>Thanks, <br>
+</P>
+IT Support
+<a href=""mailto:support@domain.com""?Subject=Password Expiry Assistance"">support@domain.com</a> | 0123 456 78910
+</font>"
+        It "should have a subject" {
+            $subject | Should Be "Your password will expire in 1 days"
         }
-        It "Columns array Should not be null or empty out of the loop" {
-            $columns | Should -Not -BeNullOrEmpty
-        }
-        It "Should have added the UserObj to the array" -Skip {
-            $columns.Name | Should Be $demouser.Name
-            $columns.SamaccountName | Should Be $demouser.SamaccountName
+        It "should have a body" {
+            $body | Should Be "
+<font face=""verdana"">
+Dear John Smith,
+<p>$subject<br>
+To change your password on a PC press CTRL ALT Delete and choose Change Password <br>
+<p> If you are using a MAC you can now change your password via Web Mail. <br>
+Login to <a href=""https://mail.domain.com/owa"">Web Mail</a> click on Options, then Change Password.
+<p> Don't forget to Update the password on your Mobile Devices as well!
+<p>Thanks, <br>
+</P>
+IT Support
+<a href=""mailto:support@domain.com""?Subject=Password Expiry Assistance"">support@domain.com</a> | 0123 456 78910
+</font>"
         }
 
     }

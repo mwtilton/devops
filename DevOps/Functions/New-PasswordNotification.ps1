@@ -29,9 +29,7 @@ Function New-PasswordNotification {
         break
     }
     $defaultMaxPasswordAge = (Get-ADDefaultDomainPasswordPolicy -ErrorAction Stop).MaxPasswordAge.Days
-    $users = get-aduser -filter {(Enabled -eq $true) -and (PasswordNeverExpires -eq $false)} -properties Name, PasswordNeverExpires, PasswordExpired, PasswordLastSet, EmailAddress | where { $_.passwordexpired -eq $false }
-    $colUsers = @()
-    $usersCount = $users.Count
+    $users = get-aduser -filter hello #{(Enabled -eq $true) -and (PasswordNeverExpires -eq $false)} #-properties Name, PasswordNeverExpires, PasswordExpired, PasswordLastSet, EmailAddress #| where { $_.passwordexpired -eq $false }
 
     <#
     param(

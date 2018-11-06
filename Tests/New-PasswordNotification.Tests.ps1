@@ -5,34 +5,29 @@ Describe "New-PasswordNotification" -Tag "UNIT"{
         Emailaddress = "jsmith@place.com"
         PasswordLastSet = "10/10/18 12:00 PM"
         SamAccountName = "jsmith"
-        Count = 1
     }
 
     Context "Testing the AD" {
-        Mock Get-Date {}
+
         Mock Import-Module {}
-        Mock Get-ADDefaultDomainPasswordPolicy {}
         Mock Get-ADuser {}
 
         New-PasswordNotification
 
-        It "mocks the date" {
-            Assert-MockCalled -CommandName Get-Date -Exactly 1
-        }
         It "AD is imported" {
             Assert-MockCalled -CommandName Import-Module -Exactly 1
         }
-        It "mocks the pass policy" {
-            Assert-MockCalled -CommandName Get-ADDefaultDomainPasswordPolicy -Exactly 1
-        }
         It "mocks the user" {
             Assert-MockCalled -CommandName Get-ADuser -Exactly 1
+        }
+        It "Should throw" {
+            Mock Import-Module { throw }
+            {Import-Module ActiveDirectory -ErrorAction Stop} | Should throw
         }
 
     }
     Context "User Information" {
 
-        Mock Get-ADuser -MockWith {return $demouser}
         Mock Get-Aduser {return $demouser} -ParameterFilter {
             $properties -eq "Name" -and $filter -like "hello"
         }
@@ -43,17 +38,6 @@ Describe "New-PasswordNotification" -Tag "UNIT"{
             $demouser.Emailaddress | Should -Be "jsmith@place.com"
             $demouser.PasswordLastSet | Should -Be "10/10/18 12:00 PM"
             $demouser.SamAccountName | Should -Be "jsmith"
-        }
-        It "should have an accurate count of 0 users when mocked" {
-            Mock Get-ADuser {}
-            (Get-Aduser -Filter *).Count | Should Be 0
-        }
-        It "mock the parameter" {
-            Mock Get-Aduser {return $demouser} -ParameterFilter {
-                $properties -eq "Name" -and $filter -like "hello"
-            }
-            $user = Get-Aduser -filter * -Properties Name, SamAccountName | where {$_.Name -eq "John Smith"}
-            $user.SamAccountName | Should Be "jsmith"
         }
     }
     Context "Creating the Hashtable" {

@@ -30,8 +30,9 @@ Function New-PasswordNotification {
     }
     $defaultMaxPasswordAge = (Get-ADDefaultDomainPasswordPolicy -ErrorAction Stop).MaxPasswordAge.Days
     #{(Enabled -eq $true) -and (PasswordNeverExpires -eq $false)} #-properties Name, PasswordNeverExpires, PasswordExpired, PasswordLastSet, EmailAddress #| where { $_.passwordexpired -eq $false }
-    $users = get-aduser -filter hello -properties Name, PasswordNeverExpires, PasswordExpired, PasswordLastSet, EmailAddress
+    $users = get-aduser -filter {(Enabled -eq $true)} -properties Name, PasswordNeverExpires, PasswordExpired, PasswordLastSet, EmailAddress
 
+    #Send-Mailmessage -smtpServer $smtpServer -from $from -to $emailaddress -subject $subject -body $body -bodyasHTML -priority High -Encoding $textEncoding -ErrorAction Stop
     <#
     param(
         # $smtpServer Enter Your SMTP Server Hostname or IP Address

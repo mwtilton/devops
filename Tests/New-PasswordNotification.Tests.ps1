@@ -37,13 +37,14 @@ IT Support
         BodyasHTML = $true
     }
 
+    Mock Send-MailMessage {}
 
     Context "Testing the AD" {
-
+        Mock Export-Csv {} -ParameterFilter {$encoding -eq "UTF8" -and $append -eq $true}
         Mock Import-Module {}
         Mock Get-ADuser {}
 
-        New-PasswordNotification
+        New-PasswordNotification -SmtpServer $email.SmtpServer
 
         It "AD is imported" {
             Assert-MockCalled -CommandName Import-Module -Exactly 1
@@ -52,17 +53,16 @@ IT Support
             Assert-MockCalled -CommandName Get-ADuser -Exactly 1
         }
         It "Should throw" {
-            Mock Import-Module { throw }
-            {Import-Module ActiveDirectory -ErrorAction Stop} | Should throw
+            Mock Import-Module {} -MockWith {$name -eq $null}
+            {Import-Module -Name} | Should throw
         }
 
     }
     Context "User Information" {
+        Mock Export-Csv {} -ParameterFilter {$encoding -eq "UTF8" -and $append -eq $true}
+        Mock Get-Aduser {return $demouser}
 
-        Mock Get-Aduser {return $demouser} -ParameterFilter {
-            $properties -eq "Name" -and $filter -eq $true
-        }
-        New-PasswordNotification
+        New-PasswordNotification -SmtpServer $email.SmtpServer
 
         It "should have the correct user information" {
             $demouser.Name | Should -Be "John Smith"
@@ -94,6 +94,17 @@ IT Support
             It "should not be null or empty" {
                 $userObj | Should -Not -BeNullOrEmpty
             }
+
+            It "should put the user into a csv" {
+                $userObj | Export-Csv "$testdrive\Log.csv" -Encoding "UTF8" -Append
+                $csv = Import-Csv "$testdrive\log.csv"
+                $csv.Name | Should Be "John Smith"
+            }
+            It "adds two users to the log" {
+                $userObj | Export-Csv "$testdrive\Log.csv" -Encoding "UTF8" -Append
+                $csv = Import-Csv "$testdrive\log.csv"
+                ($csv.Name).count | Should Be 2
+            }
         }
 
     }
@@ -119,17 +130,10 @@ IT Support
         }
         It "sends a message"  {
             Mock Send-MailMessage {}
-
             $mail = Send-Mailmessage @email
-
+            Assert-MockCalled -CommandName Send-MailMessage -Exactly 1
         }
 
-    }
-    Context "Logging Information" {
-
-        It "creates a log" -Skip{
-
-        }
     }
 
 }

@@ -21,7 +21,14 @@ Function New-PasswordNotification {
     Interval is used, and emails will be sent to people whose password expires in less than 21 days if the script is run, with 15, 10, 5, 2 or 1 days remaining untill password expires.
 
     #>
-    $today = Get-Date
+    [CmdletBinding()]
+    param(
+        # $smtpServer Enter Your SMTP Server Hostname or IP Address
+        [Parameter(Mandatory=$true,Position=0)]
+        [ValidateNotNull()]
+        [string]$smtpServer
+    )
+
     try{
         Import-Module ActiveDirectory -ErrorAction Stop
     }
@@ -30,9 +37,33 @@ Function New-PasswordNotification {
     }
     $defaultMaxPasswordAge = (Get-ADDefaultDomainPasswordPolicy -ErrorAction Stop).MaxPasswordAge.Days
     #{(Enabled -eq $true) -and (PasswordNeverExpires -eq $false)} #-properties Name, PasswordNeverExpires, PasswordExpired, PasswordLastSet, EmailAddress #| where { $_.passwordexpired -eq $false }
-    $users = get-aduser -filter {(Enabled -eq $true)} -properties Name, PasswordNeverExpires, PasswordExpired, PasswordLastSet, EmailAddress
+    $textEncoding = [System.Text.Encoding]::UTF8
+    $from = "tilt1@scalematrix.com"
+    $subject = "Your password will expire in 1 days"
+    $body = "<font face=""verdana"">
+Dear John Smith,
+<p>$subject<br>
+To change your password on a PC press CTRL ALT Delete and choose Change Password <br>
+<p> If you are using a MAC you can now change your password via Web Mail. <br>
+Login to <a href=""https://mail.domain.com/owa"">Web Mail</a> click on Options, then Change Password.
+<p> Don't forget to Update the password on your Mobile Devices as well!
+<p>Thanks, <br>
+</P>
+IT Support
+<a href=""mailto:support@domain.com""?Subject=Password Expiry Assistance"">support@domain.com</a> | 0123 456 78910
+</font>"
 
-    #Send-Mailmessage -smtpServer $smtpServer -from $from -to $emailaddress -subject $subject -body $body -bodyasHTML -priority High -Encoding $textEncoding -ErrorAction Stop
+    $users = get-aduser -filter {(Enabled -eq $true) -and (PasswordNeverExpires -eq $false)} -properties Name, PasswordNeverExpires, PasswordExpired, PasswordLastSet, EmailAddress
+    $users | ForEach-Object {
+        $userObj = New-Object System.Object
+
+        $userObj | Add-Member -Type NoteProperty -Name UserName -Value $_.SamAccountName
+        $userObj | Add-Member -Type NoteProperty -Name Name -Value $_.Name
+        $userObj | Add-Member -Type NoteProperty -Name Email -Value $_.EmailAddress
+        $userObj | Export-Csv "$env:USERPROFILE\Desktop\Log.csv" -Encoding "UTF8" -Append
+        Send-Mailmessage -smtpServer $smtpServer -from $from -to $from -subject $subject -body $body -bodyasHTML -priority High -Encoding $textEncoding -ErrorAction Stop
+    }
+
     <#
     param(
         # $smtpServer Enter Your SMTP Server Hostname or IP Address
@@ -323,3 +354,5 @@ Function New-PasswordNotification {
     # End
     #>
 }
+
+New-PasswordNotification -smtpServer "mail.scalematrix.com"

@@ -1,5 +1,5 @@
 Import-Module "$env:git\DevOps\DevOps\Functions\New-PasswordNotification.ps1" -Force -ErrorAction Stop
-Describe "New-PasswordNotification" -Tag "UNIT"{
+Describe "New-PasswordNotification" -Tag "Password"{
 
     $textEncoding = [System.Text.Encoding]::UTF8
     $demouser = @{

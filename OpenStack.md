@@ -11,3 +11,13 @@
 - [ ] Install updates on images  
 - [ ] And running a script to pull/checkout ISO  and push new updates to cloud quickly  
 - [ ] Move VM from one BU/Project to another  
+
+# Clients  
+- Spin up ISO  
+- Install/put in devops/git things  
+- run the DSC  
+- Remote into the VM from scratch  
+
+# Integrations  
+- [ ] Connecting Openstack and the quoting tool online  
+

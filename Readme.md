@@ -12,6 +12,7 @@ Authored by mwtilton
 
 1.3.0  
 [ ] Working on remoting changes and preparing for remote configuration testing  
+[ ] Make powershell profile.ps1  
 
 1.3.1  
 [ ] configure DSC for remote node usage  

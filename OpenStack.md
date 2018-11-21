@@ -12,6 +12,10 @@
 - [ ] And running a script to pull/checkout ISO  and push new updates to cloud quickly  
 - [ ] Move VM from one BU/Project to another  
 
+## Fedora Tutorial  
+https://docs.openstack.org/image-guide/fedora-image.html
+
+
 # Clients  
 - Spin up ISO  
 - Install/put in devops/git things  

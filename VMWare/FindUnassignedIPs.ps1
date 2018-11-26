@@ -43,9 +43,9 @@ $ticker = 0
 #otherwise it would just run for the first one
 While ($ticker -lt $IPRangeCount)
 {
-$ticker = $ticker + 1
-$IPRangeOutput = $IPRangeOutput += Write-Output $($IPRangeStart[$Split3+$SplitAdd]..$IPRangeEnd[$Split3+$SplitAdd] | % {"$($IPRangeStart[$Split0+$SplitAdd]).$($IPRangeStart[$Split1+$SplitAdd]).$($IPRangeStart[$Split2+$SplitAdd]).$_"})
-$SplitAdd = $SplitAdd + 4
+    $ticker = $ticker + 1
+    $IPRangeOutput = $IPRangeOutput += Write-Output $($IPRangeStart[$Split3+$SplitAdd]..$IPRangeEnd[$Split3+$SplitAdd] | % {"$($IPRangeStart[$Split0+$SplitAdd]).$($IPRangeStart[$Split1+$SplitAdd]).$($IPRangeStart[$Split2+$SplitAdd]).$_"})
+    $SplitAdd = $SplitAdd + 4
 }
 
 #Reset ticker and splitadd variables
@@ -55,9 +55,9 @@ $SplitAdd = 0
 #Does same as above loop
 While ($ticker -lt $SubAllocatedCount)
 {
-$ticker = $ticker + 1
-$SubAllocatedIPOutput = $SubAllocatedIPOutput += Write-Output $($SubAllocatedStart[$Split3+$SplitAdd]..$SubAllocatedEnd[$Split3+$SplitAdd] | % {"$($SubAllocatedStart[$Split0+$SplitAdd]).$($SubAllocatedStart[$Split1+$SplitAdd]).$($SubAllocatedStart[$Split2+$SplitAdd]).$_"})
-$SplitAdd = $SplitAdd + 4
+    $ticker = $ticker + 1
+    $SubAllocatedIPOutput = $SubAllocatedIPOutput += Write-Output $($SubAllocatedStart[$Split3+$SplitAdd]..$SubAllocatedEnd[$Split3+$SplitAdd] | % {"$($SubAllocatedStart[$Split0+$SplitAdd]).$($SubAllocatedStart[$Split1+$SplitAdd]).$($SubAllocatedStart[$Split2+$SplitAdd]).$_"})
+    $SplitAdd = $SplitAdd + 4
 }
 
 #Add suballocated IP list to allocated IP list, giving you the total allocated IPs
@@ -65,5 +65,5 @@ $TotalAllocatedIPs = ($SubAllocatedIPOutput += $AllocatedIPs) | sort -Unique
 
 #Compares the total IP list with the allocated IP list and gives you the un-allocated IPs
 $UniqueIPs = Compare-Object $IPRangeOutput $TotalAllocatedIPs | ? {$_.SideIndicator -match "<="}
-($UniqueIPs | sort InputObject | select InputObject) | Out-File C:\temp\AvailableIPs.txt
-C:\temp\AvailableIPs.txt
+($UniqueIPs | sort InputObject | select InputObject) | Out-File $env:TEMP\AvailableIPs.txt
+# C:\temp\AvailableIPs.txt

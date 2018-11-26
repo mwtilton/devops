@@ -7,20 +7,20 @@ param([bool]$promptForCEIP = $false)
 
 # List of modules to be loaded
 $moduleList = @(
-    "VMware.VimAutomation.Core",
-    "VMware.VimAutomation.Vds",
-    "VMware.VimAutomation.Cloud",
-    "VMware.VimAutomation.PCloud",
-    "VMware.VimAutomation.Cis.Core",
-    "VMware.VimAutomation.Storage",
-    "VMware.VimAutomation.HorizonView",
-    "VMware.VimAutomation.HA",
-    "VMware.VimAutomation.vROps",
-    "VMware.VumAutomation",
-    "VMware.DeployAutomation",
-    "VMware.ImageBuilder",
-    "VMware.VimAutomation.License"
-    )
+      "VMware.VimAutomation.Core",
+      "VMware.VimAutomation.Vds",
+      "VMware.VimAutomation.Cloud",
+      "VMware.VimAutomation.PCloud",
+      "VMware.VimAutomation.Cis.Core",
+      "VMware.VimAutomation.Storage",
+      "VMware.VimAutomation.HorizonView",
+      "VMware.VimAutomation.HA",
+      "VMware.VimAutomation.vROps",
+      "VMware.VumAutomation",
+      "VMware.DeployAutomation",
+      "VMware.ImageBuilder",
+      "VMware.VimAutomation.License"
+   )
 
 $productName = "PowerCLI"
 $productShortName = "PowerCLI"
@@ -40,26 +40,26 @@ function ReportFinishedActivity() {
    $script:completedActivities++
    $script:percentComplete = (100.0 / $totalActivities) * $script:completedActivities
    $script:percentComplete = [Math]::Min(99, $percentComplete)
-   
+
    Write-Progress -Activity $loadingActivity -CurrentOperation $script:currentActivity -PercentComplete $script:percentComplete
 }
 
 # Load modules
 function LoadModules(){
    ReportStartOfActivity "Searching for $productShortName module components..."
-   
+
    $loaded = Get-Module -Name $moduleList -ErrorAction Ignore | % {$_.Name}
    $registered = Get-Module -Name $moduleList -ListAvailable -ErrorAction Ignore | % {$_.Name}
    $notLoaded = $registered | ? {$loaded -notcontains $_}
-   
+
    ReportFinishedActivity
-   
+
    foreach ($module in $registered) {
       if ($loaded -notcontains $module) {
 		 ReportStartOfActivity "Loading module $module"
-         
+
 		 Import-Module $module
-		 
+
 		 ReportFinishedActivity
       }
    }
@@ -79,7 +79,7 @@ write-host "Connect-VIServer" -foregroundcolor yellow
 write-host "To find out what commands are available, type:       " -NoNewLine
 write-host "Get-VICommand" -foregroundcolor yellow
 write-host "To show searchable help for all PowerCLI commands:   " -NoNewLine
-write-host "Get-PowerCLIHelp" -foregroundcolor yellow  
+write-host "Get-PowerCLIHelp" -foregroundcolor yellow
 write-host "Once you've connected, display all virtual machines: " -NoNewLine
 write-host "Get-VM" -foregroundcolor yellow
 write-host "If you need more help, visit the PowerCLI community: " -NoNewLine
@@ -115,7 +115,7 @@ Try	{
 			(New-Object -TypeName "System.Management.Automation.Host.ChoiceDescription" -ArgumentList "&Leave","Don't participate")
 		)
 		$userChoiceIndex = $Host.UI.PromptForChoice($caption, $message, $choices, 0)
-		
+
 		$participate = $choices[$userChoiceIndex].Label -eq $acceptLabel
 
 		if ($participate) {

@@ -7,20 +7,20 @@ param([bool]$promptForCEIP = $false)
 
 # List of modules to be loaded
 $moduleList = @(
-      "VMware.VimAutomation.Core",
-      "VMware.VimAutomation.Vds",
-      "VMware.VimAutomation.Cloud",
-      "VMware.VimAutomation.PCloud",
-      "VMware.VimAutomation.Cis.Core",
-      "VMware.VimAutomation.Storage",
-      "VMware.VimAutomation.HorizonView",
-      "VMware.VimAutomation.HA",
-      "VMware.VimAutomation.vROps",
-      "VMware.VumAutomation",
-      "VMware.DeployAutomation",
-      "VMware.ImageBuilder",
-      "VMware.VimAutomation.License"
-   )
+   "VMware.VimAutomation.Core",
+   "VMware.VimAutomation.Vds",
+   "VMware.VimAutomation.Cloud",
+   "VMware.VimAutomation.PCloud",
+   "VMware.VimAutomation.Cis.Core",
+   "VMware.VimAutomation.Storage",
+   "VMware.VimAutomation.HorizonView",
+   "VMware.VimAutomation.HA",
+   "VMware.VimAutomation.vROps",
+   "VMware.VumAutomation",
+   "VMware.DeployAutomation",
+   "VMware.ImageBuilder",
+   "VMware.VimAutomation.License"
+)
 
 $productName = "PowerCLI"
 $productShortName = "PowerCLI"
@@ -58,7 +58,7 @@ function LoadModules(){
       if ($loaded -notcontains $module) {
 		 ReportStartOfActivity "Loading module $module"
 
-		 Import-Module $module
+		 Import-Module $module -Verbose
 
 		 ReportFinishedActivity
       }

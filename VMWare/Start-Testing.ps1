@@ -5,8 +5,14 @@ Get-Folder -Server $server -Name Folder
 
 Get-ExternalNetwork | Select Name | ft
 Get-Folder -Name Folder
+
+Get-PowerCLIConfiguration
+Get-PowerCLIVersion
+
+$global:defaultviserver
 #>
 
+$global:defaultviserver
 
 $PWord = ConvertTo-SecureString -String $vmware.password -AsPlainText -Force
 $Credential = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $vmware.UserName, $PWord
@@ -17,4 +23,6 @@ Connect-viServer -server $vmware.server -Credential $Credential
 [math]::Round(((get-vm | Where-object{$_.PowerState -eq "PoweredOn" }).UsedSpaceGB | measure-Object -Sum).Sum)
 [math]::Round(((get-vm | where-object{$_.PowerState -eq "PoweredOn" }).MemoryGB | Measure-Object -Sum).Sum ,0)
 
-Disconnect-CiServer -Server $vmware.server
+Disconnect-CiServer * -Confirm:$false -Force
+
+$global:defaultviserver

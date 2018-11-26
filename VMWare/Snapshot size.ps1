@@ -1,0 +1,1 @@
+﻿get-vm EBS-* | Get-Snapshot | select vm, created, sizemb | Export-Csv "c:\users\public\documents\audit.csv" -NoTypeInformation

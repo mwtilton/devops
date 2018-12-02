@@ -1,8 +1,7 @@
-#!/bin/bash
 git config --global --unset-all alias
 git config --global --unset-all core
 
-﻿git config --global user.name ""
+git config --global user.name ""
 git config --global user.email ""
 
 git config --global alias.last "log -1 HEAD"

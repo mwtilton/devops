@@ -47,6 +47,23 @@ add-type @"
 
 #>
 
-Get-Command
-Get-Help
-Get-Member
+#Get-Command
+get-command -CommandType Function
+get-command -CommandType Function -name Get-*
+
+#Firewall
+get-command -name *firewall*
+get-command -name *netfirewallrule
+
+#Get-Help
+get-help set-netfirewallrule
+get-help set-netfirewallrule -examples
+help Set-NetFirewallRule -Full
+Help set-netfirewallrule -Parameter RemoteAddress
+
+#Get-Member
+get-service | Get-Member
+(Get-Service | Get-Member | Where-Object -Property Membertype -EQ Property).count
+Get-Service | Get-Member | Where-Object -Property Membertype -EQ Property
+get-service | format-table -Property Name,Status,ServicesDependedOn
+

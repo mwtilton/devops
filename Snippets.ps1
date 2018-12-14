@@ -38,3 +38,15 @@ add-type @"
     }
 "@
 [System.Net.ServicePointManager]::CertificatePolicy = New-Object TrustAllCertsPolicy
+
+
+<#
+
+    https://techcommunity.microsoft.com/t5/ITOps-Talk-Blog/PowerShell-Basics-Finding-Your-Way-in-the-PowerShell-Console/ba-p/300935
+    PowerShell Basics: Finding Your Way in the PowerShell Console
+
+#>
+
+Get-Command
+Get-Help
+Get-Member

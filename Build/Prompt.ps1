@@ -1,3 +1,4 @@
+Import-Module posh-git -Force
 function prompt {
 
     $up = 0x25b2 -as [char]
@@ -42,8 +43,8 @@ function prompt {
         [void]$psCmd.BeginInvoke()
 
     } #catch
-    Write-Host "[" -NoNewline
-    Write-Host $(Get-date).ToString("HH:mm:ss") -ForegroundColor DarkGreen -NoNewline
+    Write-Host "[ " -NoNewline
+    Write-Host $(Get-date).ToString("HH:mm:ss")" " -ForegroundColor DarkGreen -NoNewline
     $global:testHash.results.foreach( {
             Write-Host $_.HostComputer -NoNewline
             if ($_.responding) {
@@ -56,5 +57,7 @@ function prompt {
 
     Write-Host "] " -ForegroundColor DarkGray -NoNewline
 
-    "$($executionContext.SessionState.Path.CurrentLocation)$('>' * ($nestedPromptLevel + 1)) "
+    $GitPromptSettings.DefaultPromptSuffix = "> "
+    $prompt = & $GitPromptScriptBlock
+    "$prompt"
 }

@@ -67,3 +67,24 @@ get-service | Get-Member
 Get-Service | Get-Member | Where-Object -Property Membertype -EQ Property
 get-service | format-table -Property Name,Status,ServicesDependedOn
 
+Get-Variable
+
+#Prompt Information
+(Get-Command prompt).definition
+(Get-Command Prompt).ScriptBlock
+
+#RawUI settings
+$(Get-Host).UI.RawUI
+
+#Check if you are in a nested powershell session
+$NestedPromptLevel
+
+#get running history of commands used
+Get-History
+
+#Making a new profile
+if (!(Test-Path -Path $profile)) {New-Item -ItemType File -Path $profile -Force}
+
+#profile information
+$PROFILE | select *
+

@@ -20,12 +20,12 @@ function prompt {
 
         $pscmd = [PowerShell]::Create().AddScript( {
                 #define the list of computers to test
-                $computers = "SRV1","SRV2"
+                $computers = "$env:computername",""
 
                 do {
                     $results = $computers | ForEach-Object {
                         [pscustomobject]@{
-                            Computername = $_.toupper()
+                            HostComputer = $_.toupper()
                             Responding   = Test-WSMan -ComputerName $_
                         }
                     }
@@ -43,9 +43,9 @@ function prompt {
 
     } #catch
     Write-Host "[" -NoNewline
-
+    Write-Host $(Get-date).ToString("HH:mm:ss") -ForegroundColor DarkGreen -NoNewline
     $global:testHash.results.foreach( {
-            Write-Host $_.Computername -NoNewline
+            Write-Host $_.HostComputer -NoNewline
             if ($_.responding) {
                 Write-Host $up -ForegroundColor green -NoNewline
             }
@@ -56,6 +56,5 @@ function prompt {
 
     Write-Host "] " -ForegroundColor DarkGray -NoNewline
 
-    Write-Host "PS $($executionContext.SessionState.Path.CurrentLocation)$('>' * ($nestedPromptLevel + 1))"
-
+    "$($executionContext.SessionState.Path.CurrentLocation)$('>' * ($nestedPromptLevel + 1)) "
 }

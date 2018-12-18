@@ -8,7 +8,7 @@ function prompt {
     }
     catch {
          #create the runspace and synchronized hashtable
-        $global:testHash = [hashtable]::Synchronized(@{Computername = $env:computername;results = ""; date= (Get-Date)})
+        $global:testHash = [hashtable]::Synchronized(@{HostComputer = $env:computername;results = ""; date= (Get-Date)})
         $newRunspace = [runspacefactory]::CreateRunspace()
         #set apartment state if available
         if ($newRunspace.ApartmentState) {
@@ -20,7 +20,7 @@ function prompt {
 
         $pscmd = [PowerShell]::Create().AddScript( {
                 #define the list of computers to test
-                $computers = "SRV1"
+                $computers = "SRV1","SRV2"
 
                 do {
                     $results = $computers | ForEach-Object {
@@ -54,8 +54,8 @@ function prompt {
             }
         })
 
-    Write-Host "]" -NoNewline
+    Write-Host "] " -ForegroundColor DarkGray -NoNewline
 
-    "PS $($executionContext.SessionState.Path.CurrentLocation)$('>' * ($nestedPromptLevel + 1)) "
+    Write-Host "PS $($executionContext.SessionState.Path.CurrentLocation)$('>' * ($nestedPromptLevel + 1))"
 
 }

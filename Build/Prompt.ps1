@@ -1,4 +1,5 @@
 Import-Module posh-git -Force
+
 function prompt {
 
     $up = 0x25b2 -as [char]
@@ -21,13 +22,13 @@ function prompt {
 
         $pscmd = [PowerShell]::Create().AddScript( {
                 #define the list of computers to test
-                $computers = "$env:computername",""
+                $computers = "srv1","srv2"
 
                 do {
                     $results = $computers | ForEach-Object {
                         [pscustomobject]@{
                             HostComputer = $_.toupper()
-                            Responding   = Test-WSMan -ComputerName $_
+                            Responding   = Test-Connection -ComputerName $_ -Count 1 -quiet
                         }
                     }
 

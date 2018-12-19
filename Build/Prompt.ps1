@@ -44,19 +44,25 @@ function prompt {
         [void]$psCmd.BeginInvoke()
 
     } #catch
-    Write-Host "[ " -NoNewline
-    Write-Host $(Get-date).ToString("HH:mm:ss")" " -ForegroundColor DarkGreen -NoNewline
+    Write-Host "[ "
+    Write-Host "  "$(Get-date).ToString("HH:mm:ss") -ForegroundColor Magenta
     $global:testHash.results.foreach( {
-            Write-Host $_.HostComputer -NoNewline
             if ($_.responding) {
-                Write-Host $up -ForegroundColor green -NoNewline
+                Write-Host "  [" -ForegroundColor DarkGreen -NoNewline
+                Write-Host "$up" -ForegroundColor Green -NoNewline
+                Write-Host "] " -ForegroundColor DarkGreen -NoNewline
+                Write-Host $_.HostComputer -ForegroundColor White
             }
             else {
-                Write-Host $down -ForegroundColor red -NoNewline
+                Write-Host "    [" -ForegroundColor DarkRed -NoNewline
+                Write-host $down -ForegroundColor red -NoNewline
+                Write-Host "] " -ForegroundColor DarkRed -NoNewline
+                Write-Host $_.HostComputer -ForegroundColor Red
             }
+
         })
 
-    Write-Host "] " -ForegroundColor DarkGray -NoNewline
+    Write-Host "] " -ForegroundColor DarkGray
 
     $GitPromptSettings.DefaultPromptSuffix = "> "
     $prompt = & $GitPromptScriptBlock

@@ -88,3 +88,5 @@ if (!(Test-Path -Path $profile)) {New-Item -ItemType File -Path $profile -Force}
 #profile information
 $PROFILE | select *
 
+#Git
+git checkout --track origin/<branch_name>

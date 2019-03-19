@@ -1,70 +1,74 @@
-Import-Module posh-git -Force
+$PSDefaultParameterValues=@{'Write-host:BackGroundColor'='Black';'Write-host:ForeGroundColor'='White'}
+#requires -Version 2.0
 
-function prompt {
+Import-Module ActiveDirectory -Force
+Import-Module Posh-Git -Force
+Import-module "$env:ONEDRIVE\Scripts\UCSD\UCSD.psm1" -force
 
-    $up = 0x25b2 -as [char]
-    $down = 0x25bc -as [char]
+$psversiontable.PSVersion
 
-    Try {
-        Get-Variable -Name testHash -Scope global -ErrorAction Stop | Out-Null
+#$TotalRAM = (systeminfo | Select-String 'Total Physical Memory:').ToString().Split(':')[1].Trim()
+$TotalRAM = ((Get-WmiObject Win32_PhysicalMemory | Measure-Object -Property Capacity -Sum).sum/1024/1024/1024)
+
+Function Prompt {
+    Write-Host "[" -ForegroundColor DarkGray -NoNewline
+    Write-Host $(Get-date).ToString("HH:mm:ss") -ForegroundColor Magenta -nonewline
+    Write-Host "] " -ForegroundColor DarkGray -nonewline
+
+    $procAVG = $(get-process | select @{name="CPU(s)";Expression="CPU"} | Measure-Object -property "CPU(s)" -Sum | select sum).sum
+    $procAVGFormat = [math]::Round($procAVG, 2)
+    Write-Host "RAM: " -ForegroundColor yellow -nonewline
+    Write-Host "$procAVGFormat" -ForegroundColor Gray -nonewline
+    Write-Host "/" -ForegroundColor Magenta -nonewline
+    Write-Host "$TotalRAM " -ForegroundColor DarkGray -nonewline
+
+    $user = [Security.Principal.WindowsIdentity]::GetCurrent()
+    if ( (New-Object Security.Principal.WindowsPrincipal $user).IsInRole([Security.Principal.WindowsBuiltinRole]::Administrator)) {
+        $adminfg = "Red"
     }
-    catch {
-         #create the runspace and synchronized hashtable
-        $global:testHash = [hashtable]::Synchronized(@{HostComputer = $env:computername;results = ""; date= (Get-Date)})
-        $newRunspace = [runspacefactory]::CreateRunspace()
-        #set apartment state if available
-        if ($newRunspace.ApartmentState) {
-            $newRunspace.ApartmentState = "STA"
-        }
-        $newRunspace.ThreadOptions = "ReuseThread"
-        $newRunspace.Open()
-        $newRunspace.SessionStateProxy.SetVariable("testHash", $testHash)
+    else {
+        $adminfg = $host.ui.rawui.ForegroundColor
+    }
 
-        $pscmd = [PowerShell]::Create().AddScript( {
-                #define the list of computers to test
-                $computers = "srv1","srv2"
+    Switch ((get-location).provider.name) {
+        "FileSystem" { $fg = "green"}
+        "Registry" { $fg = "magenta"}
+        "wsman" { $fg = "cyan"}
+        "Environment" { $fg = "yellow"}
+        "Certificate" { $fg = "darkcyan"}
+        "Function" { $fg = "gray"}
+        "alias" { $fg = "darkgray"}
+        "variable" { $fg = "darkgreen"}
+        Default { $fg = $host.ui.rawui.ForegroundColor}
+    }
 
-                do {
-                    $results = $computers | ForEach-Object {
-                        [pscustomobject]@{
-                            HostComputer = $_.toupper()
-                            Responding   = Test-Connection -ComputerName $_ -Count 1 -quiet
-                        }
-                    }
-
-                    $global:testHash.results = $results
-                    $global:testHash.date = Get-Date
-                    #set a sleep interval between tests
-                    Start-Sleep -Seconds 5
-                } while ($True)
-
-            })
-
-        $pscmd.runspace = $newrunspace
-        [void]$psCmd.BeginInvoke()
-
-    } #catch
-    Write-Host "[ "
-    Write-Host "  "$(Get-date).ToString("HH:mm:ss") -ForegroundColor Magenta
-    $global:testHash.results.foreach( {
-            if ($_.responding) {
-                Write-Host "  [" -ForegroundColor DarkGreen -NoNewline
-                Write-Host "$up" -ForegroundColor Green -NoNewline
-                Write-Host "] " -ForegroundColor DarkGreen -NoNewline
-                Write-Host $_.HostComputer -ForegroundColor White
-            }
-            else {
-                Write-Host "    [" -ForegroundColor DarkRed -NoNewline
-                Write-host $down -ForegroundColor red -NoNewline
-                Write-Host "] " -ForegroundColor DarkRed -NoNewline
-                Write-Host $_.HostComputer -ForegroundColor Red
-            }
-
-        })
-
-    Write-Host "] " -ForegroundColor DarkGray
-
-    $GitPromptSettings.DefaultPromptSuffix = "> "
+    #Write-Host "[$((Get-Date).timeofday.tostring().substring(0,8))] " -NoNewline
+    Write-Host "PS " -nonewline -ForegroundColor $adminfg
+    #$GitPromptSettings.DefaultPromptPrefix = '[$(hostname)] '
+    #$GitPromptSettings.DefaultPromptPath = "$env:ONEDRIVE\Scripts\UCSD"
+    $GitPromptSettings.DefaultPromptAbbreviateHomeDirectory = $true
+    #$GitPromptSettings.DefaultPromptPath.ForegroundColor = 'Orange'
+    #$GitPromptSettings.DefaultPromptPath.ForegroundColor = "orange"#$fg
+    #$GitPromptSettings.DefaultPromptBeforeSuffix.ForegroundColor = $fg
+    $GitPromptSettings.DefaultPromptSuffix = ' $((Get-History -Count 1).id + 1)$(" >" * ($nestedPromptLevel + 1)) '
+    #$GitPromptSettings.DefaultPromptWriteStatusFirst = $true
     $prompt = & $GitPromptScriptBlock
     "$prompt"
+    #Write-Output "' $((Get-History -Count 1).id + 1)$(">" * ($nestedPromptLevel + 1)) "
+}
+
+Set-Location "$env:ONEDRIVE\Scripts\UCSD"
+
+
+Register-EngineEvent PowerShell.Exiting -Action {
+
+Write-Host "  [>] " -NoNewline
+Write-Host " Finishing post processing"
+
+Write-Host "    [+] " -NoNewline
+Write-Host " Removing pssessions"
+
+Get-PSSession | Remove-PSSession
+
+sleep 2
 }

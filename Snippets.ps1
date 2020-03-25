@@ -90,3 +90,71 @@ $PROFILE | select *
 
 #Git
 git checkout --track origin/<branch_name>
+
+# Connection to mysql database from dataset
+import dataset
+from CreatePointsDatabase import create_points_database
+
+db = dataset.connect('mssql+pymssql://mssql+pymssql://user:password@server:port/database')
+
+
+# Sending Email
+#Enter in Log ID information
+$id = ''
+
+#Enter in Log Name. You can use the Asterisk(*) symbol for wildcards
+$Logname = "Application"
+$event = Get-EventLog -LogName $Logname -InstanceId $id -Newest 1
+
+#Check Event log for error
+if ($event.EntryType -eq "Error")
+{
+    #region Variables and Arguments
+    $date = Get-Date -Format MM/dd/yy
+    $users = "Josh@Justic.net" # List of users to email your report to (separate by comma)
+    $fromemail = "USERNAME@gmail.com"
+    $SMTPServer = "smtp.gmail.com"
+    $SMTPPort = "587"
+    $SMTPUser = "USERNAME@gmail.com"
+    $SMTPPassword = "PASSWORD"
+    $ComputerName = gc env:computername
+    $EmailSubject = "COMPUTERNAME - New Event Log [Application] $date"
+    $MailSubject = $MailSubject -replace('COMPUTERNAME', $ComputerName)
+    $Credentials = New-Object System.Management.Automation.PSCredential -ArgumentList $SMTPUser, $($SMTPPassword | ConvertTo-SecureString -AsPlainText -Force) 
+    $EnableSSL = $true
+    $ListOfAttachments = @()
+    $Report = @()
+    $CurrentTime = Get-Date
+    $PCName = $env:COMPUTERNAME
+    $EmailBody = $event | ConvertToHtml > elog.htm
+    $getHTML = Get-Content "elog.htm"
+    #sending email
+    send-mailmessage -from $fromemail -to $users -subject $EmailSubject -BodyAsHTML -body $getHTML -priority Normal -SmtpServer $SMTPServer -port $SMTPPort -UseSsl -Credential $Credentials
+    Remove-Item elog.htm
+}
+else
+{
+    write-host "No error found"
+    write-host "Here is the log entry that was inspected: $event"
+}
+
+# Moving from one repo to another
+1. Check out the existing repository from Bitbucket:
+$ git clone https://USER@bitbucket.org/USER/PROJECT.git
+
+2. Add the new Github repository as upstream remote of the repository checked out from Bitbucket:
+
+$ cd PROJECT
+$ git remote add upstream https://github.com:USER/PROJECT.git
+
+3. Checkout and track any extra branches you want to push to the new repo
+$ git checkout --track origin/dev
+
+4. Push all branches (below: just master) and tags to the Github repository:
+
+$ git push upstream master
+$ git push --tags upstream
+
+# PS ModulePath
+Import-Module '$($env:PSModulePath).Split(;)[1]\UCSD' -Force -ErrorAction Stop;
+

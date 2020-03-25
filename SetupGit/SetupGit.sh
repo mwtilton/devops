@@ -1,4 +1,4 @@
-﻿# error: key does not contain a section: alias
+# error: key does not contain a section: alias
 #git config --global --unset-all alias
 #git config --global --unset-all core
 

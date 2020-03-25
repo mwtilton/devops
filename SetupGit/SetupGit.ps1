@@ -10,7 +10,7 @@
     $email = Read-Host "User Email"
     git config --global user.email "$email"
 
-
+    git config --global core.autocrlf true
     git config --global alias.last "log -1 HEAD"
     git config --global alias.psu "push --set-upstream"
     git config --global alias.NUKE "reset --hard HEAD"

@@ -158,3 +158,5 @@ $ git push --tags upstream
 # PS ModulePath
 Import-Module '$($env:PSModulePath).Split(;)[1]\UCSD' -Force -ErrorAction Stop;
 
+# .lnk file to run ps script
+C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe -executinpolicy unrestricted -file "F:\ipconfig.ps1"

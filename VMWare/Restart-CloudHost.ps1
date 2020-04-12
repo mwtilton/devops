@@ -1,1 +1,0 @@
-﻿restart-vmhost 10.20.2.17 -confirm:$false

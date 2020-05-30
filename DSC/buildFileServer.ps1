@@ -156,7 +156,7 @@ $ConfigData = @{
                     IPAddressCIDR = "192.168.1.7/24"
                     GatewayAddress = "192.168.1.1"
                     DNSAddress = "192.168.1.6"
-Â Â Â Â Â Â Â Â Â Â Â Â         DomainName = "democloud.local"
+                    DomainName = "democloud.local"
                     PSDscAllowPlainTextPassword = $true
                     PSDscAllowDomainUser = $true
                 }
@@ -175,7 +175,7 @@ $ConfigData = @{
                     IPAddressCIDR = "192.168.1.7/24"
                     GatewayAddress = "192.168.1.1"
                     DNSAddress = "192.168.1.6"
-Â Â Â Â Â Â Â Â Â Â Â Â         DomainName = "democloud.local"
+                    DomainName = "democloud.local"
                     PSDscAllowPlainTextPassword = $true
                     PSDscAllowDomainUser = $true
                 }
